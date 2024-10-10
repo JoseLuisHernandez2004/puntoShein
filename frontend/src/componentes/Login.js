@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const Login = () => {
+const Login = ({ setView }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -43,6 +43,11 @@ const Login = () => {
             Login
           </button>
         </form>
+        <div className="mt-4 text-center">
+          
+          <button onClick={() => setView('forgotPassword')} className="text-blue-500">Olvidé mi contraseña</button> <br/>
+          <button onClick={() => setView('register')} className="text-blue-500">Crear cuenta</button><br />
+        </div>
       </div>
     </div>
   );
