@@ -8,12 +8,12 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (password !== confirmPassword) {
       setError('Las contraseñas no coinciden.');
       return;
     }
-
+  
     try {
       const response = await fetch('http://localhost:3000/users/register', {
         method: 'POST',
@@ -22,19 +22,20 @@ const Register = () => {
         },
         body: JSON.stringify({ email, password }),
       });
-
+  
       if (response.ok) {
         console.log('Usuario registrado');
+        setError(''); // Limpiar el mensaje de error
       } else {
-        const errorData = await response.json(); // Asegúrate de obtener la respuesta del error
-        console.error('Error al registrar el usuario:', errorData);
-        setError('Error al registrar el usuario'); // Usa el mensaje de error que desees
+        const errorData = await response.json(); // Obteniendo el mensaje de error del backend
+        setError(errorData.message || 'Error al registrar el usuario');
       }
     } catch (error) {
       setError('Error al conectar con el servidor');
       console.error('Error:', error);
     }
   };
+  
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const Login = ({ setView }) => {
+const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -14,7 +16,7 @@ const Login = ({ setView }) => {
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">
       <div className="bg-white p-8 rounded shadow-md w-96">
-        <h2 className="text-center text-2xl font-bold mb-6">Login</h2>
+        <h2 className="text-center text-2xl font-bold mb-6">Inicio de Sesión</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700">Email</label>
@@ -27,7 +29,7 @@ const Login = ({ setView }) => {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Password</label>
+            <label className="block text-sm font-medium text-gray-700">Contraseña</label>
             <input
               type="password"
               required
@@ -40,13 +42,14 @@ const Login = ({ setView }) => {
             type="submit"
             className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
           >
-            Login
+            Iniciar Sesión
           </button>
         </form>
         <div className="mt-4 text-center">
-          
-          <button onClick={() => setView('forgotPassword')} className="text-blue-500">Olvidé mi contraseña</button> <br/>
-          <button onClick={() => setView('register')} className="text-blue-500">Crear cuenta</button><br />
+          {/* Enlace para la recuperación de contraseña */}
+          <button onClick={() => navigate('/forgot-password')} className="text-blue-500">Olvidé mi contraseña</button> <br/>
+          {/* Enlace para crear una nueva cuenta */}
+          <button onClick={() => navigate('/register')} className="text-blue-500">Crear cuenta</button><br />
         </div>
       </div>
     </div>
