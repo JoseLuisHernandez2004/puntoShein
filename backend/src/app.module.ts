@@ -2,10 +2,12 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { UserModule } from './users/user.module'; // Asegúrate de importar tu módulo de usuarios
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb+srv://luis2004hdez:P55LiaCTmaeL4qDj@cluster0.exewy.mongodb.net/puntoShein'),
+    MongooseModule.forRoot(process.env.MONGODB_URI),
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
