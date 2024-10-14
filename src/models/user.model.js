@@ -1,7 +1,7 @@
 import mongoose from "mongoose";    
 
 //Esquema de la base de datos de REGISTRO
-const userSchema = mongoose.Schema({
+const userSchema = new mongoose.Schema({
 
 
     username: {
@@ -19,7 +19,8 @@ const userSchema = mongoose.Schema({
         type: String,
         required: true,
     }
-}
-)
+},{
+    timestamps:true
+})
 
-export default mongoose.model('user', userSchema)
+export default mongoose.model('user', userSchema) 
