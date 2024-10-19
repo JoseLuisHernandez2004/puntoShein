@@ -61,13 +61,17 @@ const RegisterForm = ({ verifiedEmail }) => {
   const handleChange = async (e) => {
     const { name, value } = e.target;
 
-    // Validar nombres y apellidos
+    // Validar nombres y apellidos, impidiendo la entrada de números
     if (['nombre', 'apellidoP', 'apellidoM'].includes(name)) {
-      if (!validateText(value)) {
+      const lettersOnlyValue = value.replace(/[^a-zA-ZÀ-ÿ\s]/g, '');
+
+      if (!validateText(lettersOnlyValue)) {
         setErrors((prevErrors) => ({ ...prevErrors, [name]: 'Solo se permiten letras y un máximo de 25 caracteres.' }));
       } else {
         setErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
       }
+      setFormData({ ...formData, [name]: lettersOnlyValue });
+      return;
     }
 
     // Validar teléfono y hacer la solicitud a la API de Abstract para validarlo
@@ -135,7 +139,7 @@ const RegisterForm = ({ verifiedEmail }) => {
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'Error al registrar usuario. Inténtalo de nuevo.',
+        text: `Error al registrar usuario: ${error.response?.data?.message || 'Inténtalo de nuevo.'}`,
       });
     }
   };
