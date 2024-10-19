@@ -4,7 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-     "dev": "nodemon src/index.js",  // Este es para desarrollo local
+
     "start": "node src/index.js"    // Este es para producción
   },
   "keywords": [],
