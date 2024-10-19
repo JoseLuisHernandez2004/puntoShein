@@ -5,16 +5,16 @@ import LoginForm from './componentes/LoginForm';
 import RegisterForm from './componentes/RegisterForm';
 import Logout from './componentes/Logout';
 import UserDashboard from './componentes/UserDashboard';
-import RecoverPassword from './componentes/RecoverPassword'; // Importar la nueva página
-
+import RecoverPassword from './componentes/RecoverPassword';
+import VerificarCorreo from './componentes/VerificarCorreo'; // Importa el nuevo componente
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [verifiedEmail, setVerifiedEmail] = useState(null); // Para almacenar el correo verificado
 
   return (
     <Router>
       <div>
-        {/* Navbar will be always rendered */}
         <nav className="w-full flex justify-between items-center bg-white p-6 shadow-md">
           <h1 className="text-3xl font-bold text-gray-800">Punto Shein</h1>
           <div className="flex space-x-6">
@@ -30,15 +30,13 @@ function App() {
           </div>
         </nav>
 
-        {/* Routing for different pages */}
         <Routes>
           <Route path="/" element={<Home isLoggedIn={isLoggedIn} />} />
           <Route path="/login" element={<LoginForm setIsLoggedIn={setIsLoggedIn} />} />
-          <Route path="/register" element={<RegisterForm />} />
+          <Route path="/register" element={verifiedEmail ? <RegisterForm verifiedEmail={verifiedEmail} /> : <VerificarCorreo onVerified={setVerifiedEmail} />} />
           <Route path="/logout" element={<Logout setIsLoggedIn={setIsLoggedIn} />} />
           <Route path="/profile" element={isLoggedIn ? <UserDashboard /> : <LoginForm setIsLoggedIn={setIsLoggedIn} />} />
-          <Route path="/recover-password" element={<RecoverPassword />} /> {/* Nueva ruta */}
-
+          <Route path="/recover-password" element={<RecoverPassword />} />
         </Routes>
       </div>
     </Router>

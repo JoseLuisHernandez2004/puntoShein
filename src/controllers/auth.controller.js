@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import {createAccessToken} from '../libs/jwt.js';
   
 export const register = async (req, res) => {
-    const {email, password, username} = req.body
+    const {email, password, username, nombre, apellidoM, apellidoP, telefono} = req.body
       /* Crear un nuebo usuario */
     try {
 
@@ -11,7 +11,11 @@ export const register = async (req, res) => {
 
       const newUser = new User({
         username, 
+        nombre,
+        apellidoP,
+        apellidoM,
         email,
+        telefono,
         password: passwordHash,
       });
 
@@ -20,7 +24,11 @@ export const register = async (req, res) => {
       res.cookie('token', token)
       res.json({
         id: userSaved.id,
+        nombre: userSaved.nombre,
+        apellidoP: userSaved.apellidoP,
+        apellidoM: userSaved.apellidoM,
         username: userSaved.username,
+        telefono: userSaved.telefono,
         email: userSaved.email,
         createdAt: userSaved.createdAt,
         updatedAt: userSaved.updatedAt,
@@ -50,7 +58,13 @@ export const login = async (req, res) => {
     res.json({
       id: userFound.id,
       username: userFound.username,
+
+      nombre: userFound.nombre,
+      apellidoP: userFound.apellidoP,
+      apellidoM: userFound.apellidoM,
+      telefono: userFound.telefono,
       email: userFound.email,
+
       createdAt: userFound.createdAt,
       updatedAt: userFound.updatedAt,
 
@@ -74,6 +88,10 @@ export const profile = async (req, res)=>{
   return res.json({
     id: userFound._id,
     username: userFound.username,
+    nombre: userFound.nombre,
+    apellidoP: userFound.apellidoP,
+    apellidoM: userFound.apellidoM,
+    telefono: userFound.telefono,
     email: userFound.email,
     createdAt: userFound.createdAt,
     updatedAt: userFound.updatedAt,
