@@ -11,7 +11,7 @@ const app = express();
 
 // Use CORS middleware
 app.use(cors({
-  origin: 'http://localhost:3000', // Your React app's URL
+  origin: ['http://localhost:3000', 'https://puntoshein.onrender.com'], // Your React app's URL
   credentials: true, // Allow credentials (cookies, headers)
 }));
 
