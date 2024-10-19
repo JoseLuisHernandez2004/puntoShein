@@ -9,7 +9,7 @@ const Logout = ({ setIsLoggedIn }) => {
   useEffect(() => {
     const performLogout = async () => {
       try {
-        await axios.post('http://localhost:4000/api/logout', {}, {
+        await axios.post('https://puntoshein.onrender.com/api/logout', {}, {
           withCredentials: true
         });
         localStorage.removeItem('authToken'); // Clear token

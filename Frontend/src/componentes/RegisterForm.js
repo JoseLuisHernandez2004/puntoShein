@@ -120,7 +120,7 @@ const RegisterForm = ({ verifiedEmail }) => {
     }
 
     try {
-      await axios.post('http://localhost:4000/api/register', formData, { withCredentials: true });
+      await axios.post('https://puntoshein.onrender.com/api/register', formData, { withCredentials: true });
       
       // Mostrar SweetAlert de éxito
       Swal.fire({
