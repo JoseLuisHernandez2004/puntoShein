@@ -27,7 +27,6 @@ const RegisterForm = ({ verifiedEmail }) => {
   const navigate = useNavigate();
 
   const validateText = (text) => /^[a-zA-ZÀ-ÿ\s]{1,25}$/.test(text);
-  const validatePhoneNumber = (telefono) => /^\d{10}$/.test(telefono);
 
   const validatePassword = (password) => {
     const length = password.length >= 8;
@@ -38,7 +37,28 @@ const RegisterForm = ({ verifiedEmail }) => {
     setPasswordStrength({ length, uppercase, lowercase, number, specialChar });
   };
 
-  const handleChange = (e) => {
+  const validatePhoneNumberWithAPI = async (telefono) => {
+    try {
+      // Asegúrate de que el número tenga el formato internacional con el código de país
+      const formattedPhone = telefono.startsWith('+') ? telefono : `+52${telefono}`; // Aquí +52 es para México
+      const response = await axios.get(
+        `https://phonevalidation.abstractapi.com/v1/?api_key=c95ef61fcc7b4a10a1ccbbef8feb7903&phone=${formattedPhone}`
+      );
+      if (response.data.valid) {
+        setErrors((prevErrors) => ({ ...prevErrors, telefono: '' })); // Teléfono válido
+        return true;
+      } else {
+        setErrors((prevErrors) => ({ ...prevErrors, telefono: 'Número de teléfono inválido según el país.' })); // Teléfono no válido
+        return false;
+      }
+    } catch (error) {
+      setErrors((prevErrors) => ({ ...prevErrors, telefono: 'Error al validar el número de teléfono.' }));
+      console.error('Error al validar el número de teléfono:', error);
+      return false;
+    }
+  };
+
+  const handleChange = async (e) => {
     const { name, value } = e.target;
 
     // Validar nombres y apellidos
@@ -50,13 +70,13 @@ const RegisterForm = ({ verifiedEmail }) => {
       }
     }
 
-    // Validar teléfono
+    // Validar teléfono y hacer la solicitud a la API de Abstract para validarlo
     if (name === 'telefono') {
-      const numericValue = value.replace(/[^0-9]/g, ''); // Reemplazar letras por nada
-      if (!validatePhoneNumber(numericValue)) {
-        setErrors((prevErrors) => ({ ...prevErrors, telefono: 'El número de teléfono debe tener 10 dígitos.' }));
+      const numericValue = value.replace(/[^0-9]/g, ''); // Eliminar caracteres no numéricos
+      if (numericValue.length === 10) {
+        await validatePhoneNumberWithAPI(numericValue);
       } else {
-        setErrors((prevErrors) => ({ ...prevErrors, telefono: '' }));
+        setErrors((prevErrors) => ({ ...prevErrors, telefono: 'El número de teléfono debe tener 10 dígitos.' }));
       }
       setFormData({ ...formData, [name]: numericValue });
       return;
@@ -79,11 +99,9 @@ const RegisterForm = ({ verifiedEmail }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validar número de teléfono
-    if (!validatePhoneNumber(formData.telefono)) {
-      setErrors((prevErrors) => ({ ...prevErrors, telefono: 'Número de teléfono inválido.' }));
-      return;
-    }
+    // Validar que el número de teléfono sea válido antes de continuar
+    const isPhoneValid = await validatePhoneNumberWithAPI(formData.telefono);
+    if (!isPhoneValid) return;
 
     // Validar que la contraseña sea fuerte
     if (!isPasswordStrong()) {
