@@ -7,3 +7,6 @@ app.listen(4000)
 console.log('Server en puerto', 4000)
 
 
+app.get('/', (req, res) => {
+    res.send('Bienvenido a Punto Shein');
+});
