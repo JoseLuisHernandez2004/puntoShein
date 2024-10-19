@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2'; 
 import axios from 'axios';
 
 const Logout = ({ setIsLoggedIn }) => {
@@ -14,6 +15,10 @@ const Logout = ({ setIsLoggedIn }) => {
         localStorage.removeItem('authToken'); // Clear token
         setIsLoggedIn(false); // Clear logged-in state
         navigate('/'); // Redirect to home
+        Swal.fire({
+          icon: 'success',
+          title: 'Cerrando Sesion',
+        });
       } catch (error) {
         console.error('Error logging out:', error);
       }
