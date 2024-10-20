@@ -41,14 +41,13 @@ const Home = ({ isLoggedIn }) => {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen flex flex-col items-center">
+    <div className="bg-gray-50 min-h-screen flex flex-col items-center">
       <main className="flex flex-col items-center justify-center flex-grow mt-16">
-        <h2 className="text-5xl font-bold text-gray-800 mt-32 mb-6">Punto Shein</h2>
+        <h2 className="text-5xl font-bold text-gray-800 mb-6">Punto Shein</h2>
         <p className="text-lg text-gray-600 mb-10 text-center">
           La mejor tienda de ropa y accesorios en línea. ¡Descubre la moda más reciente con nosotros!
         </p>
 
-        {/* Carousel */}
         <div className="w-full max-w-4xl">
           <Carousel responsive={responsive} infinite={true} autoPlay={true} autoPlaySpeed={3000} showDots={true}>
             {carouselItems.map((item, index) => (
@@ -64,105 +63,6 @@ const Home = ({ isLoggedIn }) => {
             ))}
           </Carousel>
         </div>
-
-        {/* Featured Categories */}
-        <section className="mt-12 w-full max-w-6xl text-center">
-          <h3 className="text-3xl font-bold text-gray-800 mb-6">Explora nuestras categorías</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-4 bg-white rounded-lg shadow-lg">
-              <img
-                src="https://via.placeholder.com/150"
-                alt="Ropa"
-                className="w-full h-40 object-cover mb-4"
-              />
-              <h4 className="text-xl font-bold text-gray-700">Ropa</h4>
-              <p className="text-gray-600">Descubre nuestra colección de ropa moderna y casual.</p>
-            </div>
-            <div className="p-4 bg-white rounded-lg shadow-lg">
-              <img
-                src="https://via.placeholder.com/150"
-                alt="Accesorios"
-                className="w-full h-40 object-cover mb-4"
-              />
-              <h4 className="text-xl font-bold text-gray-700">Accesorios</h4>
-              <p className="text-gray-600">Complementa tu estilo con los mejores accesorios.</p>
-            </div>
-            <div className="p-4 bg-white rounded-lg shadow-lg">
-              <img
-                src="https://via.placeholder.com/150"
-                alt="Ofertas"
-                className="w-full h-40 object-cover mb-4"
-              />
-              <h4 className="text-xl font-bold text-gray-700">Ofertas</h4>
-              <p className="text-gray-600">Aprovecha nuestras ofertas y promociones exclusivas.</p>
-            </div>
-          </div>
-        </section>
-
-        {/* Customer Testimonials */}
-        <section className="mt-12 w-full max-w-4xl text-center">
-          <h3 className="text-3xl font-bold text-gray-800 mb-6">Lo que nuestros clientes dicen</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-4 bg-white rounded-lg shadow-lg">
-              <p className="text-gray-600 mb-4">
-                "¡La calidad de la ropa es impresionante! El envío fue rápido y el servicio al cliente es excepcional."
-              </p>
-              <h4 className="text-xl font-bold text-gray-700">- Ana López</h4>
-            </div>
-            <div className="p-4 bg-white rounded-lg shadow-lg">
-              <p className="text-gray-600 mb-4">
-                "¡Me encantan los accesorios que compré! Definitivamente volveré a comprar en Punto Shein."
-              </p>
-              <h4 className="text-xl font-bold text-gray-700">- Carlos Martínez</h4>
-            </div>
-          </div>
-        </section>
-
-        {/* Newsletter Signup */}
-        <section className="mt-12 w-full max-w-4xl text-center">
-          <h3 className="text-3xl font-bold text-gray-800 mb-6">Suscríbete a nuestro boletín</h3>
-          <p className="text-gray-600 mb-4">Recibe ofertas exclusivas y las últimas novedades directamente en tu correo electrónico.</p>
-          <form className="flex flex-col sm:flex-row justify-center gap-4">
-            <input
-              type="email"
-              placeholder="Tu correo electrónico"
-              className="w-full sm:w-2/3 py-2 px-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              required
-            />
-            <button
-              type="submit"
-              className="bg-green-600 text-white py-2 px-6 rounded-lg hover:bg-purple-700"
-            >
-              Suscribirse
-            </button>
-          </form>
-        </section>
-
-        {/* Footer */}
-        <footer className="mt-16 w-full bg-gray-800 text-gray-300 py-8">
-          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center md:text-left">
-              <h4 className="font-bold text-white mb-4">Punto Shein</h4>
-              <p>La mejor tienda de ropa y accesorios en línea. ¡Visítanos y descubre lo último en moda!</p>
-            </div>
-            <div className="text-center">
-              <h4 className="font-bold text-white mb-4">Enlaces útiles</h4>
-              <ul>
-                <li><a href="#" className="hover:underline">Acerca de nosotros</a></li>
-                <li><a href="#" className="hover:underline">Contacto</a></li>
-                <li><a href="#" className="hover:underline">Política de privacidad</a></li>
-              </ul>
-            </div>
-            <div className="text-center md:text-right">
-              <h4 className="font-bold text-white mb-4">Síguenos</h4>
-              <ul className="flex justify-center md:justify-end space-x-4">
-                <li><a href="#" className="hover:underline">Facebook</a></li>
-                <li><a href="#" className="hover:underline">Instagram</a></li>
-                <li><a href="#" className="hover:underline">Twitter</a></li>
-              </ul>
-            </div>
-          </div>
-        </footer>
       </main>
     </div>
   );
