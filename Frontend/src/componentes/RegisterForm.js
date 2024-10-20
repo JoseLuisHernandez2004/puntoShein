@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Swal from 'sweetalert2';  // Importar SweetAlert2
+import Swal from 'sweetalert2';
+import { MdEmail, MdPerson, MdPhone, MdLock, MdVisibility, MdVisibilityOff } from 'react-icons/md'; // Importando íconos
 
 const RegisterForm = ({ verifiedEmail }) => {
   const [formData, setFormData] = useState({
@@ -24,6 +25,9 @@ const RegisterForm = ({ verifiedEmail }) => {
     specialChar: false
   });
 
+  const [showPassword, setShowPassword] = useState(false); // Para mostrar/ocultar contraseña
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Para mostrar/ocultar confirmación de contraseña
+
   const navigate = useNavigate();
 
   const validateText = (text) => /^[a-zA-ZÀ-ÿ\s]{1,25}$/.test(text);
@@ -39,16 +43,15 @@ const RegisterForm = ({ verifiedEmail }) => {
 
   const validatePhoneNumberWithAPI = async (telefono) => {
     try {
-      // Asegúrate de que el número tenga el formato internacional con el código de país
-      const formattedPhone = telefono.startsWith('+') ? telefono : `+52${telefono}`; // Aquí +52 es para México
+      const formattedPhone = telefono.startsWith('+') ? telefono : `+52${telefono}`;
       const response = await axios.get(
         `https://phonevalidation.abstractapi.com/v1/?api_key=c95ef61fcc7b4a10a1ccbbef8feb7903&phone=${formattedPhone}`
       );
       if (response.data.valid) {
-        setErrors((prevErrors) => ({ ...prevErrors, telefono: '' })); // Teléfono válido
+        setErrors((prevErrors) => ({ ...prevErrors, telefono: '' }));
         return true;
       } else {
-        setErrors((prevErrors) => ({ ...prevErrors, telefono: 'Número de teléfono inválido según el país.' })); // Teléfono no válido
+        setErrors((prevErrors) => ({ ...prevErrors, telefono: 'Número de teléfono inválido según el país.' }));
         return false;
       }
     } catch (error) {
@@ -61,10 +64,8 @@ const RegisterForm = ({ verifiedEmail }) => {
   const handleChange = async (e) => {
     const { name, value } = e.target;
 
-    // Validar nombres y apellidos, impidiendo la entrada de números
     if (['nombre', 'apellidoP', 'apellidoM'].includes(name)) {
       const lettersOnlyValue = value.replace(/[^a-zA-ZÀ-ÿ\s]/g, '');
-
       if (!validateText(lettersOnlyValue)) {
         setErrors((prevErrors) => ({ ...prevErrors, [name]: 'Solo se permiten letras y un máximo de 25 caracteres.' }));
       } else {
@@ -74,9 +75,8 @@ const RegisterForm = ({ verifiedEmail }) => {
       return;
     }
 
-    // Validar teléfono y hacer la solicitud a la API de Abstract para validarlo
     if (name === 'telefono') {
-      const numericValue = value.replace(/[^0-9]/g, ''); // Eliminar caracteres no numéricos
+      const numericValue = value.replace(/[^0-9]/g, '');
       if (numericValue.length === 10) {
         await validatePhoneNumberWithAPI(numericValue);
       } else {
@@ -86,12 +86,10 @@ const RegisterForm = ({ verifiedEmail }) => {
       return;
     }
 
-    // Validar contraseña
     if (name === 'password') {
       validatePassword(value);
     }
 
-    // Actualizar el estado general
     setFormData({ ...formData, [name]: value });
   };
 
@@ -103,17 +101,14 @@ const RegisterForm = ({ verifiedEmail }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validar que el número de teléfono sea válido antes de continuar
     const isPhoneValid = await validatePhoneNumberWithAPI(formData.telefono);
     if (!isPhoneValid) return;
 
-    // Validar que la contraseña sea fuerte
     if (!isPasswordStrong()) {
       setErrors((prevErrors) => ({ ...prevErrors, password: 'La contraseña es débil. Asegúrate de que cumple los requisitos.' }));
       return;
     }
 
-    // Validar que las contraseñas coincidan
     if (formData.password !== formData.confirmPassword) {
       setErrors((prevErrors) => ({ ...prevErrors, confirmPassword: 'Las contraseñas no coinciden.' }));
       return;
@@ -121,8 +116,7 @@ const RegisterForm = ({ verifiedEmail }) => {
 
     try {
       await axios.post('https://puntoshein.onrender.com/api/register', formData, { withCredentials: true });
-      
-      // Mostrar SweetAlert de éxito
+
       Swal.fire({
         icon: 'success',
         title: '¡Registro exitoso!',
@@ -132,7 +126,7 @@ const RegisterForm = ({ verifiedEmail }) => {
       });
 
       setTimeout(() => {
-        navigate('/login'); // Redirigir al login
+        navigate('/login');
       }, 2000);
 
     } catch (error) {
@@ -145,7 +139,7 @@ const RegisterForm = ({ verifiedEmail }) => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
+    <div className="flex flex-col items-center justify-center h-screen bg-gray-100 px-4">
       <div className="w-full max-w-5xl bg-white rounded-lg shadow-lg p-6">
         <h1 className="text-2xl font-bold mb-4 text-center">Registrar</h1>
 
@@ -154,88 +148,106 @@ const RegisterForm = ({ verifiedEmail }) => {
           <form onSubmit={handleSubmit} className="bg-gray-50 p-6 border border-gray-300 rounded-lg">
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">Correo Electrónico</label>
-              <input
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="email"
-                type="email"
-                name="email"
-                value={formData.email}
-                disabled
-                required
-              />
+              <div className="flex items-center border rounded px-2 py-2 shadow appearance-none">
+                <MdEmail className="text-gray-500 mr-2" size={20} />
+                <input
+                  className="w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  id="email"
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  disabled
+                  required
+                />
+              </div>
             </div>
 
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">Nombre de Usuario</label>
-              <input
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="username"
-                type="text"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                maxLength="20"
-                required
-              />
+              <div className="flex items-center border rounded px-2 py-2 shadow appearance-none">
+                <MdPerson className="text-gray-500 mr-2" size={20} />
+                <input
+                  className="w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  id="username"
+                  type="text"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  maxLength="20"
+                  required
+                />
+              </div>
             </div>
 
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="nombre">Nombre</label>
-              <input
-                className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.nombre ? 'border-red-500' : ''}`}
-                id="nombre"
-                type="text"
-                name="nombre"
-                value={formData.nombre}
-                onChange={handleChange}
-                maxLength="25"
-                required
-              />
+              <div className="flex items-center border rounded px-2 py-2 shadow appearance-none">
+                <MdPerson className="text-gray-500 mr-2" size={20} />
+                <input
+                  className={`w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.nombre ? 'border-red-500' : ''}`}
+                  id="nombre"
+                  type="text"
+                  name="nombre"
+                  value={formData.nombre}
+                  onChange={handleChange}
+                  maxLength="25"
+                  required
+                />
+              </div>
               {errors.nombre && <p className="text-red-500 text-xs italic">{errors.nombre}</p>}
             </div>
 
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="apellidoP">Apellido Paterno</label>
-              <input
-                className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.apellidoP ? 'border-red-500' : ''}`}
-                id="apellidoP"
-                type="text"
-                name="apellidoP"
-                value={formData.apellidoP}
-                onChange={handleChange}
-                maxLength="25"
-                required
-              />
+              <div className="flex items-center border rounded px-2 py-2 shadow appearance-none">
+                <MdPerson className="text-gray-500 mr-2" size={20} />
+                <input
+                  className={`w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.apellidoP ? 'border-red-500' : ''}`}
+                  id="apellidoP"
+                  type="text"
+                  name="apellidoP"
+                  value={formData.apellidoP}
+                  onChange={handleChange}
+                  maxLength="25"
+                  required
+                />
+              </div>
               {errors.apellidoP && <p className="text-red-500 text-xs italic">{errors.apellidoP}</p>}
             </div>
 
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="apellidoM">Apellido Materno</label>
-              <input
-                className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.apellidoM ? 'border-red-500' : ''}`}
-                id="apellidoM"
-                type="text"
-                name="apellidoM"
-                value={formData.apellidoM}
-                onChange={handleChange}
-                maxLength="25"
-                required
-              />
+              <div className="flex items-center border rounded px-2 py-2 shadow appearance-none">
+                <MdPerson className="text-gray-500 mr-2" size={20} />
+                <input
+                  className={`w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.apellidoM ? 'border-red-500' : ''}`}
+                  id="apellidoM"
+                  type="text"
+                  name="apellidoM"
+                  value={formData.apellidoM}
+                  onChange={handleChange}
+                  maxLength="25"
+                  required
+                />
+              </div>
               {errors.apellidoM && <p className="text-red-500 text-xs italic">{errors.apellidoM}</p>}
             </div>
 
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="telefono">Teléfono</label>
-              <input
-                className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.telefono ? 'border-red-500' : ''}`}
-                id="telefono"
-                type="text"
-                name="telefono"
-                value={formData.telefono}
-                onChange={handleChange}
-                maxLength="10"
-                required
-              />
+              <div className="flex items-center border rounded px-2 py-2 shadow appearance-none">
+                <MdPhone className="text-gray-500 mr-2" size={20} />
+                <input
+                  className={`w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.telefono ? 'border-red-500' : ''}`}
+                  id="telefono"
+                  type="text"
+                  name="telefono"
+                  value={formData.telefono}
+                  onChange={handleChange}
+                  maxLength="10"
+                  required
+                />
+              </div>
               {errors.telefono && <p className="text-red-500 text-xs italic">{errors.telefono}</p>}
             </div>
           </form>
@@ -244,15 +256,21 @@ const RegisterForm = ({ verifiedEmail }) => {
           <form onSubmit={handleSubmit} className="bg-gray-50 p-6 border border-gray-300 rounded-lg">
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">Contraseña</label>
-              <input
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="password"
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-              />
+              <div className="flex items-center border rounded px-2 py-2 shadow appearance-none">
+                <MdLock className="text-gray-500 mr-2" size={20} />
+                <input
+                  className="w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                />
+                <button type="button" onClick={() => setShowPassword(!showPassword)}>
+                  {showPassword ? <MdVisibilityOff size={20} /> : <MdVisibility size={20} />}
+                </button>
+              </div>
               {errors.password && <p className="text-red-500 text-xs italic">{errors.password}</p>}
 
               {/* Mostrar los requisitos de la contraseña */}
@@ -267,15 +285,21 @@ const RegisterForm = ({ verifiedEmail }) => {
 
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="confirmPassword">Repetir Contraseña</label>
-              <input
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="confirmPassword"
-                type="password"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                required
-              />
+              <div className="flex items-center border rounded px-2 py-2 shadow appearance-none">
+                <MdLock className="text-gray-500 mr-2" size={20} />
+                <input
+                  className="w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  id="confirmPassword"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  required
+                />
+                <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                  {showConfirmPassword ? <MdVisibilityOff size={20} /> : <MdVisibility size={20} />}
+                </button>
+              </div>
               {errors.confirmPassword && <p className="text-red-500 text-xs italic">{errors.confirmPassword}</p>}
             </div>
 
