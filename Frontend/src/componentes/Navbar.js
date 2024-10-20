@@ -15,15 +15,16 @@ const Navbar = ({ isLoggedIn }) => {
         {/* Logo Section */}
         <Link to="/" className="flex items-center">
           <img
-            src="https://scontent.fver2-1.fna.fbcdn.net/v/t39.30808-6/370115356_645029297697036_1951347873711812214_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeHfjHXAdaLXgFH9xRAvaiUGJQ0iOM2CJ34lDSI4zYInfoE7bvHUXJzrxh4mfXi8piRwpwHNrQRi8SI4gkvQ3x__&_nc_ohc=VAC14nsSYg4Q7kNvgHsS29h&_nc_ht=scontent.fver2-1.fna&_nc_gid=AYPd5kdOdC74tZd_26eMiE-&oh=00_AYCOzI8ZkOiNSJgiAoSy4QxyCj-f8jpZomkuqzeDiFuBUQ&oe=67195DBD" // Replace with your actual logo link
+            src="https://scontent.fver2-1.fna.fbcdn.net/v/t39.30808-6/370115356_645029297697036_1951347873711812214_n.jpg"
             alt="Punto Shein Logo"
-            className="h-12 w-12 object-cover mr-2" // Adjusted size
+            className="h-12 w-12 object-cover mr-2"
           />
         </Link>
 
         {/* Desktop Links */}
         <div className="hidden md:flex space-x-6">
           <Link to="/" className="text-gray-700 hover:text-gray-900">Home</Link>
+          <Link to="/about" className="text-gray-700 hover:text-gray-900">Quiénes Somos</Link> {/* New Link */}
           {!isLoggedIn ? (
             <>
               <Link to="/login" className="text-gray-700 hover:text-gray-900">Login</Link>
@@ -51,6 +52,13 @@ const Navbar = ({ isLoggedIn }) => {
             onClick={toggleMenu}
           >
             Home
+          </Link>
+          <Link
+            to="/about"
+            className="block text-gray-700 py-2 hover:text-gray-900"
+            onClick={toggleMenu}
+          >
+            Quiénes Somos
           </Link>
           {!isLoggedIn ? (
             <>
