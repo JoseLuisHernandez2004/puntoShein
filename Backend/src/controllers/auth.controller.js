@@ -1,6 +1,9 @@
 import User from '../models/user.model.js';
 import bcrypt from 'bcryptjs';
 import { createAccessToken } from '../libs/jwt.js';
+import jwt from 'jsonwebtoken';
+import nodemailer from 'nodemailer';
+import { TOKEN_SECRET } from '../config.js';
 
 export const register = async (req, res) => {
   const { email, password, username, nombre, apellidoM, apellidoP, telefono } = req.body;
@@ -122,3 +125,71 @@ export const profile = async (req, res) => {
 
 };
 
+export const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    // Usar TOKEN_SECRET para firmar el token
+    const resetToken = jwt.sign({ id: user._id }, TOKEN_SECRET, { expiresIn: '1h' });
+
+    const resetUrl = `http://localhost:3000/reset-password/${resetToken}`;
+
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: {
+        user: process.env.EMAIL_USER,  // Variables de entorno para email
+        pass: process.env.EMAIL_PASS,  
+      },
+    });
+
+    const mailOptions = {
+      from: 'luis2004hdez@gmail.com',
+      to: user.email,
+      subject: 'Recuperación de contraseña',
+      html: `<p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p><a href="${resetUrl}">${resetUrl}</a>`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.json({ message: "Correo de recuperación enviado" });
+  } catch (error) {
+    res.status(500).json({ message: "Error al procesar la solicitud: " + error.message });
+  }
+};
+
+
+export const resetPassword = async (req, res) => {
+  const { token } = req.params;
+  const { newPassword } = req.body;
+
+  try {
+    // Verificar el token
+    const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
+    const user = await User.findById(decoded.id);
+
+    if (!user) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    // Validar la nueva contraseña (ejemplo: longitud mínima)
+    if (!newPassword || newPassword.length < 6) {
+      return res.status(400).json({ message: "La nueva contraseña debe tener al menos 6 caracteres" });
+    }
+
+    // Hashear la nueva contraseña
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+
+    // Actualizar la contraseña en la base de datos
+    user.password = passwordHash;
+    await user.save();
+
+    res.json({ message: "Contraseña actualizada con éxito" });
+  } catch (error) {
+    res.status(500).json({ message: "Error al restablecer la contraseña: " + error.message });
+  }
+};
