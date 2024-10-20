@@ -139,9 +139,10 @@ const RegisterForm = ({ verifiedEmail }) => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-100 px-4">
+    <div className="flex flex-col items-center justify-center bg-gray-100 px-10 py-40">
       <div className="w-full max-w-5xl bg-white rounded-lg shadow-lg p-6">
-        <h1 className="text-2xl font-bold mb-4 text-center">Registrar</h1>
+        <h1 className="text-2x4 font-bold mb-4 text-center">Registrar</h1>
+
 
         <div className="grid grid-cols-2 gap-8">
           {/* Formulario izquierdo */}
