@@ -41,13 +41,14 @@ const Home = ({ isLoggedIn }) => {
   };
 
   return (
-    <div className="bg-red-100 min-h-screen flex flex-col items-center">
+    <div className="bg-gray-100 min-h-screen flex flex-col items-center">
       <main className="flex flex-col items-center justify-center flex-grow mt-16">
         <h2 className="text-5xl font-bold text-gray-800 mt-32 mb-6">Punto Shein</h2>
         <p className="text-lg text-gray-600 mb-10 text-center">
           La mejor tienda de ropa y accesorios en línea. ¡Descubre la moda más reciente con nosotros!
         </p>
 
+        {/* Carousel */}
         <div className="w-full max-w-4xl">
           <Carousel responsive={responsive} infinite={true} autoPlay={true} autoPlaySpeed={3000} showDots={true}>
             {carouselItems.map((item, index) => (
@@ -64,7 +65,7 @@ const Home = ({ isLoggedIn }) => {
           </Carousel>
         </div>
 
-        {/* New Section: Featured Categories */}
+        {/* Featured Categories */}
         <section className="mt-12 w-full max-w-6xl text-center">
           <h3 className="text-3xl font-bold text-gray-800 mb-6">Explora nuestras categorías</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -98,7 +99,7 @@ const Home = ({ isLoggedIn }) => {
           </div>
         </section>
 
-        {/* New Section: Customer Testimonials */}
+        {/* Customer Testimonials */}
         <section className="mt-12 w-full max-w-4xl text-center">
           <h3 className="text-3xl font-bold text-gray-800 mb-6">Lo que nuestros clientes dicen</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -117,7 +118,7 @@ const Home = ({ isLoggedIn }) => {
           </div>
         </section>
 
-        {/* New Section: Newsletter Signup */}
+        {/* Newsletter Signup */}
         <section className="mt-12 w-full max-w-4xl text-center">
           <h3 className="text-3xl font-bold text-gray-800 mb-6">Suscríbete a nuestro boletín</h3>
           <p className="text-gray-600 mb-4">Recibe ofertas exclusivas y las últimas novedades directamente en tu correo electrónico.</p>
@@ -137,7 +138,7 @@ const Home = ({ isLoggedIn }) => {
           </form>
         </section>
 
-        {/* Footer Section */}
+        {/* Footer */}
         <footer className="mt-16 w-full bg-gray-800 text-gray-300 py-8">
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center md:text-left">
