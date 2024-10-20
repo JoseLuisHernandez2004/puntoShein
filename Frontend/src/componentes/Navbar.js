@@ -12,19 +12,26 @@ const Navbar = ({ isLoggedIn }) => {
   return (
     <nav className="w-full bg-white shadow-md fixed top-0 z-50">
       <div className="container mx-auto flex justify-between items-center p-4">
-        {/* Logo Section */}
-        <Link to="/" className="flex items-center">
-          <img
-            src="https://scontent.fver2-1.fna.fbcdn.net/v/t39.30808-6/370115356_645029297697036_1951347873711812214_n.jpg"
-            alt="Punto Shein Logo"
-            className="h-12 w-12 object-cover mr-2"
-          />
-        </Link>
+        {/* Left-aligned Logo and Links */}
+        <div className="flex items-center space-x-6">
+          {/* Logo Section */}
+          <Link to="/" className="flex items-center">
+            <img
+              src="https://scontent.fver2-1.fna.fbcdn.net/v/t39.30808-6/370115356_645029297697036_1951347873711812214_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeHfjHXAdaLXgFH9xRAvaiUGJQ0iOM2CJ34lDSI4zYInfoE7bvHUXJzrxh4mfXi8piRwpwHNrQRi8SI4gkvQ3x__&_nc_ohc=tf5ubIATdXMQ7kNvgFiiaH_&_nc_ht=scontent.fver2-1.fna&_nc_gid=Ahd04UulPRbxCJzP3J9nYwD&oh=00_AYBgXMwP039HG94-B3p_Qu7STCsRnjHLyZT3TyQCKWK7jQ&oe=671A76FD"
+              alt="Punto Shein Logo"
+              className="h-30 w-20 object-cover mr-20"
+            />
+          </Link>
 
-        {/* Desktop Links */}
+          {/* Left-aligned Links */}
+          <div className="hidden md:flex space-x-6">
+            <Link to="/" className="text-gray-700 hover:text-gray-900">Home</Link>
+            <Link to="/about" className="text-gray-700 hover:text-gray-900">Quiénes Somos</Link> {/* New Link */}
+          </div>
+        </div>
+
+        {/* Right-aligned Links (Login, Register, etc.) */}
         <div className="hidden md:flex space-x-6">
-          <Link to="/" className="text-gray-700 hover:text-gray-900">Home</Link>
-          <Link to="/about" className="text-gray-700 hover:text-gray-900">Quiénes Somos</Link> {/* New Link */}
           {!isLoggedIn ? (
             <>
               <Link to="/login" className="text-gray-700 hover:text-gray-900">Login</Link>
