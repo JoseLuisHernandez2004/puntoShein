@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import { MdEmail, MdPerson, MdPhone, MdLock, MdVisibility, MdVisibilityOff } from 'react-icons/md'; // Importando íconos
+import { MdEmail, MdPerson, MdPhone, MdLock, MdVisibility, MdVisibilityOff } from 'react-icons/md'; 
 
 const RegisterForm = ({ verifiedEmail }) => {
   const [formData, setFormData] = useState({
@@ -25,9 +25,8 @@ const RegisterForm = ({ verifiedEmail }) => {
     specialChar: false
   });
 
-  const [showPassword, setShowPassword] = useState(false); // Para mostrar/ocultar contraseña
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Para mostrar/ocultar confirmación de contraseña
-
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
   const validateText = (text) => /^[a-zA-ZÀ-ÿ\s]{1,25}$/.test(text);
@@ -56,7 +55,6 @@ const RegisterForm = ({ verifiedEmail }) => {
       }
     } catch (error) {
       setErrors((prevErrors) => ({ ...prevErrors, telefono: 'Error al validar el número de teléfono.' }));
-      console.error('Error al validar el número de teléfono:', error);
       return false;
     }
   };
@@ -139,171 +137,174 @@ const RegisterForm = ({ verifiedEmail }) => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center bg-gray-100 px-10 py-40">
-      <div className="w-full max-w-5xl bg-white rounded-lg shadow-lg p-6">
-        <h1 className="text-2x4 font-bold mb-4 text-center">Registrar</h1>
+    <div className="flex flex-col items-center justify-center bg-gray-100 px-4 py-10 md:py-20">
+      <div className="w-full max-w-lg bg-white rounded-lg shadow-lg p-6 md:p-10">
+        <h1 className="text-2xl font-bold mb-4 text-center">Registrar</h1>
 
-
-        <div className="grid grid-cols-2 gap-8">
-          {/* Formulario izquierdo */}
-          <form onSubmit={handleSubmit} className="bg-gray-50 p-6 border border-gray-300 rounded-lg">
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">Correo Electrónico</label>
-              <div className="flex items-center border rounded px-2 py-2 shadow appearance-none">
-                <MdEmail className="text-gray-500 mr-2" size={20} />
-                <input
-                  className="w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="email"
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  disabled
-                  required
-                />
-              </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          
+          {/* Email Field */}
+          <div>
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">Correo Electrónico</label>
+            <div className="flex items-center border rounded px-2 py-2 shadow">
+              <MdEmail className="text-gray-500 mr-2" size={20} />
+              <input
+                className="w-full focus:outline-none"
+                id="email"
+                type="email"
+                name="email"
+                value={formData.email}
+                disabled
+                required
+              />
             </div>
+          </div>
 
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">Nombre de Usuario</label>
-              <div className="flex items-center border rounded px-2 py-2 shadow appearance-none">
-                <MdPerson className="text-gray-500 mr-2" size={20} />
-                <input
-                  className="w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="username"
-                  type="text"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  maxLength="20"
-                  required
-                />
-              </div>
+          {/* Username Field */}
+          <div>
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">Nombre de Usuario</label>
+            <div className="flex items-center border rounded px-2 py-2 shadow">
+              <MdPerson className="text-gray-500 mr-2" size={20} />
+              <input
+                className="w-full focus:outline-none"
+                id="username"
+                type="text"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                maxLength="20"
+                required
+              />
             </div>
+          </div>
 
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="nombre">Nombre</label>
-              <div className="flex items-center border rounded px-2 py-2 shadow appearance-none">
-                <MdPerson className="text-gray-500 mr-2" size={20} />
-                <input
-                  className={`w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.nombre ? 'border-red-500' : ''}`}
-                  id="nombre"
-                  type="text"
-                  name="nombre"
-                  value={formData.nombre}
-                  onChange={handleChange}
-                  maxLength="25"
-                  required
-                />
-              </div>
-              {errors.nombre && <p className="text-red-500 text-xs italic">{errors.nombre}</p>}
+          {/* Nombre Field */}
+          <div>
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="nombre">Nombre</label>
+            <div className="flex items-center border rounded px-2 py-2 shadow">
+              <MdPerson className="text-gray-500 mr-2" size={20} />
+              <input
+                className="w-full focus:outline-none"
+                id="nombre"
+                type="text"
+                name="nombre"
+                value={formData.nombre}
+                onChange={handleChange}
+                maxLength="25"
+                required
+              />
             </div>
+            {errors.nombre && <p className="text-red-500 text-xs italic">{errors.nombre}</p>}
+          </div>
 
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="apellidoP">Apellido Paterno</label>
-              <div className="flex items-center border rounded px-2 py-2 shadow appearance-none">
-                <MdPerson className="text-gray-500 mr-2" size={20} />
-                <input
-                  className={`w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.apellidoP ? 'border-red-500' : ''}`}
-                  id="apellidoP"
-                  type="text"
-                  name="apellidoP"
-                  value={formData.apellidoP}
-                  onChange={handleChange}
-                  maxLength="25"
-                  required
-                />
-              </div>
-              {errors.apellidoP && <p className="text-red-500 text-xs italic">{errors.apellidoP}</p>}
+          {/* Apellido Paterno Field */}
+          <div>
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="apellidoP">Apellido Paterno</label>
+            <div className="flex items-center border rounded px-2 py-2 shadow">
+              <MdPerson className="text-gray-500 mr-2" size={20} />
+              <input
+                className="w-full focus:outline-none"
+                id="apellidoP"
+                type="text"
+                name="apellidoP"
+                value={formData.apellidoP}
+                onChange={handleChange}
+                maxLength="25"
+                required
+              />
             </div>
+            {errors.apellidoP && <p className="text-red-500 text-xs italic">{errors.apellidoP}</p>}
+          </div>
 
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="apellidoM">Apellido Materno</label>
-              <div className="flex items-center border rounded px-2 py-2 shadow appearance-none">
-                <MdPerson className="text-gray-500 mr-2" size={20} />
-                <input
-                  className={`w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.apellidoM ? 'border-red-500' : ''}`}
-                  id="apellidoM"
-                  type="text"
-                  name="apellidoM"
-                  value={formData.apellidoM}
-                  onChange={handleChange}
-                  maxLength="25"
-                  required
-                />
-              </div>
-              {errors.apellidoM && <p className="text-red-500 text-xs italic">{errors.apellidoM}</p>}
+          {/* Apellido Materno Field */}
+          <div>
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="apellidoM">Apellido Materno</label>
+            <div className="flex items-center border rounded px-2 py-2 shadow">
+              <MdPerson className="text-gray-500 mr-2" size={20} />
+              <input
+                className="w-full focus:outline-none"
+                id="apellidoM"
+                type="text"
+                name="apellidoM"
+                value={formData.apellidoM}
+                onChange={handleChange}
+                maxLength="25"
+                required
+              />
             </div>
+            {errors.apellidoM && <p className="text-red-500 text-xs italic">{errors.apellidoM}</p>}
+          </div>
 
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="telefono">Teléfono</label>
-              <div className="flex items-center border rounded px-2 py-2 shadow appearance-none">
-                <MdPhone className="text-gray-500 mr-2" size={20} />
-                <input
-                  className={`w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.telefono ? 'border-red-500' : ''}`}
-                  id="telefono"
-                  type="text"
-                  name="telefono"
-                  value={formData.telefono}
-                  onChange={handleChange}
-                  maxLength="10"
-                  required
-                />
-              </div>
-              {errors.telefono && <p className="text-red-500 text-xs italic">{errors.telefono}</p>}
+          {/* Phone Number Field */}
+          <div>
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="telefono">Teléfono</label>
+            <div className="flex items-center border rounded px-2 py-2 shadow">
+              <MdPhone className="text-gray-500 mr-2" size={20} />
+              <input
+                className={`w-full focus:outline-none ${errors.telefono ? 'border-red-500' : ''}`}
+                id="telefono"
+                type="text"
+                name="telefono"
+                value={formData.telefono}
+                onChange={handleChange}
+                maxLength="10"
+                required
+              />
             </div>
-          </form>
+            {errors.telefono && <p className="text-red-500 text-xs italic">{errors.telefono}</p>}
+          </div>
 
-          {/* Formulario derecho */}
-          <form onSubmit={handleSubmit} className="bg-gray-50 p-6 border border-gray-300 rounded-lg">
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">Contraseña</label>
-              <div className="flex items-center border rounded px-2 py-2 shadow appearance-none">
-                <MdLock className="text-gray-500 mr-2" size={20} />
-                <input
-                  className="w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                />
-                <button type="button" onClick={() => setShowPassword(!showPassword)}>
-                  {showPassword ? <MdVisibilityOff size={20} /> : <MdVisibility size={20} />}
-                </button>
-              </div>
-              {errors.password && <p className="text-red-500 text-xs italic">{errors.password}</p>}
-
-              {/* Mostrar los requisitos de la contraseña */}
-              <div className="mt-2 text-xs">
-                <p className={passwordStrength.length ? 'text-green-500' : 'text-red-500'}>Debe tener al menos 8 caracteres</p>
-                <p className={passwordStrength.uppercase ? 'text-green-500' : 'text-red-500'}>Debe tener al menos una letra mayúscula</p>
-                <p className={passwordStrength.lowercase ? 'text-green-500' : 'text-red-500'}>Debe tener al menos una letra minúscula</p>
-                <p className={passwordStrength.number ? 'text-green-500' : 'text-red-500'}>Debe tener al menos un número</p>
-                <p className={passwordStrength.specialChar ? 'text-green-500' : 'text-red-500'}>Debe tener al menos un carácter especial (@$!%*?&)</p>
-              </div>
+          {/* Password Field */}
+          <div>
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">Contraseña</label>
+            <div className="flex items-center border rounded px-2 py-2 shadow">
+              <MdLock className="text-gray-500 mr-2" size={20} />
+              <input
+                className="w-full focus:outline-none"
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
+              <button type="button" onClick={() => setShowPassword(!showPassword)}>
+                {showPassword ? <MdVisibilityOff size={20} /> : <MdVisibility size={20} />}
+              </button>
             </div>
+            {errors.password && <p className="text-red-500 text-xs italic">{errors.password}</p>}
 
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="confirmPassword">Repetir Contraseña</label>
-              <div className="flex items-center border rounded px-2 py-2 shadow appearance-none">
-                <MdLock className="text-gray-500 mr-2" size={20} />
-                <input
-                  className="w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="confirmPassword"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  required
-                />
-                <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                  {showConfirmPassword ? <MdVisibilityOff size={20} /> : <MdVisibility size={20} />}
-                </button>
-              </div>
-              {errors.confirmPassword && <p className="text-red-500 text-xs italic">{errors.confirmPassword}</p>}
+            <div className="mt-2 text-xs">
+              <p className={passwordStrength.length ? 'text-green-500' : 'text-red-500'}>Debe tener al menos 8 caracteres</p>
+              <p className={passwordStrength.uppercase ? 'text-green-500' : 'text-red-500'}>Debe tener al menos una letra mayúscula</p>
+              <p className={passwordStrength.lowercase ? 'text-green-500' : 'text-red-500'}>Debe tener al menos una letra minúscula</p>
+              <p className={passwordStrength.number ? 'text-green-500' : 'text-red-500'}>Debe tener al menos un número</p>
+              <p className={passwordStrength.specialChar ? 'text-green-500' : 'text-red-500'}>Debe tener al menos un carácter especial (@$!%*?&)</p>
             </div>
+          </div>
 
+          {/* Confirm Password Field */}
+          <div>
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="confirmPassword">Repetir Contraseña</label>
+            <div className="flex items-center border rounded px-2 py-2 shadow">
+              <MdLock className="text-gray-500 mr-2" size={20} />
+              <input
+                className="w-full focus:outline-none"
+                id="confirmPassword"
+                type={showConfirmPassword ? 'text' : 'password'}
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                required
+              />
+              <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                {showConfirmPassword ? <MdVisibilityOff size={20} /> : <MdVisibility size={20} />}
+              </button>
+            </div>
+            {errors.confirmPassword && <p className="text-red-500 text-xs italic">{errors.confirmPassword}</p>}
+          </div>
+
+          <div className="mt-8 flex justify-center">
             <button
               className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${!isPasswordStrong() ? 'opacity-50 cursor-not-allowed' : ''}`}
               type="submit"
@@ -311,8 +312,8 @@ const RegisterForm = ({ verifiedEmail }) => {
             >
               Registrar
             </button>
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
     </div>
   );
