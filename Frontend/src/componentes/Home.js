@@ -41,7 +41,7 @@ const Home = ({ isLoggedIn }) => {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen flex flex-col items-center">
+    <div className="bg-red-100 min-h-screen flex flex-col items-center">
       <main className="flex flex-col items-center justify-center flex-grow mt-16">
         <h2 className="text-5xl font-bold text-gray-800 mb-6">Punto Shein</h2>
         <p className="text-lg text-gray-600 mb-10 text-center">
