@@ -21,31 +21,47 @@ const LoginForm = ({ setIsLoggedIn }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Show loading state before request is made
+      Swal.fire({
+        icon: 'info',
+        title: 'Iniciando sesión...',
+        timer: 1000,
+        showConfirmButton: false,
+        willOpen: () => {
+          Swal.showLoading(); // Show loading while waiting for server response
+        },
+      });
+  
       const response = await axios.post('https://puntoshein.onrender.com/api/login', formData, {
         withCredentials: true
       });
-
+  
+      // Show success notification without long delay
       Swal.fire({
         icon: 'success',
         title: '¡Inicio de sesión exitoso!',
         text: 'Redirigiendo...',
-        timer: 2000,
-        showConfirmButton: false
+        timer: 1000, // Reduce the timer to speed up transition
+        showConfirmButton: false,
       });
-
+  
       localStorage.setItem('authToken', response.data.token);
       setIsLoggedIn(true);
+  
       setTimeout(() => {
         navigate('/profile');
-      }, 2000);
+      }, 1000); // Reduce wait time for navigation
     } catch (error) {
+      // Show error immediately without delay
       Swal.fire({
         icon: 'error',
         title: 'Error',
         text: 'Correo o contraseña incorrectos',
+        timer: 1500, // Shorten error display duration
       });
     }
   };
+  
 
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-gray-100 px-4">

@@ -1,49 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import Carousel from 'react-multi-carousel';
 import 'react-multi-carousel/lib/styles.css';
-import axios from 'axios';
 
-const Home = ({ isLoggedIn }) => {
-  const [userData, setUserData] = useState(null);
-
-  useEffect(() => {
-    if (isLoggedIn) {
-      const token = localStorage.getItem('authToken');
-      const fetchUserData = async () => {
-        try {
-          const response = await axios.get('https://puntoshein.onrender.com/api/user', {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          });
-          setUserData(response.data);
-        } catch (error) {
-          console.error('Error fetching user data', error);
-        }
-      };
-      fetchUserData();
-    }
-  }, [isLoggedIn]);
-
+const Home = () => {
+  
   const carouselItems = [
     {
-      image: 'https://scontent.fver2-1.fna.fbcdn.net/v/t39.30808-6/369966618_645024687697497_2994804745531471255_n.png?_nc_cat=102&ccb=1-7&_nc_sid=cc71e4&_nc_eui2=AeHnfnjOGwC1Jvd1N6OJHBt1jdMuayhn0O6N0y5rKGfQ7hSJFJ8KMDqB_ZrfOVI9fPudtLcJ8A5aUwLNh4JJOznB&_nc_ohc=w1dnmwzemYIQ7kNvgF25q2-&_nc_ht=scontent.fver2-1.fna&_nc_gid=AOG2jLMATQH5rqiuPb8XHIo&oh=00_AYDs00B6clRUZHuaYedBke9uyhQzaQY2MWFtaiqdKJ7xxA&oe=67195663',
-      title: 'Nuevas tendencias',
-      description: 'Explora la moda más reciente para esta temporada.'
+      image: 'https://scontent.fver2-1.fna.fbcdn.net/v/t39.30808-6/369966618_645024687697497_2994804745531471255_n.png?_nc_cat=102&ccb=1-7&_nc_sid=cc71e4&_nc_eui2=AeHnfnjOGwC1Jvd1N6OJHBt1jdMuayhn0O6N0y5rKGfQ7hSJFJ8KMDqB_ZrfOVI9fPudtLcJ8A5aUwLNh4JJOznB&_nc_ohc=JB0zK9ZHLcgQ7kNvgGKaZT_&_nc_ht=scontent.fver2-1.fna&_nc_gid=AC-wdh4nZNy7wlUiqRf7acR&oh=00_AYApO446Yl7Fdyf2eK_bq63l_d5I09xuTBXqgiaYsqDqQA&oe=671BF963',
+      title: 'Nueva Colección',
+      description: 'Descubre las últimas tendencias en moda para esta temporada.'
     },
     {
-      image: 'https://scontent.fver2-1.fna.fbcdn.net/v/t39.30808-6/457137391_848177607382203_6569964154041620214_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeGxAgEujiP1vDY7oZ-RsZPrZ5TIm3RlbtNnlMibdGVu098xNdWjELIWxVav4IAPxlS1hE9KWY9UnBcGmHeMxa_Q&_nc_ohc=yrONhB3hlKMQ7kNvgHgFO5x&_nc_ht=scontent.fver2-1.fna&_nc_gid=Acd5PPdeXgOld_HvAtXm9uL&oh=00_AYCJD44TjIdQiotM3s3AL8CrKr2a30QAIBSfzZ6HnQIC2Q&oe=67194AB3',
-      title: 'Accesorios elegantes',
+      image: 'https://scontent.fver2-1.fna.fbcdn.net/v/t39.30808-6/457256898_848177587382205_3155642889022591445_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeHOSzUBezNIaYfIcQNwgh2MyngOHxdDqDvKeA4fF0OoO-ZNF8MZeH6g0T83uzoH2qd12FcySL6R1Qe_2iSCxMno&_nc_ohc=sQU8wtm3MjgQ7kNvgHZiWt0&_nc_ht=scontent.fver2-1.fna&_nc_gid=A7im0i4w9g35Q0ZVxsiJ-TQ&oh=00_AYDWJiEym3ulHjy-QGQBCXvBaTHprwt1E78d0e6z01XfsA&oe=671BFB90',
+      title: 'Accesorios Elegantes',
       description: 'Complementa tu estilo con los mejores accesorios.'
     },
     {
-      image: 'https://scontent.fver2-1.fna.fbcdn.net/v/t39.30808-6/445478422_793579999508631_3673927731190996348_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeFDa8o18s_N4ZJMScQurJ0o-DwHi3FMhCf4PAeLcUyEJ_CyDOFjzf_bgnJSD8e_-eXJyaqDZQwl8vhs_L0Kcrtg&_nc_ohc=MNXcCWsaJGkQ7kNvgEcgGS0&_nc_ht=scontent.fver2-1.fna&_nc_gid=AGQ1qRMK57zXVbzmbqa6RDV&oh=00_AYBjKXt0djrnKSRWjvh2MUeqgaHAXN8Eve38Ur62oVsFQw&oe=671A82E9',
-      title: 'Ofertas exclusivas',
-      description: 'Aprovecha nuestras ofertas de fin de temporada.'
-    },
-    {
-      image: 'https://scontent.fver2-1.fna.fbcdn.net/v/t39.30808-6/450771021_820275723505725_4466161861117399194_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeEZX0rIx-x5Lb22mkWLWw2I4NMQIfECPgfg0xAh8QI-B62vf3_Xz_3eZWID0q1RBP43CM78F0J298Dlid7U4nx9&_nc_ohc=hG416VY0YOIQ7kNvgHZ_J5x&_nc_ht=scontent.fver2-1.fna&_nc_gid=ABGCeOFPwoltLeYps6TtezN&oh=00_AYCfePpCGGfozu5uhEFsKKKqphq_HOgnMThmOuFBywvN-A&oe=67194A9B',
-      title: 'Ofertas exclusivas',
+      image: 'https://scontent.fver2-1.fna.fbcdn.net/v/t39.30808-6/445478422_793579999508631_3673927731190996348_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeFDa8o18s_N4ZJMScQurJ0o-DwHi3FMhCf4PAeLcUyEJ_CyDOFjzf_bgnJSD8e_-eXJyaqDZQwl8vhs_L0Kcrtg&_nc_ohc=Jn7HyoHXNgMQ7kNvgElcg2I&_nc_ht=scontent.fver2-1.fna&_nc_gid=AO049yfvG8HhiAc5ICjZUAO&oh=00_AYDdl3OzBOvtejQM4FUBZElW0zeD1zogANHH5GyETl1p2g&oe=671BD469',
+      title: 'Ofertas Exclusivas',
       description: 'Aprovecha nuestras ofertas de fin de temporada.'
     }
   ];
@@ -51,11 +25,11 @@ const Home = ({ isLoggedIn }) => {
   const responsive = {
     superLargeDesktop: {
       breakpoint: { max: 4000, min: 2000 },
-      items: 3
+      items: 1
     },
     desktop: {
-      breakpoint: { max: 3000, min: 1024 },
-      items: 2
+      breakpoint: { max: 2000, min: 1024 },
+      items: 1
     },
     tablet: {
       breakpoint: { max: 1024, min: 464 },
@@ -67,45 +41,57 @@ const Home = ({ isLoggedIn }) => {
     }
   };
 
-  return (
-    <div className="bg-red-100 min-h-screen flex flex-col items-center">
-      <main className="flex flex-col items-center justify-center flex-grow mt-16 px-4 md:px-0">
-        <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6 text-center">Punto Shein</h2>
-        
-        {isLoggedIn && userData ? (
-          <div className="text-center">
-            <h3 className="text-3xl">¡Bienvenido, {userData.nombre}!</h3>
-            <p className="text-lg">Tus datos: {userData.email}, {userData.telefono}</p>
-          </div>
-        ) : (
-          <p className="text-base md:text-lg text-gray-600 mb-10 text-center">
-            La mejor tienda de ropa y accesorios en línea. ¡Descubre la moda más reciente con nosotros!
-          </p>
-        )}
 
-        <div className="w-full max-w-4xl">
-          <Carousel 
-            responsive={responsive} 
-            infinite={true} 
-            autoPlay={true} 
-            autoPlaySpeed={3000} 
-            showDots={true}
-            containerClass="carousel-container"
-          >
-            {carouselItems.map((item, index) => (
-              <div key={index} className="flex flex-col items-center p-4">
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="w-full h-48 md:h-64 object-cover rounded-lg shadow-lg mb-4"
-                />
-                <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-2">{item.title}</h3>
-                <p className="text-gray-600 text-center">{item.description}</p>
+  return (
+    
+
+    <div className="bg-white min-h-screen flex flex-col items-center mt-20"> {/* Added mt-20 to push content down */}
+      {/* Fullscreen Carousel */}
+      <div className="w-full max-w-screen-xl mb-10">
+        <Carousel 
+          responsive={responsive} 
+          infinite={true} 
+          autoPlay={true} 
+          autoPlaySpeed={4000} 
+          showDots={true}
+        >
+          {carouselItems.map((item, index) => (
+            <div key={index} className="flex flex-col items-center">
+              <img 
+                src={item.image} 
+                alt={item.title} 
+                className="w-full h-72 md:h-96 object-cover rounded-lg"
+              />
+              <div className="absolute text-center bottom-8 text-white">
+                <h3 className="text-2xl md:text-4xl font-bold">{item.title}</h3>
+                <p className="text-lg md:text-xl">{item.description}</p>
               </div>
-            ))}
-          </Carousel>
+            </div>
+          ))}
+        </Carousel>
+      </div>
+
+      {/* Featured Section */}
+      <div className="w-full max-w-screen-xl px-4 md:px-8">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">Ofertas Destacadas</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Example product feature */}
+          <div className="bg-gray-100 p-6 rounded-lg shadow-lg text-center">
+            <img 
+              src="https://via.placeholder.com/400x400?text=Producto+1" 
+              alt="Producto 1" 
+              className="w-full h-40 object-cover rounded-lg mb-4"
+            />
+            <h3 className="text-lg font-bold mb-2">Producto 1</h3>
+            <p className="text-gray-600 mb-4">Descripción corta del producto.</p>
+            <button className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700">
+              Comprar Ahora
+            </button>
+          </div>
+          {/* Repeat the above block for additional featured products */}
         </div>
-      </main>
+      </div>
+      
     </div>
   );
 };

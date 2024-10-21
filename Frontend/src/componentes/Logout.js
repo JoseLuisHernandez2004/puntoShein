@@ -17,7 +17,7 @@ const Logout = ({ setIsLoggedIn }) => {
         navigate('/'); // Redirect to home
         Swal.fire({
           icon: 'success',
-          title: 'Cerrando Sesion',
+          title: 'Cerraste Sesión',
         });
       } catch (error) {
         console.error('Error logging out:', error);
@@ -29,7 +29,7 @@ const Logout = ({ setIsLoggedIn }) => {
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">
-      <h1 className="text-2xl font-bold">Logging out...</h1>
+      <h1 className="text-2xl font-bold">Cerrando inicio de sesión...</h1>
     </div>
   );
 };

@@ -44,7 +44,7 @@ const RegisterForm = ({ verifiedEmail }) => {
     try {
       const formattedPhone = telefono.startsWith('+') ? telefono : `+52${telefono}`;
       const response = await axios.get(
-        `https://phonevalidation.abstractapi.com/v1/?api_key=c95ef61fcc7b4a10a1ccbbef8feb7903&phone=${formattedPhone}`
+        `https://phonevalidation.abstractapi.com/v1/?api_key=91efd6efd8b8481dadc22f37931c7aa7&phone=${formattedPhone}`
       );
       if (response.data.valid) {
         setErrors((prevErrors) => ({ ...prevErrors, telefono: '' }));
