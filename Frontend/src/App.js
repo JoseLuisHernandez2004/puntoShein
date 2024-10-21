@@ -8,6 +8,7 @@ import UserDashboard from './componentes/UserDashboard';
 import RecoverPassword from './componentes/RecoverPassword';
 import VerificarCorreo from './componentes/VerificarCorreo';
 import Navbar from './componentes/Navbar'; // Import Navbar
+import About from './componentes/About';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -25,6 +26,7 @@ function App() {
           <Route path="/logout" element={<Logout setIsLoggedIn={setIsLoggedIn} />} />
           <Route path="/profile" element={isLoggedIn ? <UserDashboard /> : <LoginForm setIsLoggedIn={setIsLoggedIn} />} />
           <Route path="/recover-password" element={<RecoverPassword />} />
+          <Route path="/about" element={<About />} /> {/* Add the About route */}
         </Routes>
 
         {/* Add space at the bottom of the page */}

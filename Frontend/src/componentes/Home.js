@@ -1,15 +1,36 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Carousel from 'react-multi-carousel';
 import 'react-multi-carousel/lib/styles.css';
+import axios from 'axios';
 
 const Home = ({ isLoggedIn }) => {
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      const token = localStorage.getItem('authToken');
+      const fetchUserData = async () => {
+        try {
+          const response = await axios.get('https://puntoshein.onrender.com/api/user', {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+          setUserData(response.data);
+        } catch (error) {
+          console.error('Error fetching user data', error);
+        }
+      };
+      fetchUserData();
+    }
+  }, [isLoggedIn]);
+
   const carouselItems = [
     {
       image: 'https://scontent.fver2-1.fna.fbcdn.net/v/t39.30808-6/369966618_645024687697497_2994804745531471255_n.png?_nc_cat=102&ccb=1-7&_nc_sid=cc71e4&_nc_eui2=AeHnfnjOGwC1Jvd1N6OJHBt1jdMuayhn0O6N0y5rKGfQ7hSJFJ8KMDqB_ZrfOVI9fPudtLcJ8A5aUwLNh4JJOznB&_nc_ohc=w1dnmwzemYIQ7kNvgF25q2-&_nc_ht=scontent.fver2-1.fna&_nc_gid=AOG2jLMATQH5rqiuPb8XHIo&oh=00_AYDs00B6clRUZHuaYedBke9uyhQzaQY2MWFtaiqdKJ7xxA&oe=67195663',
       title: 'Nuevas tendencias',
       description: 'Explora la moda más reciente para esta temporada.'
     },
-    
     {
       image: 'https://scontent.fver2-1.fna.fbcdn.net/v/t39.30808-6/457137391_848177607382203_6569964154041620214_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeGxAgEujiP1vDY7oZ-RsZPrZ5TIm3RlbtNnlMibdGVu098xNdWjELIWxVav4IAPxlS1hE9KWY9UnBcGmHeMxa_Q&_nc_ohc=yrONhB3hlKMQ7kNvgHgFO5x&_nc_ht=scontent.fver2-1.fna&_nc_gid=Acd5PPdeXgOld_HvAtXm9uL&oh=00_AYCJD44TjIdQiotM3s3AL8CrKr2a30QAIBSfzZ6HnQIC2Q&oe=67194AB3',
       title: 'Accesorios elegantes',
@@ -50,9 +71,17 @@ const Home = ({ isLoggedIn }) => {
     <div className="bg-red-100 min-h-screen flex flex-col items-center">
       <main className="flex flex-col items-center justify-center flex-grow mt-16 px-4 md:px-0">
         <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6 text-center">Punto Shein</h2>
-        <p className="text-base md:text-lg text-gray-600 mb-10 text-center">
-          La mejor tienda de ropa y accesorios en línea. ¡Descubre la moda más reciente con nosotros!
-        </p>
+        
+        {isLoggedIn && userData ? (
+          <div className="text-center">
+            <h3 className="text-3xl">¡Bienvenido, {userData.nombre}!</h3>
+            <p className="text-lg">Tus datos: {userData.email}, {userData.telefono}</p>
+          </div>
+        ) : (
+          <p className="text-base md:text-lg text-gray-600 mb-10 text-center">
+            La mejor tienda de ropa y accesorios en línea. ¡Descubre la moda más reciente con nosotros!
+          </p>
+        )}
 
         <div className="w-full max-w-4xl">
           <Carousel 

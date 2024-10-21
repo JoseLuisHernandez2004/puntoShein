@@ -103,11 +103,11 @@ export const logout = (req, res) => {
 
 export const profile = async (req, res) => {
   try {
-    const userFound = await User.findById(req.user.id);
+    const userFound = await User.findById(req.user.id); // Encuentra al usuario por su ID
 
     if (!userFound) return res.status(400).json({ message: "Usuario no encontrado" });
 
-    // Responder con los detalles del perfil del usuario
+    // Devuelve los detalles del usuario
     return res.json({
       id: userFound._id,
       username: userFound.username,
@@ -122,8 +122,8 @@ export const profile = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-
 };
+
 
 export const forgotPassword = async (req, res) => {
   const { email } = req.body;
