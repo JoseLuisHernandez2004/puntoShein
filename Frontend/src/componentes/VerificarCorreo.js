@@ -41,7 +41,7 @@ const VerificarCorreo = ({ onVerified }) => {
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
       <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-6">
-        <h1 className="text-2xl font-bold mb-4 text-center">Verificar Correo</h1>
+        <h1 className="text-2xl font-bold mb-4 text-center">Registrar</h1>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
