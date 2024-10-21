@@ -99,8 +99,10 @@ const RegisterForm = ({ verifiedEmail }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const isPhoneValid = await validatePhoneNumberWithAPI(formData.telefono);
-    if (!isPhoneValid) return;
+    // Verifica si el teléfono ya fue validado previamente
+    if (errors.telefono) {
+      return; // No procede si hay errores con el teléfono
+    }
 
     if (!isPasswordStrong()) {
       setErrors((prevErrors) => ({ ...prevErrors, password: 'La contraseña es débil. Asegúrate de que cumple los requisitos.' }));
@@ -135,6 +137,7 @@ const RegisterForm = ({ verifiedEmail }) => {
       });
     }
   };
+
 
   return (
     <div className="flex flex-col items-center justify-center bg-gray-100 px-4 py-10 md:py-20">
