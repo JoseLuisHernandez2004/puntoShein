@@ -21,16 +21,6 @@ const LoginForm = ({ setIsLoggedIn }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      Swal.fire({
-        icon: 'info',
-        title: 'Iniciando sesión...',
-        timer: 1000,
-        showConfirmButton: false,
-        willOpen: () => {
-          Swal.showLoading();
-        },
-      });
-  
       const response = await axios.post('https://puntoshein.onrender.com/api/login', formData, {
         withCredentials: true
       });
