@@ -5,6 +5,10 @@ import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
 import { TOKEN_SECRET } from '../config.js';
 
+/* Variables para la funcion de bloqueo del numero de intentos de inicio de sesion */
+const MAX_ATTEMPTS = 3;
+const LOCK_TIME = 2 * 60 * 1000; // 2 minutos
+
 export const register = async (req, res) => {
   const { email, password, username, nombre, apellidoM, apellidoP, telefono } = req.body;
 
@@ -60,28 +64,42 @@ export const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Buscar al usuario por correo electrónico
     const userFound = await User.findOne({ email });
     if (!userFound) return res.status(400).json({ message: "Usuario no encontrado" });
 
-    // Comparar la contraseña ingresada con la almacenada en la base de datos
+    // Verificar si la cuenta está bloqueada
+    if (userFound.lockUntil && userFound.lockUntil > Date.now()) {
+      const lockTimeRemaining = Math.ceil((userFound.lockUntil - Date.now()) / 1000);
+      return res.status(403).json({ message: `Cuenta bloqueada. Inténtalo de nuevo en ${lockTimeRemaining} segundos.` });
+    }
+
+    // Verificar la contraseña
     const isMatch = await bcrypt.compare(password, userFound.password);
-    if (!isMatch) return res.status(400).json({ message: "Contraseña incorrecta" });
+    if (!isMatch) {
+      // Incrementar intentos fallidos
+      userFound.loginAttempts += 1;
 
-    // Crear un token de acceso
+      if (userFound.loginAttempts >= MAX_ATTEMPTS) {
+        userFound.lockUntil = Date.now() + LOCK_TIME; // Bloquear por un tiempo
+        userFound.loginAttempts = 0; // Reiniciar después del bloqueo
+      }
+
+      await userFound.save();
+      return res.status(401).json({ message: 'Correo o contraseña incorrectos' });
+    }
+
+    // Restablecer intentos fallidos después de un inicio de sesión exitoso
+    userFound.loginAttempts = 0;
+    userFound.lockUntil = null;
+    await userFound.save();
+
     const token = await createAccessToken({ id: userFound._id });
-
-    // Configurar una cookie con el token
     res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
 
     // Responder con los detalles del usuario
     res.json({
       id: userFound._id,
       username: userFound.username,
-      nombre: userFound.nombre,
-      apellidoP: userFound.apellidoP,
-      apellidoM: userFound.apellidoM,
-      telefono: userFound.telefono,
       email: userFound.email,
       createdAt: userFound.createdAt,
       updatedAt: userFound.updatedAt,
@@ -91,6 +109,7 @@ export const login = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 export const logout = (req, res) => {
   res.cookie('token', '', {
@@ -193,3 +212,4 @@ export const resetPassword = async (req, res) => {
     res.status(500).json({ message: "Error al restablecer la contraseña: " + error.message });
   }
 };
+

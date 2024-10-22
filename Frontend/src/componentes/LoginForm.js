@@ -40,14 +40,31 @@ const LoginForm = ({ setIsLoggedIn }) => {
         navigate('/profile');
       }, 1000);
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Correo o contraseña incorrectos',
-        timer: 1500,
-      });
+      if (error.response.status === 403) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Cuenta bloqueada',
+          text: error.response.data.message,
+          timer: 5000,
+        });
+      } else if (error.response.status === 401) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Intento fallido',
+          text: error.response.data.message,
+          timer: 1500,
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Hubo un error al intentar iniciar sesión. Por favor, intenta nuevamente.',
+          timer: 1500,
+        });
+      }
     }
   };
+  
 
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-gray-100 px-4">
