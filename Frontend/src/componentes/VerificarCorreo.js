@@ -42,15 +42,17 @@ const VerificarCorreo = ({ onVerified }) => {
     <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
       <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-6">
         <h1 className="text-2xl font-bold mb-4 text-center">Registrar</h1>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          
+          {/* Correo Electrónico Field */}
+          <div>
+            <label className="block text-black-600 text-md font-semibold mb-2" htmlFor="email">
               Correo Electrónico
             </label>
-            <div className="flex items-center border rounded px-2 py-2">
-              <MdEmail className="text-gray-500 mr-2" size={20} /> {/* React Icon for Email */}
+            <div className="flex items-center border border-black-400 rounded-full px-3 py-2 shadow-lg transition-all hover:shadow-xl">
+              <MdEmail className="text-black-400 mr-3" size={24} /> {/* React Icon for Email */}
               <input
-                className="flex-grow focus:outline-none"
+                className="w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full text-blue-600 px-2 py-1 transition-all duration-300 ease-in-out"
                 id="email"
                 type="email"
                 value={email}
@@ -60,8 +62,10 @@ const VerificarCorreo = ({ onVerified }) => {
               />
             </div>
           </div>
+  
+          {/* Submit Button */}
           <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline transition-all duration-300 ease-in-out"
             type="submit"
           >
             Verificar correo
@@ -69,6 +73,8 @@ const VerificarCorreo = ({ onVerified }) => {
         </form>
       </div>
     </div>
+
+  
   );
 };
 

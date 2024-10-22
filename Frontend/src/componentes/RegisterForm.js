@@ -27,6 +27,7 @@ const RegisterForm = ({ verifiedEmail }) => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isFocused, setIsFocused] = useState(false); // Estado para manejar el foco del campo de contraseña
   const navigate = useNavigate();
 
   const validateText = (text) => /^[a-zA-ZÀ-ÿ\s]{1,25}$/.test(text);
@@ -99,9 +100,8 @@ const RegisterForm = ({ verifiedEmail }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Verifica si el teléfono ya fue validado previamente
     if (errors.telefono) {
-      return; // No procede si hay errores con el teléfono
+      return;
     }
 
     if (!isPasswordStrong()) {
@@ -138,21 +138,24 @@ const RegisterForm = ({ verifiedEmail }) => {
     }
   };
 
+  const handleFocus = () => setIsFocused(true);
+  const handleBlur = () => setIsFocused(false);
 
   return (
     <div className="flex flex-col items-center justify-center bg-gray-100 px-4 py-10 md:py-20">
       <div className="w-full max-w-lg bg-white rounded-lg shadow-lg p-6 md:p-10">
         <h1 className="text-2xl font-bold mb-4 text-center">Registrar</h1>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          
+        <form onSubmit={handleSubmit} className="space-y-2">
           {/* Email Field */}
           <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">Correo Electrónico</label>
-            <div className="flex items-center border rounded px-2 py-2 shadow">
-              <MdEmail className="text-gray-500 mr-2" size={20} />
+            <label className="block text-black-600 text-md font-semibold mb-2" htmlFor="email">
+              Correo Electrónico
+            </label>
+            <div className="flex items-center border border-black-400 rounded-full px-3 py-2 shadow-lg transition-all hover:shadow-xl">
+              <MdEmail className="text-black-400 mr-3" size={24} />
               <input
-                className="w-full focus:outline-none"
+                className="w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full text-blue-600 px-2 py-1 transition-all duration-300 ease-in-out"
                 id="email"
                 type="email"
                 name="email"
@@ -163,19 +166,23 @@ const RegisterForm = ({ verifiedEmail }) => {
             </div>
           </div>
 
+
           {/* Username Field */}
           <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">Nombre de Usuario</label>
-            <div className="flex items-center border rounded px-2 py-2 shadow">
-              <MdPerson className="text-gray-500 mr-2" size={20} />
+            <label className="block text-black-600 text-md font-semibold mb-2" htmlFor="username">
+              Nombre de Usuario
+            </label>
+            <div className="flex items-center border border-black-400 rounded-full px-3 py-2 shadow-lg transition-all hover:shadow-xl">
+              <MdPerson className="text-black-400 mr-3" size={24} />
               <input
-                className="w-full focus:outline-none"
+                className="w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full text-blue-600 px-2 py-1 transition-all duration-300 ease-in-out"
                 id="username"
                 type="text"
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
                 maxLength="20"
+                placeholder='Ingresa un nombre de usuario'
                 required
               />
             </div>
@@ -183,74 +190,89 @@ const RegisterForm = ({ verifiedEmail }) => {
 
           {/* Nombre Field */}
           <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="nombre">Nombre</label>
-            <div className="flex items-center border rounded px-2 py-2 shadow">
-              <MdPerson className="text-gray-500 mr-2" size={20} />
+            <label className="block text-black-600 text-md font-semibold mb-2" htmlFor="nombre">
+              Nombre
+            </label>
+            <div className="flex items-center border border-black-400 rounded-full px-3 py-2 shadow-lg transition-all hover:shadow-xl">
+              <MdPerson className="text-black-400 mr-3" size={24} />
               <input
-                className="w-full focus:outline-none"
+                className="w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full text-blue-600 px-2 py-1 transition-all duration-300 ease-in-out"
                 id="nombre"
                 type="text"
                 name="nombre"
                 value={formData.nombre}
                 onChange={handleChange}
                 maxLength="25"
+                placeholder="Ingresa tu nombre"
                 required
               />
             </div>
             {errors.nombre && <p className="text-red-500 text-xs italic">{errors.nombre}</p>}
           </div>
 
+
           {/* Apellido Paterno Field */}
           <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="apellidoP">Apellido Paterno</label>
-            <div className="flex items-center border rounded px-2 py-2 shadow">
-              <MdPerson className="text-gray-500 mr-2" size={20} />
+            <label className="block text-black-600 text-md font-semibold mb-2" htmlFor="apellidoP">
+              Apellido Paterno
+            </label>
+            <div className="flex items-center border border-black-400 rounded-full px-3 py-2 shadow-lg transition-all hover:shadow-xl">
+              <MdPerson className="text-black-400 mr-3" size={24} />
               <input
-                className="w-full focus:outline-none"
+                className="w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full text-blue-600 px-2 py-1 transition-all duration-300 ease-in-out"
                 id="apellidoP"
                 type="text"
                 name="apellidoP"
                 value={formData.apellidoP}
                 onChange={handleChange}
                 maxLength="25"
+                placeholder="Ingresa tu apellido paterno"
                 required
               />
             </div>
             {errors.apellidoP && <p className="text-red-500 text-xs italic">{errors.apellidoP}</p>}
           </div>
 
+
           {/* Apellido Materno Field */}
           <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="apellidoM">Apellido Materno</label>
-            <div className="flex items-center border rounded px-2 py-2 shadow">
-              <MdPerson className="text-gray-500 mr-2" size={20} />
+            <label className="block text-black-600 text-md font-semibold mb-2" htmlFor="apellidoM">
+              Apellido Materno
+            </label>
+            <div className="flex items-center border border-black-400 rounded-full px-3 py-2 shadow-lg transition-all hover:shadow-xl">
+              <MdPerson className="text-black-400 mr-3" size={24} />
               <input
-                className="w-full focus:outline-none"
+                className="w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full text-blue-600 px-2 py-1 transition-all duration-300 ease-in-out"
                 id="apellidoM"
                 type="text"
                 name="apellidoM"
                 value={formData.apellidoM}
                 onChange={handleChange}
                 maxLength="25"
+                placeholder="Ingresa tu apellido materno"
                 required
               />
             </div>
             {errors.apellidoM && <p className="text-red-500 text-xs italic">{errors.apellidoM}</p>}
           </div>
 
+
           {/* Phone Number Field */}
           <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="telefono">Teléfono</label>
-            <div className="flex items-center border rounded px-2 py-2 shadow">
-              <MdPhone className="text-gray-500 mr-2" size={20} />
+            <label className="block text-black-600 text-md font-semibold mb-2" htmlFor="telefono">
+              Teléfono
+            </label>
+            <div className="flex items-center border border-black-400 rounded-full px-3 py-2 shadow-lg transition-all hover:shadow-xl">
+              <MdPhone className="text-black-400 mr-3" size={24} />
               <input
-                className={`w-full focus:outline-none ${errors.telefono ? 'border-red-500' : ''}`}
+                className={`w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full text-blue-600 px-2 py-1 transition-all duration-300 ease-in-out ${errors.telefono ? 'border-red-500' : ''}`}
                 id="telefono"
                 type="text"
                 name="telefono"
                 value={formData.telefono}
                 onChange={handleChange}
                 maxLength="10"
+                placeholder="Ingresa tu número de teléfono"
                 required
               />
             </div>
@@ -259,53 +281,65 @@ const RegisterForm = ({ verifiedEmail }) => {
 
           {/* Password Field */}
           <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">Contraseña</label>
-            <div className="flex items-center border rounded px-2 py-2 shadow">
-              <MdLock className="text-gray-500 mr-2" size={20} />
+            <label className="block text-black-600 text-md font-semibold mb-2" htmlFor="password">
+              Contraseña
+            </label>
+            <div className="flex items-center border border-black-400 rounded-full px-3 py-2 shadow-lg transition-all hover:shadow-xl">
+              <MdLock className="text-black-400 mr-3" size={24} />
               <input
-                className="w-full focus:outline-none"
+                className="w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full text-blue-600 px-2 py-1 transition-all duration-300 ease-in-out"
                 id="password"
                 type={showPassword ? 'text' : 'password'}
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
+                placeholder="Ingresa tu contraseña"
                 required
               />
               <button type="button" onClick={() => setShowPassword(!showPassword)}>
-                {showPassword ? <MdVisibilityOff size={20} /> : <MdVisibility size={20} />}
+                {showPassword ? <MdVisibilityOff className="text-black-400" size={24} /> : <MdVisibility className="text-black-400" size={24} />}
               </button>
             </div>
             {errors.password && <p className="text-red-500 text-xs italic">{errors.password}</p>}
 
-            <div className="mt-2 text-xs">
-              <p className={passwordStrength.length ? 'text-green-500' : 'text-red-500'}>Debe tener al menos 8 caracteres</p>
-              <p className={passwordStrength.uppercase ? 'text-green-500' : 'text-red-500'}>Debe tener al menos una letra mayúscula</p>
-              <p className={passwordStrength.lowercase ? 'text-green-500' : 'text-red-500'}>Debe tener al menos una letra minúscula</p>
-              <p className={passwordStrength.number ? 'text-green-500' : 'text-red-500'}>Debe tener al menos un número</p>
-              <p className={passwordStrength.specialChar ? 'text-green-500' : 'text-red-500'}>Debe tener al menos un carácter especial (@$!%*?&)</p>
-            </div>
+            {/* Instrucciones solo se muestran cuando el campo está en foco */}
+            {isFocused && (
+              <div className="mt-2 text-xs">
+                <p className={passwordStrength.length ? 'text-green-500' : 'text-red-500'}>Debe tener al menos 8 caracteres</p>
+                <p className={passwordStrength.uppercase ? 'text-green-500' : 'text-red-500'}>Debe tener al menos una letra mayúscula</p>
+                <p className={passwordStrength.lowercase ? 'text-green-500' : 'text-red-500'}>Debe tener al menos una letra minúscula</p>
+                <p className={passwordStrength.number ? 'text-green-500' : 'text-red-500'}>Debe tener al menos un número</p>
+                <p className={passwordStrength.specialChar ? 'text-green-500' : 'text-red-500'}>Debe tener al menos un carácter especial (@$!%*?&)</p>
+              </div>
+            )}
           </div>
 
           {/* Confirm Password Field */}
           <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="confirmPassword">Repetir Contraseña</label>
-            <div className="flex items-center border rounded px-2 py-2 shadow">
-              <MdLock className="text-gray-500 mr-2" size={20} />
+            <label className="block text-black-600 text-md font-semibold mb-2" htmlFor="confirmPassword">
+              Repetir Contraseña
+            </label>
+            <div className="flex items-center border border-black-400 rounded-full px-3 py-2 shadow-lg transition-all hover:shadow-xl">
+              <MdLock className="text-black-400 mr-3" size={24} />
               <input
-                className="w-full focus:outline-none"
+                className="w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full text-blue-600 px-2 py-1 transition-all duration-300 ease-in-out"
                 id="confirmPassword"
                 type={showConfirmPassword ? 'text' : 'password'}
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleChange}
+                placeholder="Repite tu contraseña"
                 required
               />
               <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                {showConfirmPassword ? <MdVisibilityOff size={20} /> : <MdVisibility size={20} />}
+                {showConfirmPassword ? <MdVisibilityOff className="text-black-400" size={24} /> : <MdVisibility className="text-black-400" size={24} />}
               </button>
             </div>
             {errors.confirmPassword && <p className="text-red-500 text-xs italic">{errors.confirmPassword}</p>}
           </div>
+
 
           <div className="mt-8 flex justify-center">
             <button

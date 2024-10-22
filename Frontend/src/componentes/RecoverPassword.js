@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { MdEmail } from 'react-icons/md'; // Importar ícono de email
 
 const RecoverPassword = () => {
   const [email, setEmail] = useState('');
@@ -24,29 +25,43 @@ const RecoverPassword = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-10 mt-10 min-h-screen flex flex-col justify-center items-center">
-        <h1 className="text-2xl font-bold text-center mb-6">Recuperar Contraseña</h1>
-        <form onSubmit={handleSubmit} className="max-w-md w-full bg-white p-6 rounded-lg shadow-lg">
-        <div className="mb-4">
-            <label htmlFor="email" className="block text-gray-700 font-bold mb-2">Correo Electrónico</label>
-            <input
-            type="email"
-            id="email"
-            name="email"
-            className="w-full p-2 border rounded-lg"
-            placeholder="Ingresa tu correo"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            />
-        </div>
-        <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded-lg w-full hover:bg-blue-700">
-            Enviar
-        </button>
-        </form>
-    </div>
-  
+    <div className="flex flex-col items-center justify-center h-screen bg-gray-100 px-4">
+      <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-6">
+        <h1 className="text-2xl font-bold text-center mb-4">Recuperar Contraseña</h1>
+        <form onSubmit={handleSubmit} className="space-y-4">
 
+          {/* Correo Electrónico Field con diseño actualizado */}
+          <div>
+            <label className="block text-black-600 text-md font-semibold mb-2" htmlFor="email">
+              Correo Electrónico
+            </label>
+            <div className="flex items-center border border-black-400 rounded-full px-3 py-2 shadow-lg transition-all hover:shadow-xl">
+              <MdEmail className="text-black-400 mr-3" size={24} />
+              <input
+                className="w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full text-blue-600 px-2 py-1 transition-all duration-300 ease-in-out"
+                id="email"
+                type="email"
+                name="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Ingresa tu correo"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Botón de enviar */}
+          <div className="mt-6">
+            <button
+              className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full transition-all duration-300"
+              type="submit"
+            >
+              Enviar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 };
 
