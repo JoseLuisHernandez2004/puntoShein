@@ -187,7 +187,7 @@ export const forgotPassword = async (req, res) => {
     });
 
     const mailOptions = {
-      from: 'luis2004hdez@gmail.com',
+      from: 'puntoShein',
       to: user.email,
       subject: 'Recuperación de contraseña',
       html: `<p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p><a href="${resetUrl}">${resetUrl}</a>`,
