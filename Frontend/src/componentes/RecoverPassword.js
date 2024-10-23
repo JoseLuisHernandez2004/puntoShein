@@ -9,7 +9,8 @@ const RecoverPassword = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('/api/forgot-password', { email });
+      await axios.post('https://puntoshein.onrender.com/api/forgot-password', { email });
+
       Swal.fire({
         icon: 'success',
         title: 'Correo enviado',

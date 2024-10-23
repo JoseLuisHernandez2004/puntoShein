@@ -6,7 +6,7 @@ import nodemailer from 'nodemailer';
 import { TOKEN_SECRET } from '../config.js';
 
 /* Variables para la funcion de bloqueo del numero de intentos de inicio de sesion */
-const MAX_ATTEMPTS = 3;
+const MAX_ATTEMPTS = 5;
 const LOCK_TIME = 2 * 60 * 1000; // 2 minutos
 
 export const register = async (req, res) => {
@@ -19,7 +19,7 @@ export const register = async (req, res) => {
       return res.status(400).json({ message: "El correo ya está registrado" });
     }
 
-    // Hashear la contraseña
+    // Hashear la contraseña usando bcrypt
     const passwordHash = await bcrypt.hash(password, 10);
 
     // Crear un nuevo usuario
@@ -153,17 +153,20 @@ export const forgotPassword = async (req, res) => {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
-    // Usar TOKEN_SECRET para firmar el token
+    // Generar token de restablecimiento válido por 1 hora
     const resetToken = jwt.sign({ id: user._id }, TOKEN_SECRET, { expiresIn: '1h' });
 
-    const resetUrl = `http://localhost:3000/reset-password/${resetToken}`;
+    const resetUrl = `https://puntoshein.netlify.app/reset-password/${resetToken}`;
 
     const transporter = nodemailer.createTransport({
       service: 'Gmail',
       auth: {
-        user: process.env.EMAIL_USER,  // Variables de entorno para email
-        pass: process.env.EMAIL_PASS,  
+        user: 'luis2004hdez@gmail.com', // Reemplaza con tu correo
+        pass: 'zjdt tnxx bite jdjc',  // Reemplaza con la contraseña de aplicaciones
       },
+      tls: {
+        rejectUnauthorized: false // Ignora el certificado autofirmado
+      }
     });
 
     const mailOptions = {
@@ -181,21 +184,21 @@ export const forgotPassword = async (req, res) => {
   }
 };
 
-
+// Controlador para restablecer la contraseña
 export const resetPassword = async (req, res) => {
   const { token } = req.params;
   const { newPassword } = req.body;
 
   try {
     // Verificar el token
-    const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
+    const decoded = jwt.verify(token, TOKEN_SECRET);
     const user = await User.findById(decoded.id);
 
     if (!user) {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
-    // Validar la nueva contraseña (ejemplo: longitud mínima)
+    // Validar la nueva contraseña
     if (!newPassword || newPassword.length < 6) {
       return res.status(400).json({ message: "La nueva contraseña debe tener al menos 6 caracteres" });
     }
@@ -212,4 +215,3 @@ export const resetPassword = async (req, res) => {
     res.status(500).json({ message: "Error al restablecer la contraseña: " + error.message });
   }
 };
-

@@ -6,6 +6,7 @@ import RegisterForm from './componentes/RegisterForm';
 import Logout from './componentes/Logout';
 import UserDashboard from './componentes/UserDashboard';
 import RecoverPassword from './componentes/RecoverPassword';
+import ResetPassword from './componentes/ResetPassword';
 import VerificarCorreo from './componentes/VerificarCorreo';
 import Navbar from './componentes/Navbar'; // Import Navbar
 import About from './componentes/About';
@@ -26,6 +27,7 @@ function App() {
           <Route path="/logout" element={<Logout setIsLoggedIn={setIsLoggedIn} />} />
           <Route path="/profile" element={isLoggedIn ? <UserDashboard /> : <LoginForm setIsLoggedIn={setIsLoggedIn} />} />
           <Route path="/recover-password" element={<RecoverPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/about" element={<About />} /> {/* Add the About route */}
         </Routes>
 
