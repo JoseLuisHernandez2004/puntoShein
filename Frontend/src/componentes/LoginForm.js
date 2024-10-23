@@ -10,7 +10,6 @@ const LoginForm = ({ setIsLoggedIn }) => {
     password: ''
   });
   const [showPassword, setShowPassword] = useState(false);  // Control de visibilidad de la contraseña
-  const [recaptchaToken, setRecaptchaToken] = useState(''); // Token de reCAPTCHA
   const navigate = useNavigate();
 
   // Cargar el script de reCAPTCHA en el frontend
