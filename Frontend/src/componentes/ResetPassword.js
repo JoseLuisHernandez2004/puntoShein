@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import { MdLock } from 'react-icons/md'; // Reutilizando el ícono de candado
+import { MdLock, MdVisibility, MdVisibilityOff } from 'react-icons/md'; // Agregado iconos de visibilidad
 
 const ResetPassword = () => {
   const { token } = useParams();
@@ -10,6 +10,17 @@ const ResetPassword = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState(null);
+
+  const [showNewPassword, setShowNewPassword] = useState(false); // Estado para la visibilidad de la nueva contraseña
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Estado para la visibilidad de confirmar contraseña
+
+  const handleToggleNewPasswordVisibility = () => {
+    setShowNewPassword(!showNewPassword); // Alterna la visibilidad de la nueva contraseña
+  };
+
+  const handleToggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword); // Alterna la visibilidad de confirmar contraseña
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,7 +31,7 @@ const ResetPassword = () => {
 
     try {
       const response = await axios.post(`https://puntoshein.onrender.com/api/reset-password/${token}`, { newPassword });
-      
+
       if (response.data.message === 'Contraseña actualizada con éxito') {
         Swal.fire({
           icon: 'success',
@@ -35,7 +46,16 @@ const ResetPassword = () => {
         }, 3000);
       }
     } catch (err) {
-      setError('Hubo un error al restablecer la contraseña');
+      // Captura el error cuando el token ha expirado
+      if (err.response && err.response.data.message === "jwt expired") {
+        Swal.fire({
+          icon: 'error',
+          title: 'Enlace ha caducado',
+          text: 'El enlace para restablecer la contraseña ha caducado. Solicita uno nuevo.',
+        });
+      } else {
+        setError('Hubo un error al restablecer la contraseña');
+      }
     }
   };
 
@@ -58,13 +78,16 @@ const ResetPassword = () => {
               <input
                 className="w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full text-blue-600 px-2 py-1 transition-all duration-300 ease-in-out"
                 id="newPassword"
-                type="password"
+                type={showNewPassword ? 'text' : 'password'} // Cambia el tipo de input según la visibilidad
                 name="newPassword"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="Ingresa la nueva contraseña"
                 required
               />
+              <button type="button" onClick={handleToggleNewPasswordVisibility} className="ml-2">
+                {showNewPassword ? <MdVisibilityOff size={24} /> : <MdVisibility size={24} />} {/* Botón de visibilidad */}
+              </button>
             </div>
           </div>
           
@@ -78,13 +101,16 @@ const ResetPassword = () => {
               <input
                 className="w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full text-blue-600 px-2 py-1 transition-all duration-300 ease-in-out"
                 id="confirmPassword"
-                type="password"
+                type={showConfirmPassword ? 'text' : 'password'} // Cambia el tipo de input según la visibilidad
                 name="confirmPassword"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Confirma tu contraseña"
                 required
               />
+              <button type="button" onClick={handleToggleConfirmPasswordVisibility} className="ml-2">
+                {showConfirmPassword ? <MdVisibilityOff size={24} /> : <MdVisibility size={24} />} {/* Botón de visibilidad */}
+              </button>
             </div>
           </div>
 

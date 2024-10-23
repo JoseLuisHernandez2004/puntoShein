@@ -45,6 +45,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    // Campo para registrar la última vez que se cambió la contraseña
+    passwordChangedAt: {
+        type: Date,
+    },
 
     /* Bloqueo de cuanto por varios intentos */
     loginAttempts: {

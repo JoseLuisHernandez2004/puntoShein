@@ -154,15 +154,15 @@ export const forgotPassword = async (req, res) => {
     }
 
     // Generar token de restablecimiento válido por 1 hora
-    const resetToken = jwt.sign({ id: user._id }, TOKEN_SECRET, { expiresIn: '1h' });
+    const resetToken = jwt.sign({ id: user._id }, TOKEN_SECRET, { expiresIn: '15m' });
 
     const resetUrl = `https://puntoshein.netlify.app/reset-password/${resetToken}`;
 
     const transporter = nodemailer.createTransport({
       service: 'Gmail',
       auth: {
-        user: 'luis2004hdez@gmail.com', // Reemplaza con tu correo
-        pass: 'zjdt tnxx bite jdjc',  // Reemplaza con la contraseña de aplicaciones
+        user: 'luis2004hdez@gmail.com', //Mi correo
+        pass: 'zjdt tnxx bite jdjc',  // Mi contraseña de aplicaciones
       },
       tls: {
         rejectUnauthorized: false // Ignora el certificado autofirmado
@@ -198,6 +198,14 @@ export const resetPassword = async (req, res) => {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
+    // Verificar si ha pasado menos de 24 horas desde el último cambio de contraseña
+    const oneDay = 24 * 60 * 60 * 1000; // 24 horas en milisegundos
+    const now = Date.now();
+
+    if (user.passwordChangedAt && (now - user.passwordChangedAt.getTime()) < oneDay) {
+      return res.status(400).json({ message: "Solo puedes cambiar tu contraseña una vez cada 24 horas." });
+    }
+
     // Validar la nueva contraseña
     if (!newPassword || newPassword.length < 6) {
       return res.status(400).json({ message: "La nueva contraseña debe tener al menos 6 caracteres" });
@@ -206,8 +214,9 @@ export const resetPassword = async (req, res) => {
     // Hashear la nueva contraseña
     const passwordHash = await bcrypt.hash(newPassword, 10);
 
-    // Actualizar la contraseña en la base de datos
+    // Actualizar la contraseña en la base de datos y registrar la fecha del cambio
     user.password = passwordHash;
+    user.passwordChangedAt = new Date(); // Registrar la fecha y hora del cambio de contraseña
     await user.save();
 
     res.json({ message: "Contraseña actualizada con éxito" });
@@ -215,3 +224,4 @@ export const resetPassword = async (req, res) => {
     res.status(500).json({ message: "Error al restablecer la contraseña: " + error.message });
   }
 };
+
