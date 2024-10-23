@@ -64,16 +64,15 @@ export const register = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  const { email, password } = req.body;  // Eliminar recaptchaToken de la solicitud
+  const { email, password } = req.body;
 
   try {
-    // Buscar al usuario por correo electrónico
     const userFound = await User.findOne({ email });
     if (!userFound) return res.status(400).json({ message: "Usuario no encontrado" });
 
     // Verificar si la cuenta está bloqueada
     if (userFound.lockUntil && userFound.lockUntil > Date.now()) {
-      const lockTimeRemaining = Math.ceil((userFound.lockUntil - Date.now()) / 1000); // en segundos
+      const lockTimeRemaining = Math.ceil((userFound.lockUntil - Date.now()) / 1000);
       return res.status(403).json({ message: `Cuenta bloqueada. Inténtalo de nuevo en ${lockTimeRemaining} segundos.` });
     }
 
@@ -83,25 +82,21 @@ export const login = async (req, res) => {
       // Incrementar intentos fallidos
       userFound.loginAttempts += 1;
 
-      // Verificar si se alcanzaron los intentos máximos
       if (userFound.loginAttempts >= MAX_ATTEMPTS) {
-        userFound.lockUntil = Date.now() + LOCK_TIME; // Bloquear por un tiempo definido (ej. 2 minutos)
-        userFound.loginAttempts = 0; // Reiniciar intentos fallidos después del bloqueo
+        userFound.lockUntil = Date.now() + LOCK_TIME; // Bloquear por un tiempo
+        userFound.loginAttempts = 0; // Reiniciar después del bloqueo
       }
 
       await userFound.save();
       return res.status(401).json({ message: 'Correo o contraseña incorrectos' });
     }
 
-    // Si la contraseña es correcta, restablecer intentos fallidos y desbloquear la cuenta
+    // Restablecer intentos fallidos después de un inicio de sesión exitoso
     userFound.loginAttempts = 0;
     userFound.lockUntil = null;
     await userFound.save();
 
-    // Generar el token de acceso
     const token = await createAccessToken({ id: userFound._id });
-
-    // Guardar el token en la cookie de forma segura
     res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
 
     // Responder con los detalles del usuario

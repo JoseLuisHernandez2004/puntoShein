@@ -1,15 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2'; 
-import { MdEmail, MdLock, MdVisibility, MdVisibilityOff } from 'react-icons/md';  // Importar iconos de visibilidad
+import { MdEmail, MdLock } from 'react-icons/md'; 
 
 const LoginForm = ({ setIsLoggedIn }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
-  const [showPassword, setShowPassword] = useState(false);  // Control de visibilidad de la contraseña
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -19,20 +18,11 @@ const LoginForm = ({ setIsLoggedIn }) => {
     });
   };
 
-  // Alternar visibilidad de contraseña
-  const handleTogglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      const response = await axios.post('https://puntoshein.onrender.com/api/login', {
-        email: formData.email,
-        password: formData.password
-      }, {
-        withCredentials: true  // Asegurar el manejo de las cookies de sesión
+      const response = await axios.post('https://puntoshein.onrender.com/api/login', formData, {
+        withCredentials: true
       });
   
       Swal.fire({
@@ -50,14 +40,14 @@ const LoginForm = ({ setIsLoggedIn }) => {
         navigate('/profile');
       }, 1000);
     } catch (error) {
-      if (error.response && error.response.status === 403) {
+      if (error.response.status === 403) {
         Swal.fire({
           icon: 'error',
           title: 'Cuenta bloqueada',
           text: error.response.data.message,
           timer: 5000,
         });
-      } else if (error.response && error.response.status === 401) {
+      } else if (error.response.status === 401) {
         Swal.fire({
           icon: 'error',
           title: 'Intento fallido',
@@ -74,6 +64,7 @@ const LoginForm = ({ setIsLoggedIn }) => {
       }
     }
   };
+  
 
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-gray-100 px-4">
@@ -81,7 +72,7 @@ const LoginForm = ({ setIsLoggedIn }) => {
         <h1 className="text-2xl font-bold mb-4 text-center">Iniciar Sesión</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           
-          {/* Campo Correo Electrónico */}
+          {/* Correo Electrónico Field con diseño actualizado */}
           <div>
             <label className="block text-black-600 text-md font-semibold mb-2" htmlFor="email">
               Correo Electrónico
@@ -102,7 +93,7 @@ const LoginForm = ({ setIsLoggedIn }) => {
             </div>
           </div>
           
-          {/* Campo Contraseña con visibilidad */}
+          {/* Contraseña Field con diseño actualizado */}
           <div>
             <label className="block text-black-600 text-md font-semibold mb-2" htmlFor="password">
               Contraseña
@@ -112,7 +103,7 @@ const LoginForm = ({ setIsLoggedIn }) => {
               <input
                 className="w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full text-blue-600 px-2 py-1 transition-all duration-300 ease-in-out"
                 id="password"
-                type={showPassword ? 'text' : 'password'}  // Alternar entre tipo password/text
+                type="password"
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
@@ -120,13 +111,10 @@ const LoginForm = ({ setIsLoggedIn }) => {
                 placeholder="Ingresa tu contraseña"
                 required
               />
-              <button type="button" onClick={handleTogglePasswordVisibility} className="ml-2">
-                {showPassword ? <MdVisibilityOff size={24} /> : <MdVisibility size={24} />} {/* Botón de visibilidad */}
-              </button>
             </div>
           </div>
 
-          {/* Botón de Enviar */}
+          {/* Botón de enviar */}
           <div className="mt-6">
             <button
               className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full transition-all duration-300"
