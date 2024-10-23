@@ -8,6 +8,7 @@ import { TOKEN_SECRET } from '../config.js';
 /* Variables para la funcion de bloqueo del numero de intentos de inicio de sesion */
 const MAX_ATTEMPTS = 5;
 const LOCK_TIME = 2 * 60 * 1000; // 2 minutos
+const RECAPTCHA_SECRET = '6LdxumkqAAAAA1a3g6_M2SFHPb0YJhpV3SkRPjU';
 
 export const register = async (req, res) => {
   const { email, password, username, nombre, apellidoM, apellidoP, telefono } = req.body;
@@ -61,15 +62,25 @@ export const register = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, recaptchaToken } = req.body;
 
   try {
+    // Verificar el token de reCAPTCHA con la API de Google
+    const verificationUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${RECAPTCHA_SECRET}&response=${recaptchaToken}`;
+    const { data } = await axios.post(verificationUrl);
+
+    // Si reCAPTCHA falla, devolver error
+    if (!data.success) {
+      return res.status(400).json({ message: "Fallo la verificación de CAPTCHA. Inténtalo de nuevo." });
+    }
+
+    // Buscar al usuario por correo electrónico
     const userFound = await User.findOne({ email });
     if (!userFound) return res.status(400).json({ message: "Usuario no encontrado" });
 
     // Verificar si la cuenta está bloqueada
     if (userFound.lockUntil && userFound.lockUntil > Date.now()) {
-      const lockTimeRemaining = Math.ceil((userFound.lockUntil - Date.now()) / 1000);
+      const lockTimeRemaining = Math.ceil((userFound.lockUntil - Date.now()) / 1000); // en segundos
       return res.status(403).json({ message: `Cuenta bloqueada. Inténtalo de nuevo en ${lockTimeRemaining} segundos.` });
     }
 
@@ -79,21 +90,25 @@ export const login = async (req, res) => {
       // Incrementar intentos fallidos
       userFound.loginAttempts += 1;
 
+      // Verificar si se alcanzaron los intentos máximos
       if (userFound.loginAttempts >= MAX_ATTEMPTS) {
-        userFound.lockUntil = Date.now() + LOCK_TIME; // Bloquear por un tiempo
-        userFound.loginAttempts = 0; // Reiniciar después del bloqueo
+        userFound.lockUntil = Date.now() + LOCK_TIME; // Bloquear por un tiempo definido (2 minutos aquí)
+        userFound.loginAttempts = 0; // Reiniciar intentos fallidos después del bloqueo
       }
 
       await userFound.save();
       return res.status(401).json({ message: 'Correo o contraseña incorrectos' });
     }
 
-    // Restablecer intentos fallidos después de un inicio de sesión exitoso
+    // Si la contraseña es correcta, restablecer intentos fallidos y desbloquear la cuenta
     userFound.loginAttempts = 0;
     userFound.lockUntil = null;
     await userFound.save();
 
+    // Generar el token de acceso
     const token = await createAccessToken({ id: userFound._id });
+
+    // Guardar el token en la cookie de forma segura
     res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
 
     // Responder con los detalles del usuario
@@ -109,7 +124,6 @@ export const login = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 
 export const logout = (req, res) => {
   res.cookie('token', '', {

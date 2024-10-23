@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2'; 
@@ -9,8 +9,23 @@ const LoginForm = ({ setIsLoggedIn }) => {
     email: '',
     password: ''
   });
-  const [showPassword, setShowPassword] = useState(false);  // Estado para controlar la visibilidad de la contraseña
+  const [showPassword, setShowPassword] = useState(false);  // Control de visibilidad de la contraseña
+  const [recaptchaToken, setRecaptchaToken] = useState(''); // Token de reCAPTCHA
   const navigate = useNavigate();
+
+  // Cargar el script de reCAPTCHA en el frontend
+  useEffect(() => {
+    const loadRecaptcha = () => {
+      if (!document.querySelector('script[src="https://www.google.com/recaptcha/api.js"]')) {
+        const script = document.createElement('script');
+        script.src = 'https://www.google.com/recaptcha/api.js';
+        script.async = true;
+        script.defer = true;
+        document.body.appendChild(script);
+      }
+    };
+    loadRecaptcha();
+  }, []);
 
   const handleChange = (e) => {
     setFormData({
@@ -19,55 +34,53 @@ const LoginForm = ({ setIsLoggedIn }) => {
     });
   };
 
-  // Función para alternar la visibilidad de la contraseña
+  // Alternar visibilidad de contraseña
   const handleTogglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const response = await axios.post('https://puntoshein.onrender.com/api/login', formData, {
-        withCredentials: true
-      });
-  
+    
+    // Captura el token de reCAPTCHA
+    const recaptchaToken = window.grecaptcha.getResponse();
+    if (!recaptchaToken) {
       Swal.fire({
-        icon: 'success',
-        title: '¡Inicio de sesión exitoso!',
-        text: 'Redirigiendo...',
-        timer: 1000,
-        showConfirmButton: false,
+        icon: 'error',
+        title: 'Error',
+        text: 'Por favor, verifica que no eres un robot.',
       });
-  
-      localStorage.setItem('authToken', response.data.token);
-      setIsLoggedIn(true);
-  
-      setTimeout(() => {
-        navigate('/profile');
-      }, 1000);
-    } catch (error) {
-      if (error.response.status === 403) {
+      return;
+    }
+
+    try {
+      const response = await axios.post('https://puntoshein.onrender.com/api/login', {
+        email: formData.email,
+        password: formData.password,
+        recaptchaToken  // Enviar el token de reCAPTCHA al backend
+      });
+
+      // Si el inicio de sesión es exitoso
+      if (response.data) {
+        setIsLoggedIn(true); // Actualizar el estado de inicio de sesión
         Swal.fire({
-          icon: 'error',
-          title: 'Cuenta bloqueada',
-          text: error.response.data.message,
-          timer: 5000,
+          icon: 'success',
+          title: '¡Inicio de sesión exitoso!',
+          text: 'Redirigiendo...',
+          timer: 1000,
+          showConfirmButton: false,
         });
-      } else if (error.response.status === 401) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Intento fallido',
-          text: error.response.data.message,
-          timer: 1500,
-        });
-      } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Hubo un error al intentar iniciar sesión. Por favor, intenta nuevamente.',
-          timer: 1500,
-        });
+
+        setTimeout(() => {
+          navigate('/profile');  // Redirigir al perfil del usuario
+        }, 1000);
       }
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Hubo un error al intentar iniciar sesión.',
+      });
     }
   };
 
@@ -77,7 +90,7 @@ const LoginForm = ({ setIsLoggedIn }) => {
         <h1 className="text-2xl font-bold mb-4 text-center">Iniciar Sesión</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           
-          {/* Correo Electrónico Field con diseño actualizado */}
+          {/* Campo Correo Electrónico */}
           <div>
             <label className="block text-black-600 text-md font-semibold mb-2" htmlFor="email">
               Correo Electrónico
@@ -98,7 +111,7 @@ const LoginForm = ({ setIsLoggedIn }) => {
             </div>
           </div>
           
-          {/* Contraseña Field con diseño actualizado y visibilidad de contraseña */}
+          {/* Campo Contraseña con visibilidad */}
           <div>
             <label className="block text-black-600 text-md font-semibold mb-2" htmlFor="password">
               Contraseña
@@ -122,7 +135,10 @@ const LoginForm = ({ setIsLoggedIn }) => {
             </div>
           </div>
 
-          {/* Botón de enviar */}
+          {/* reCAPTCHA */}
+          <div className="g-recaptcha" data-sitekey="6LdxumkqAAAAAKr0LAnMwe1u1rQdKM-hNoiyPmck"></div>
+
+          {/* Botón de Enviar */}
           <div className="mt-6">
             <button
               className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full transition-all duration-300"
