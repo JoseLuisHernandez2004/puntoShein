@@ -12,20 +12,6 @@ const LoginForm = ({ setIsLoggedIn }) => {
   const [showPassword, setShowPassword] = useState(false);  // Control de visibilidad de la contraseña
   const navigate = useNavigate();
 
-  // Cargar el script de reCAPTCHA en el frontend
-  useEffect(() => {
-    const loadRecaptcha = () => {
-      if (!document.querySelector('script[src="https://www.google.com/recaptcha/api.js"]')) {
-        const script = document.createElement('script');
-        script.src = 'https://www.google.com/recaptcha/api.js';
-        script.async = true;
-        script.defer = true;
-        document.body.appendChild(script);
-      }
-    };
-    loadRecaptcha();
-  }, []);
-
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -40,46 +26,52 @@ const LoginForm = ({ setIsLoggedIn }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Captura el token de reCAPTCHA
-    const recaptchaToken = window.grecaptcha.getResponse();
-    if (!recaptchaToken) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Por favor, verifica que no eres un robot.',
-      });
-      return;
-    }
 
     try {
       const response = await axios.post('https://puntoshein.onrender.com/api/login', {
         email: formData.email,
-        password: formData.password,
-        recaptchaToken  // Enviar el token de reCAPTCHA al backend
+        password: formData.password
+      }, {
+        withCredentials: true  // Asegurar el manejo de las cookies de sesión
       });
-
-      // Si el inicio de sesión es exitoso
-      if (response.data) {
-        setIsLoggedIn(true); // Actualizar el estado de inicio de sesión
-        Swal.fire({
-          icon: 'success',
-          title: '¡Inicio de sesión exitoso!',
-          text: 'Redirigiendo...',
-          timer: 1000,
-          showConfirmButton: false,
-        });
-
-        setTimeout(() => {
-          navigate('/profile');  // Redirigir al perfil del usuario
-        }, 1000);
-      }
-    } catch (error) {
+  
       Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Hubo un error al intentar iniciar sesión.',
+        icon: 'success',
+        title: '¡Inicio de sesión exitoso!',
+        text: 'Redirigiendo...',
+        timer: 1000,
+        showConfirmButton: false,
       });
+  
+      localStorage.setItem('authToken', response.data.token);
+      setIsLoggedIn(true);
+  
+      setTimeout(() => {
+        navigate('/profile');
+      }, 1000);
+    } catch (error) {
+      if (error.response && error.response.status === 403) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Cuenta bloqueada',
+          text: error.response.data.message,
+          timer: 5000,
+        });
+      } else if (error.response && error.response.status === 401) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Intento fallido',
+          text: error.response.data.message,
+          timer: 1500,
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Hubo un error al intentar iniciar sesión. Por favor, intenta nuevamente.',
+          timer: 1500,
+        });
+      }
     }
   };
 
@@ -133,9 +125,6 @@ const LoginForm = ({ setIsLoggedIn }) => {
               </button>
             </div>
           </div>
-
-          {/* reCAPTCHA */}
-          <div className="g-recaptcha" data-sitekey="6LdxumkqAAAAAKr0LAnMwe1u1rQdKM-hNoiyPmck"></div>
 
           {/* Botón de Enviar */}
           <div className="mt-6">

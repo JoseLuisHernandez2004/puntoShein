@@ -64,18 +64,9 @@ export const register = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  const { email, password, recaptchaToken } = req.body;
+  const { email, password } = req.body;  // Eliminar recaptchaToken de la solicitud
 
   try {
-    // Verificar el token de reCAPTCHA con la API de Google
-    const verificationUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${RECAPTCHA_SECRET}&response=${recaptchaToken}`;
-    const { data } = await axios.post(verificationUrl);
-
-    // Si reCAPTCHA falla, devolver error
-    if (!data.success) {
-      return res.status(400).json({ message: "Fallo la verificación de CAPTCHA. Inténtalo de nuevo." });
-    }
-
     // Buscar al usuario por correo electrónico
     const userFound = await User.findOne({ email });
     if (!userFound) return res.status(400).json({ message: "Usuario no encontrado" });
@@ -94,7 +85,7 @@ export const login = async (req, res) => {
 
       // Verificar si se alcanzaron los intentos máximos
       if (userFound.loginAttempts >= MAX_ATTEMPTS) {
-        userFound.lockUntil = Date.now() + LOCK_TIME; // Bloquear por un tiempo definido (2 minutos aquí)
+        userFound.lockUntil = Date.now() + LOCK_TIME; // Bloquear por un tiempo definido (ej. 2 minutos)
         userFound.loginAttempts = 0; // Reiniciar intentos fallidos después del bloqueo
       }
 
@@ -126,6 +117,7 @@ export const login = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 export const logout = (req, res) => {
   res.cookie('token', '', {
@@ -240,4 +232,3 @@ export const resetPassword = async (req, res) => {
     res.status(500).json({ message: "Error al restablecer la contraseña: " + error.message });
   }
 };
-
