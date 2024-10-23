@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2'; 
-import { MdEmail, MdLock } from 'react-icons/md'; 
+import { MdEmail, MdLock, MdVisibility, MdVisibilityOff } from 'react-icons/md';  // Importar iconos de visibilidad
 
 const LoginForm = ({ setIsLoggedIn }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
+  const [showPassword, setShowPassword] = useState(false);  // Estado para controlar la visibilidad de la contraseña
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -16,6 +17,11 @@ const LoginForm = ({ setIsLoggedIn }) => {
       ...formData,
       [e.target.name]: e.target.value
     });
+  };
+
+  // Función para alternar la visibilidad de la contraseña
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   const handleSubmit = async (e) => {
@@ -64,7 +70,6 @@ const LoginForm = ({ setIsLoggedIn }) => {
       }
     }
   };
-  
 
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-gray-100 px-4">
@@ -93,7 +98,7 @@ const LoginForm = ({ setIsLoggedIn }) => {
             </div>
           </div>
           
-          {/* Contraseña Field con diseño actualizado */}
+          {/* Contraseña Field con diseño actualizado y visibilidad de contraseña */}
           <div>
             <label className="block text-black-600 text-md font-semibold mb-2" htmlFor="password">
               Contraseña
@@ -103,7 +108,7 @@ const LoginForm = ({ setIsLoggedIn }) => {
               <input
                 className="w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full text-blue-600 px-2 py-1 transition-all duration-300 ease-in-out"
                 id="password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}  // Alternar entre tipo password/text
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
@@ -111,6 +116,9 @@ const LoginForm = ({ setIsLoggedIn }) => {
                 placeholder="Ingresa tu contraseña"
                 required
               />
+              <button type="button" onClick={handleTogglePasswordVisibility} className="ml-2">
+                {showPassword ? <MdVisibilityOff size={24} /> : <MdVisibility size={24} />} {/* Botón de visibilidad */}
+              </button>
             </div>
           </div>
 
