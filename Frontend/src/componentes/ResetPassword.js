@@ -46,17 +46,31 @@ const ResetPassword = () => {
         }, 3000);
       }
     } catch (err) {
-      // Captura el error cuando el token ha expirado
-      if (err.response && err.response.data.message === "jwt expired") {
-        Swal.fire({
-          icon: 'error',
-          title: 'Enlace ha caducado',
-          text: 'El enlace para restablecer la contraseña ha caducado. Solicita uno nuevo.',
-        });
+      if (err.response) {
+        if (err.response.data.message === "jwt expired") {
+          Swal.fire({
+            icon: 'error',
+            title: 'Enlace ha caducado',
+            text: 'El enlace para restablecer la contraseña ha caducado. Solicita uno nuevo.',
+          });
+        } else if (err.response.data.message === "Solo puedes cambiar tu contraseña una vez cada 24 horas.") {
+          Swal.fire({
+            icon: 'error',
+            title: 'Cambio de contraseña no permitido',
+            text: 'Solo puedes cambiar tu contraseña una vez cada 24 horas.',
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: err.response.data.message || 'Hubo un error al restablecer la contraseña',
+          });
+        }
       } else {
         setError('Hubo un error al restablecer la contraseña');
       }
     }
+    
   };
 
   return (
