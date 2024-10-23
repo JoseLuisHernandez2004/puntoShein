@@ -2,13 +2,16 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2'; 
-import { MdEmail, MdLock } from 'react-icons/md'; 
+import { MdEmail, MdLock, MdVisibility, MdVisibilityOff } from 'react-icons/md';  
+import ReCAPTCHA from "react-google-recaptcha";  // Importar el componente reCAPTCHA
 
 const LoginForm = ({ setIsLoggedIn }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
+  const [captchaToken, setCaptchaToken] = useState('');  // Guardar el token de reCAPTCHA
+  const [showPassword, setShowPassword] = useState(false);  
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -18,10 +21,29 @@ const LoginForm = ({ setIsLoggedIn }) => {
     });
   };
 
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword(!showPassword);  
+  };
+
+  const handleCaptchaChange = (token) => {
+    setCaptchaToken(token);  // Guardar el token generado por reCAPTCHA
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!captchaToken) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error de reCAPTCHA',
+        text: 'Por favor, completa el reCAPTCHA antes de continuar.',
+        timer: 2000,
+      });
+      return;
+    }
+
     try {
-      const response = await axios.post('https://puntoshein.onrender.com/api/login', formData, {
+      const response = await axios.post('https://puntoshein.onrender.com/api/login', { ...formData, captchaToken }, {
         withCredentials: true
       });
   
@@ -64,7 +86,6 @@ const LoginForm = ({ setIsLoggedIn }) => {
       }
     }
   };
-  
 
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-gray-100 px-4">
@@ -72,7 +93,7 @@ const LoginForm = ({ setIsLoggedIn }) => {
         <h1 className="text-2xl font-bold mb-4 text-center">Iniciar Sesión</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           
-          {/* Correo Electrónico Field con diseño actualizado */}
+          {/* Correo Electrónico Field */}
           <div>
             <label className="block text-black-600 text-md font-semibold mb-2" htmlFor="email">
               Correo Electrónico
@@ -93,7 +114,7 @@ const LoginForm = ({ setIsLoggedIn }) => {
             </div>
           </div>
           
-          {/* Contraseña Field con diseño actualizado */}
+          {/* Contraseña Field con visibilidad */}
           <div>
             <label className="block text-black-600 text-md font-semibold mb-2" htmlFor="password">
               Contraseña
@@ -103,7 +124,7 @@ const LoginForm = ({ setIsLoggedIn }) => {
               <input
                 className="w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full text-blue-600 px-2 py-1 transition-all duration-300 ease-in-out"
                 id="password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}  
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
@@ -111,8 +132,17 @@ const LoginForm = ({ setIsLoggedIn }) => {
                 placeholder="Ingresa tu contraseña"
                 required
               />
+              <button type="button" onClick={handleTogglePasswordVisibility} className="ml-2">
+                {showPassword ? <MdVisibilityOff size={24} /> : <MdVisibility size={24} />}  
+              </button>
             </div>
           </div>
+
+          {/* reCAPTCHA Widget */}
+          <ReCAPTCHA
+            sitekey="6LdxumkqAAAAAKr0LAnMwe1u1rQdKM-hNoiyPmck"  // reCAPTCHA site key
+            onChange={handleCaptchaChange}
+          />
 
           {/* Botón de enviar */}
           <div className="mt-6">
