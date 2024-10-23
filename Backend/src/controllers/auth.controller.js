@@ -4,6 +4,8 @@ import { createAccessToken } from '../libs/jwt.js';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
 import { TOKEN_SECRET } from '../config.js';
+import axios from 'axios';
+
 
 /* Variables para la funcion de bloqueo del numero de intentos de inicio de sesion */
 const MAX_ATTEMPTS = 5;
