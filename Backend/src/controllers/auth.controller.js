@@ -10,7 +10,7 @@ import axios from 'axios';
 /* Variables para la funcion de bloqueo del numero de intentos de inicio de sesion */
 const MAX_ATTEMPTS = 5;
 const LOCK_TIME = 2 * 60 * 1000; // 2 minutos
-const RECAPTCHA_SECRET = '6LdxumkqAAAAA1a3g6_M2SFHPb0YJhpV3SkRPjU';
+const RECAPTCHA_SECRET = '6LeQ6GoqAAAAAIecNT-3pcgw1yfB49LyRY1eGR4-';
 
 export const register = async (req, res) => {
   const { email, password, username, nombre, apellidoM, apellidoP, telefono } = req.body;
@@ -64,9 +64,17 @@ export const register = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  const { email, password } = req.body;  // Capturamos el email y la contraseña
+  const { email, password, captchaToken } = req.body; // Capturamos el email, contraseña y token de reCAPTCHA
 
   try {
+    // Verificar el token de reCAPTCHA
+    const verifyCaptchaUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${RECAPTCHA_SECRET}&response=${captchaToken}`;
+    const captchaResponse = await axios.post(verifyCaptchaUrl);
+    
+    if (!captchaResponse.data.success) {
+      return res.status(400).json({ message: "Error en reCAPTCHA. Inténtalo nuevamente." });
+    }
+
     // Buscar al usuario en la base de datos
     const userFound = await User.findOne({ email });
     if (!userFound) return res.status(400).json({ message: "Usuario no encontrado" });
@@ -86,7 +94,7 @@ export const login = async (req, res) => {
       // Si el usuario ha excedido el número máximo de intentos, bloquear la cuenta temporalmente
       if (userFound.loginAttempts >= MAX_ATTEMPTS) {
         userFound.lockUntil = Date.now() + LOCK_TIME;
-        userFound.loginAttempts = 0;  // Reiniciar los intentos después de bloquear la cuenta
+        userFound.loginAttempts = 0; // Reiniciar los intentos después de bloquear la cuenta
       }
 
       await userFound.save();

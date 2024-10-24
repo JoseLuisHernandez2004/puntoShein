@@ -3,12 +3,14 @@ import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2'; 
 import { MdEmail, MdLock, MdVisibility, MdVisibilityOff } from 'react-icons/md';  
+import ReCAPTCHA from "react-google-recaptcha"; // Importa el componente reCAPTCHA
 
 const LoginForm = ({ setIsLoggedIn }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
+  const [captchaToken, setCaptchaToken] = useState(''); // Guardar el token de reCAPTCHA
   const [showPassword, setShowPassword] = useState(false);  
   const navigate = useNavigate();
 
@@ -23,11 +25,27 @@ const LoginForm = ({ setIsLoggedIn }) => {
     setShowPassword(!showPassword);  
   };
 
+  const handleCaptchaChange = (token) => {
+    setCaptchaToken(token); // Guardar el token generado por reCAPTCHA
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
+    if (!captchaToken) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error de reCAPTCHA',
+        text: 'Por favor, completa el reCAPTCHA antes de continuar.',
+        timer: 2000,
+      });
+      return;
+    }
+
     try {
-      const response = await axios.post('http://puntoshein.onrender.com/api/login', { ...formData }, {
+      const response = await axios.post('https://puntoshein.onrender.com/api/login', { ...formData, captchaToken }, {
+        //https://puntoshein.onrender.com/api/login
+        //http://localhost:4000/api/login
         withCredentials: true
       });
     
@@ -46,7 +64,6 @@ const LoginForm = ({ setIsLoggedIn }) => {
         navigate('/profile');
       }, 1000);
     } catch (error) {
-      // Verificamos si error.response existe
       if (error.response) {
         if (error.response.status === 403) {
           Swal.fire({
@@ -71,7 +88,6 @@ const LoginForm = ({ setIsLoggedIn }) => {
           });
         }
       } else {
-        // Manejo de errores que no provienen de la respuesta de la API
         Swal.fire({
           icon: 'error',
           title: 'Error de conexión',
@@ -132,6 +148,12 @@ const LoginForm = ({ setIsLoggedIn }) => {
               </button>
             </div>
           </div>
+
+          {/* reCAPTCHA Widget */}
+          <ReCAPTCHA
+            sitekey="6LeQ6GoqAAAAAME55CApzdiO7MWxWKlJXBAl4J2N" // Tu clave de sitio web
+            onChange={handleCaptchaChange}
+          />
 
           {/* Botón de enviar */}
           <div className="mt-6">
