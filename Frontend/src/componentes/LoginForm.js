@@ -27,7 +27,7 @@ const LoginForm = ({ setIsLoggedIn }) => {
     e.preventDefault();
   
     try {
-      const response = await axios.post('http://puntoshein.onrender.com/api/login', { ...formData }, {
+      const response = await axios.post('https://puntoshein.onrender.com/api/login', { ...formData }, {
         withCredentials: true
       });
     
