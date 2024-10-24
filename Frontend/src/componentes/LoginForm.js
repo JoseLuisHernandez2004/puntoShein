@@ -3,14 +3,12 @@ import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2'; 
 import { MdEmail, MdLock, MdVisibility, MdVisibilityOff } from 'react-icons/md';  
-import ReCAPTCHA from "react-google-recaptcha";  // Importar el componente reCAPTCHA
 
 const LoginForm = ({ setIsLoggedIn }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
-  const [captchaToken, setCaptchaToken] = useState('');  // Guardar el token de reCAPTCHA
   const [showPassword, setShowPassword] = useState(false);  
   const navigate = useNavigate();
 
@@ -25,28 +23,14 @@ const LoginForm = ({ setIsLoggedIn }) => {
     setShowPassword(!showPassword);  
   };
 
-  const handleCaptchaChange = (token) => {
-    setCaptchaToken(token);  // Guardar el token generado por reCAPTCHA
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!captchaToken) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error de reCAPTCHA',
-        text: 'Por favor, completa el reCAPTCHA antes de continuar.',
-        timer: 2000,
-      });
-      return;
-    }
-
+  
     try {
-      const response = await axios.post('https://puntoshein.onrender.com/api/login', { ...formData, captchaToken }, {
+      const response = await axios.post('http://puntoshein.onrender.com/api/login', { ...formData }, {
         withCredentials: true
       });
-  
+    
       Swal.fire({
         icon: 'success',
         title: '¡Inicio de sesión exitoso!',
@@ -54,39 +38,50 @@ const LoginForm = ({ setIsLoggedIn }) => {
         timer: 1000,
         showConfirmButton: false,
       });
-  
+    
       localStorage.setItem('authToken', response.data.token);
       setIsLoggedIn(true);
-  
+    
       setTimeout(() => {
         navigate('/profile');
       }, 1000);
     } catch (error) {
-      if (error.response.status === 403) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Cuenta bloqueada',
-          text: error.response.data.message,
-          timer: 5000,
-        });
-      } else if (error.response.status === 401) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Intento fallido',
-          text: error.response.data.message,
-          timer: 1500,
-        });
+      // Verificamos si error.response existe
+      if (error.response) {
+        if (error.response.status === 403) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Cuenta bloqueada',
+            text: error.response.data.message,
+            timer: 5000,
+          });
+        } else if (error.response.status === 401) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Intento fallido',
+            text: error.response.data.message,
+            timer: 1500,
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Hubo un error al intentar iniciar sesión. Por favor, intenta nuevamente.',
+            timer: 1500,
+          });
+        }
       } else {
+        // Manejo de errores que no provienen de la respuesta de la API
         Swal.fire({
           icon: 'error',
-          title: 'Error',
-          text: 'Hubo un error al intentar iniciar sesión. Por favor, intenta nuevamente.',
+          title: 'Error de conexión',
+          text: 'No se pudo conectar al servidor. Inténtalo de nuevo más tarde.',
           timer: 1500,
         });
       }
     }
   };
-
+  
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-gray-100 px-4">
       <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-6">
@@ -137,12 +132,6 @@ const LoginForm = ({ setIsLoggedIn }) => {
               </button>
             </div>
           </div>
-
-          {/* reCAPTCHA Widget */}
-          <ReCAPTCHA
-            sitekey="6LdxumkqAAAAAKr0LAnMwe1u1rQdKM-hNoiyPmck"  // reCAPTCHA site key
-            onChange={handleCaptchaChange}
-          />
 
           {/* Botón de enviar */}
           <div className="mt-6">

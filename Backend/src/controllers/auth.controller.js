@@ -64,20 +64,9 @@ export const register = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  const { email, password, captchaToken } = req.body;  // Capturamos el token de reCAPTCHA enviado desde el frontend
-
-  // Verificar el token de reCAPTCHA
-  const verifyCaptchaUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${RECAPTCHA_SECRET}&response=${captchaToken}`;
+  const { email, password } = req.body;  // Capturamos el email y la contraseña
 
   try {
-    // Verificar si el token de reCAPTCHA es válido
-    const captchaResponse = await axios.post(verifyCaptchaUrl);
-
-    // Si la verificación falla, devolver un error
-    if (!captchaResponse.data.success) {
-      return res.status(400).json({ message: "Error en reCAPTCHA. Inténtalo nuevamente." });
-    }
-
     // Buscar al usuario en la base de datos
     const userFound = await User.findOne({ email });
     if (!userFound) return res.status(400).json({ message: "Usuario no encontrado" });
@@ -126,6 +115,7 @@ export const login = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 
 export const logout = (req, res) => {
