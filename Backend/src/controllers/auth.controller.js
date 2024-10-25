@@ -64,15 +64,19 @@ export const register = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  const { email, password, captchaToken } = req.body; // Capturamos el email, contraseña y token de reCAPTCHA
+  const { email, password, recaptchaToken } = req.body; // Añadir recaptchaToken del frontend
 
   try {
-    // Verificar el token de reCAPTCHA
-    const verifyCaptchaUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${RECAPTCHA_SECRET}&response=${captchaToken}`;
-    const captchaResponse = await axios.post(verifyCaptchaUrl);
-    
-    if (!captchaResponse.data.success) {
-      return res.status(400).json({ message: "Error en reCAPTCHA. Inténtalo nuevamente." });
+    // Validar el token de reCAPTCHA con Google
+    const recaptchaResponse = await axios.post(`https://www.google.com/recaptcha/api/siteverify`, null, {
+      params: {
+        secret: RECAPTCHA_SECRET,
+        response: recaptchaToken,
+      },
+    });
+
+    if (!recaptchaResponse.data.success) {
+      return res.status(400).json({ message: "Error en reCAPTCHA. Inténtalo de nuevo." });
     }
 
     // Buscar al usuario en la base de datos
@@ -88,13 +92,11 @@ export const login = async (req, res) => {
     // Verificar la contraseña
     const isMatch = await bcrypt.compare(password, userFound.password);
     if (!isMatch) {
-      // Incrementar intentos fallidos
       userFound.loginAttempts += 1;
 
-      // Si el usuario ha excedido el número máximo de intentos, bloquear la cuenta temporalmente
       if (userFound.loginAttempts >= MAX_ATTEMPTS) {
         userFound.lockUntil = Date.now() + LOCK_TIME;
-        userFound.loginAttempts = 0; // Reiniciar los intentos después de bloquear la cuenta
+        userFound.loginAttempts = 0;
       }
 
       await userFound.save();
@@ -106,15 +108,14 @@ export const login = async (req, res) => {
     userFound.lockUntil = null;
     await userFound.save();
 
-    // Crear un token de acceso
     const token = await createAccessToken({ id: userFound._id });
     res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
 
-    // Responder con los detalles del usuario
     res.json({
       id: userFound._id,
       username: userFound.username,
       email: userFound.email,
+      role: userFound.role,
       createdAt: userFound.createdAt,
       updatedAt: userFound.updatedAt,
     });
@@ -123,8 +124,6 @@ export const login = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
-
 
 export const logout = (req, res) => {
   res.cookie('token', '', {

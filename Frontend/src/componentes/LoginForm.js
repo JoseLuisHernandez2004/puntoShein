@@ -3,15 +3,15 @@ import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2'; 
 import { MdEmail, MdLock, MdVisibility, MdVisibilityOff } from 'react-icons/md';  
-import ReCAPTCHA from "react-google-recaptcha"; // Importa el componente reCAPTCHA
+import ReCAPTCHA from 'react-google-recaptcha';
 
-const LoginForm = ({ setIsLoggedIn }) => {
+const LoginForm = ({ setIsLoggedIn, setUserRole }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
-  const [captchaToken, setCaptchaToken] = useState(''); // Guardar el token de reCAPTCHA
   const [showPassword, setShowPassword] = useState(false);  
+  const [recaptchaToken, setRecaptchaToken] = useState(null); // Para almacenar el token de reCAPTCHA
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -25,27 +25,21 @@ const LoginForm = ({ setIsLoggedIn }) => {
     setShowPassword(!showPassword);  
   };
 
-  const handleCaptchaChange = (token) => {
-    setCaptchaToken(token); // Guardar el token generado por reCAPTCHA
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!captchaToken) {
+    if (!recaptchaToken) {
       Swal.fire({
         icon: 'error',
         title: 'Error de reCAPTCHA',
-        text: 'Por favor, completa el reCAPTCHA antes de continuar.',
-        timer: 2000,
+        text: 'Por favor, completa el reCAPTCHA.',
+        timer: 1500,
       });
       return;
     }
 
     try {
-      const response = await axios.post('https://puntoshein.onrender.com/api/login', { ...formData, captchaToken }, {
-        //https://puntoshein.onrender.com/api/login
-        //http://localhost:4000/api/login
+      const response = await axios.post('https://puntoshein.onrender.com/api/login', { ...formData, recaptchaToken }, {
         withCredentials: true
       });
     
@@ -59,10 +53,14 @@ const LoginForm = ({ setIsLoggedIn }) => {
     
       localStorage.setItem('authToken', response.data.token);
       setIsLoggedIn(true);
+      setUserRole(response.data.role); 
+
+      if (response.data.role === 'admin') {
+        navigate('/admin/dashboard'); 
+      } else {
+        navigate('/profile'); 
+      }
     
-      setTimeout(() => {
-        navigate('/profile');
-      }, 1000);
     } catch (error) {
       if (error.response) {
         if (error.response.status === 403) {
@@ -97,7 +95,11 @@ const LoginForm = ({ setIsLoggedIn }) => {
       }
     }
   };
-  
+
+  const handleRecaptchaChange = (token) => {
+    setRecaptchaToken(token); // Almacenar el token de reCAPTCHA
+  };
+
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-gray-100 px-4">
       <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-6">
@@ -149,11 +151,13 @@ const LoginForm = ({ setIsLoggedIn }) => {
             </div>
           </div>
 
-          {/* reCAPTCHA Widget */}
-          <ReCAPTCHA
-            sitekey="6LeQ6GoqAAAAAME55CApzdiO7MWxWKlJXBAl4J2N" // Tu clave de sitio web
-            onChange={handleCaptchaChange}
-          />
+          {/* reCAPTCHA */}
+          <div className="mt-4">
+            <ReCAPTCHA
+              sitekey="6LeQ6GoqAAAAAME55CApzdiO7MWxWKlJXBAl4J2N"
+              onChange={handleRecaptchaChange}
+            />
+          </div>
 
           {/* Botón de enviar */}
           <div className="mt-6">

@@ -54,11 +54,15 @@ const userSchema = new mongoose.Schema({
     loginAttempts: {
         type: Number,
         default: 0, // Inicia en 0
-      },
+    },
       lockUntil: {
         type: Date,
-      },
-    
+    },
+    role: {
+        type: String,
+        enum: ['user', 'admin'], // Solo puede ser 'user' o 'admin'
+        default: 'user', // Por defecto, los nuevos usuarios serán 'user'
+    },
 },{
     timestamps:true
 })
