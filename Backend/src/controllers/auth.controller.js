@@ -109,7 +109,7 @@ export const login = async (req, res) => {
     await userFound.save();
 
     const token = await createAccessToken({ id: userFound._id });
-    res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
+    res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === 'production',  sameSite: 'none', });
 
     res.json({
       id: userFound._id,

@@ -12,6 +12,7 @@ const app = express();
 // Use CORS middleware
 app.use(cors({
   origin: ['http://localhost:3000', 'https://puntoshein.netlify.app'], // Your React app's URL
+  origin: '*',
   credentials: true, // Allow credentials (cookies, headers)
 }));
 

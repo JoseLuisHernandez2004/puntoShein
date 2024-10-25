@@ -13,8 +13,8 @@ import About from './componentes/About';
 import Footer from './componentes/Compartido/Footer';
 import AdminProfile from './componentes/Admin/AdminProfile';
 import UserDashboard from './componentes/User/UserDashboard';
-/* import UserProfile from './componentes/User/UserProfile';
- */
+/* import UserProfile from './componentes/User/UserProfile'; */
+
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Estado para manejo de login
   const [verifiedEmail, setVerifiedEmail] = useState(null); // Verificación de correo para el registro
@@ -78,8 +78,12 @@ function App() {
             element={isLoggedIn && userRole === 'admin' ? <AdminDashboard /> : <Navigate to="/login" />} 
           />
 
-{/*           <Route path="/profile" element={isLoggedIn && userRole === 'user' ? <UserProfile /> : <LoginForm setIsLoggedIn={setIsLoggedIn} />} />
- */}
+          {/* Rutas protegidas para usuarios regulares */}
+          {/* <Route 
+            path="/user/profile" 
+            element={isLoggedIn && userRole === 'user' ? <UserProfile /> : <Navigate to="/login" />} 
+          /> */}
+
         </Routes>
 
         {/* Footer */}

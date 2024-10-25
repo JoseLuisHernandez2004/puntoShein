@@ -9,7 +9,7 @@ const AdminProfile = () => {
   useEffect(() => {
     const fetchAdminData = async () => {
       try {
-        const response = await axios.get('https://puntoshein.onrender.com/api/admin/profile', { withCredentials: true });
+        const response = await axios.get('http://puntoshein.onrender.com/api/admin/profile', { withCredentials: true });
         setAdminData(response.data);
         setLoading(false);
       } catch (error) {
