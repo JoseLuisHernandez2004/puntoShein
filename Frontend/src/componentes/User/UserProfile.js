@@ -10,7 +10,7 @@ const UserProfile = () => {
     const fetchUserData = async () => {
       try {
         // Se corrigió el problema de la URL (se eliminó el espacio en el endpoint)
-        const response = await axios.get('http://localhost:4000/api/profile', { withCredentials: true });
+        const response = await axios.get('https://puntoshein.onrender.com/api/profile', { withCredentials: true });
         setUserData(response.data);
         setLoading(false);
       } catch (error) {
