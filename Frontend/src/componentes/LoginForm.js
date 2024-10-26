@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2'; 
@@ -11,7 +11,8 @@ const LoginForm = ({ setIsLoggedIn, setUserRole }) => {
     password: ''
   });
   const [showPassword, setShowPassword] = useState(false);  
-  const [recaptchaToken, setRecaptchaToken] = useState(null); // Para almacenar el token de reCAPTCHA
+  const [recaptchaToken, setRecaptchaToken] = useState(null); 
+  const recaptchaRef = useRef(null); // Referencia para el reCAPTCHA
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -63,6 +64,12 @@ const LoginForm = ({ setIsLoggedIn, setUserRole }) => {
     
     } catch (error) {
       if (error.response) {
+        // Reiniciar el reCAPTCHA aquí si hay un error
+        if (recaptchaRef.current) {
+          recaptchaRef.current.reset(); // Reinicia el reCAPTCHA
+          setRecaptchaToken(null); // Borra el token actual
+        }
+
         if (error.response.status === 403) {
           Swal.fire({
             icon: 'error',
@@ -97,7 +104,7 @@ const LoginForm = ({ setIsLoggedIn, setUserRole }) => {
   };
 
   const handleRecaptchaChange = (token) => {
-    setRecaptchaToken(token); // Almacenar el token de reCAPTCHA
+    setRecaptchaToken(token); 
   };
 
   return (
@@ -154,6 +161,7 @@ const LoginForm = ({ setIsLoggedIn, setUserRole }) => {
           {/* reCAPTCHA */}
           <div className="mt-4">
             <ReCAPTCHA
+              ref={recaptchaRef}  // Asignar referencia
               sitekey="6LeQ6GoqAAAAAME55CApzdiO7MWxWKlJXBAl4J2N"
               onChange={handleRecaptchaChange}
             />
