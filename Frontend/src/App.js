@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';  // Asegúrate de importar Navigate
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom'; 
 import Home from './componentes/Home';
 import LoginForm from './componentes/LoginForm';
 import RegisterForm from './componentes/RegisterForm';
 import Logout from './componentes/Logout';
-import AdminDashboard from './componentes/Admin/AdminDashboard';  // Nuevo componente para admin
+import AdminDashboard from './componentes/Admin/AdminDashboard'; 
 import RecoverPassword from './componentes/RecoverPassword';
 import ResetPassword from './componentes/ResetPassword';
 import VerificarCorreo from './componentes/VerificarCorreo';
@@ -12,8 +12,8 @@ import Navbar from './componentes/Compartido/Navbar';
 import About from './componentes/About';
 import Footer from './componentes/Compartido/Footer';
 import AdminProfile from './componentes/Admin/AdminProfile';
-import UserDashboard from './componentes/User/UserDashboard';
-/* import UserProfile from './componentes/User/UserProfile'; */
+import UserProfile from './componentes/User/UserProfile';
+import UserDashboard from './componentes/User/UserDashboard';  // Añadimos UserDashboard
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Estado para manejo de login
@@ -35,7 +35,7 @@ function App() {
           <Route 
             path="/login" 
             element={<LoginForm setIsLoggedIn={setIsLoggedIn} setUserRole={setUserRole} />} 
-          /> {/* Pasamos setUserRole para capturar el rol en login */}
+          />
 
           <Route 
             path="/register" 
@@ -47,9 +47,15 @@ function App() {
             element={<Logout setIsLoggedIn={setIsLoggedIn} />} 
           />
 
+          {/* Rutas para usuarios regulares */}
+          <Route 
+            path="/user/dashboard" 
+            element={isLoggedIn && userRole === 'user' ? <UserDashboard /> : <Navigate to="/login" />} 
+          />
+
           <Route 
             path="/profile" 
-            element={isLoggedIn ? <UserDashboard /> : <LoginForm setIsLoggedIn={setIsLoggedIn} />} 
+            element={isLoggedIn && userRole === 'user' ? <UserProfile /> : <Navigate to="/login" />} 
           />
 
           <Route 
@@ -77,17 +83,24 @@ function App() {
             path="/admin/dashboard" 
             element={isLoggedIn && userRole === 'admin' ? <AdminDashboard /> : <Navigate to="/login" />} 
           />
-
-          {/* Rutas protegidas para usuarios regulares */}
-          {/* <Route 
-            path="/user/profile" 
+          
+          {/* Ruta para UserProfile (solo cuando se hace clic en "Mi Perfil") */}
+          <Route 
+            path="/profile" 
             element={isLoggedIn && userRole === 'user' ? <UserProfile /> : <Navigate to="/login" />} 
-          /> */}
+          />
+
+          {/* Ruta para UserDashboard (la bienvenida) */}
+          <Route 
+            path="/user/dashboard" 
+            element={isLoggedIn && userRole === 'user' ? <UserDashboard /> : <Navigate to="/login" />} 
+          />
+
 
         </Routes>
 
         {/* Footer */}
-        <Footer /> {/* Footer at the bottom */}
+        <Footer />
       </div>
     </Router>
   );
