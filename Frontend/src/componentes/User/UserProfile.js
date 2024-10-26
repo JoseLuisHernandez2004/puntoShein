@@ -9,7 +9,7 @@ const UserProfile = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        // Se corrigió el problema de la URL (se eliminó el espacio en el endpoint)
+        // Se corrigió el problema de la URL (se eliminó el espacio en el endpoint
         const response = await axios.get('https://puntoshein.onrender.com/api/profile', { withCredentials: true });
         setUserData(response.data);
         setLoading(false);
