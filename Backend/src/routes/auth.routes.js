@@ -9,7 +9,7 @@ const router = Router();
 router.post("/register", register);
 router.post("/login", login);
 router.post("/logout", logout);
-router.get("/Profile", authRequired, profile);
+router.get("/profile", authRequired, profile);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password/:token", resetPassword);
 
@@ -24,5 +24,4 @@ router.get('/admin/profile', authRequired, isAdmin, (req, res) => {
       role: req.user.role,
     });
   });
-
 export default router;

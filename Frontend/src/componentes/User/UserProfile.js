@@ -46,7 +46,6 @@ const UserProfile = () => {
       <div className="mt-6 bg-white shadow-md rounded-lg p-6">
         <p><strong>Nombre:</strong> {userData.username}</p>
         <p><strong>Email:</strong> {userData.email}</p>
-        <p><strong>Rol:</strong> {userData.role}</p>
       </div>
     </div>
   );
