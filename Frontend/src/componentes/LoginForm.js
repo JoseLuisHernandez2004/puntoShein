@@ -58,7 +58,7 @@ const LoginForm = ({ setIsLoggedIn, setUserRole }) => {
       if (response.data.role === 'admin') {
         navigate('/admin/dashboard'); 
       } else {
-        navigate('/user/profile'); 
+        navigate('/user/dashboard'); 
       }
     
     } catch (error) {
