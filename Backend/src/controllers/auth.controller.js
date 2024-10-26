@@ -64,13 +64,13 @@ export const register = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  const { email, password, recaptchaToken } = req.body; // Añadir recaptchaToken del frontend
+  const { email, password, recaptchaToken } = req.body;  // Se recibe el token de reCAPTCHA
 
   try {
     // Validar el token de reCAPTCHA con Google
     const recaptchaResponse = await axios.post(`https://www.google.com/recaptcha/api/siteverify`, null, {
       params: {
-        secret: RECAPTCHA_SECRET,
+        secret: process.env.RECAPTCHA_SECRET,  // Asegúrate de que la clave secreta de reCAPTCHA esté en tus variables de entorno
         response: recaptchaToken,
       },
     });
@@ -108,9 +108,18 @@ export const login = async (req, res) => {
     userFound.lockUntil = null;
     await userFound.save();
 
+    // Crear el token de acceso
     const token = await createAccessToken({ id: userFound._id });
-    res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === 'production',  sameSite: 'none', });
 
+    // Configuración de la cookie
+    res.cookie("token", token, { 
+      httpOnly: true,  // La cookie solo puede ser leída por el servidor
+      secure: process.env.NODE_ENV === 'production',  // Solo en HTTPS en producción
+      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',  // 'None' para dominios cruzados en producción
+      maxAge: 1000 * 60 * 60 * 24,  // Expira en 1 día
+    });
+
+    // Enviar la respuesta
     res.json({
       id: userFound._id,
       username: userFound.username,
@@ -135,6 +144,7 @@ export const logout = (req, res) => {
 };
 
 export const profile = async (req, res) => {
+  console.log('Token JWT:', req.cookies.token);  
   try {
     const userFound = await User.findById(req.user.id); // Encuentra al usuario por su ID
 
