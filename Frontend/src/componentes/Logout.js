@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2'; 
 import axios from 'axios';
+import { MIS_URL } from './MiVariable'; 
 
 const Logout = ({ setIsLoggedIn }) => {
   const navigate = useNavigate();
@@ -9,7 +10,7 @@ const Logout = ({ setIsLoggedIn }) => {
   useEffect(() => {
     const performLogout = async () => {
       try {
-        await axios.post('https://puntoshein.onrender.com/api/logout', {}, {
+        await axios.post(`${MIS_URL}/api/logout`, {}, {
           withCredentials: true
         });
         localStorage.removeItem('authToken'); // Clear token

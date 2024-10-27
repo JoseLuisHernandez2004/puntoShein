@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-
+import { MIS_URL } from "../MiVariable";
 const AdminProfile = () => {
   const [adminData, setAdminData] = useState(null);
   const [loading, setLoading] = useState(true);  // Añadir estado de carga
@@ -9,7 +9,7 @@ const AdminProfile = () => {
   useEffect(() => {
     const fetchAdminData = async () => {
       try {
-        const response = await axios.get('https://puntoshein.onrender.com/api/admin/profile', { withCredentials: true });
+        const response = await axios.get(`${MIS_URL}/api/admin/profile`, { withCredentials: true });
         setAdminData(response.data);
         setLoading(false);
       } catch (error) {

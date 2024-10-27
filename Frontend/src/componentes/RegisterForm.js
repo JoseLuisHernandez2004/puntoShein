@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { MdEmail, MdPerson, MdPhone, MdLock, MdVisibility, MdVisibilityOff } from 'react-icons/md'; 
+import { MIS_URL } from "./MiVariable";
+
 
 const RegisterForm = ({ verifiedEmail }) => {
   const [formData, setFormData] = useState({
@@ -115,8 +117,8 @@ const RegisterForm = ({ verifiedEmail }) => {
     }
 
     try {
-      await axios.post('https://puntoshein.onrender.com/api/register', formData, { withCredentials: true });
-
+      await axios.post(`${MIS_URL}/api/register`,formData,{withCredentials: true});
+      
       Swal.fire({
         icon: 'success',
         title: '¡Registro exitoso!',

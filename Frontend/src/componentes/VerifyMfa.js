@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { MIS_URL } from "./MiVariable";
 
 const VerifyMfa = ({ setIsLoggedIn, setUserRole }) => {
   const [mfaCode, setMfaCode] = useState('');
@@ -15,6 +16,7 @@ const VerifyMfa = ({ setIsLoggedIn, setUserRole }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Verificar si se proporcionó el código MFA
     if (!mfaCode) {
       Swal.fire({
         icon: 'warning',
@@ -26,7 +28,8 @@ const VerifyMfa = ({ setIsLoggedIn, setUserRole }) => {
     }
 
     try {
-      const response = await axios.post('https://puntoshein.onrender.com/api/verify-mfa', { email, mfaCode }, {
+      // Enviar la solicitud de verificación al backend
+      const response = await axios.post(`${MIS_URL}/api/verify-mfa`, { email, mfaCode }, {
         withCredentials: true,
       });
 
@@ -39,7 +42,7 @@ const VerifyMfa = ({ setIsLoggedIn, setUserRole }) => {
         showConfirmButton: false,
       });
 
-      // Limpiar email almacenado y guardar token
+      // Limpiar el email almacenado y guardar el token de sesión
       localStorage.removeItem('mfaEmail');
       localStorage.setItem('authToken', response.data.token);
 

@@ -5,6 +5,7 @@ import axios from 'axios';
 import Swal from 'sweetalert2'; 
 import { MdEmail, MdLock, MdVisibility, MdVisibilityOff } from 'react-icons/md';  
 import ReCAPTCHA from 'react-google-recaptcha';
+import { MIS_URL } from "./MiVariable";
 
 const LoginForm = ({ setIsLoggedIn, setUserRole }) => {
   const [formData, setFormData] = useState({
@@ -41,7 +42,7 @@ const LoginForm = ({ setIsLoggedIn, setUserRole }) => {
     }
 
     try {
-      const response = await axios.post('https://puntoshein.onrender.com/api/login', { ...formData, recaptchaToken }, {
+      const response = await axios.post(`${MIS_URL}/api/login`, { ...formData, recaptchaToken }, {
         withCredentials: true
       });
       

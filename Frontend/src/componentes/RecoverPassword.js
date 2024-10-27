@@ -4,6 +4,8 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import { MdEmail } from 'react-icons/md'; // Importar ícono de email
 import { useNavigate } from 'react-router-dom'; // Importar useNavigate
+import { MIS_URL } from "./MiVariable";
+
 
 const RecoverPassword = () => {
   const [email, setEmail] = useState('');
@@ -15,8 +17,8 @@ const RecoverPassword = () => {
     setLoading(true); // Iniciar estado de carga
     try {
       // Realizar la solicitud POST para recuperar la contraseña
-      await axios.post('https://puntoshein.onrender.com/api/forgot-password', { email });
-
+      await axios.post(`${MIS_URL}/api/forgot-password`,{ email });
+      
       // Mostrar mensaje de éxito
       await Swal.fire({
         icon: 'success',

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { MIS_URL } from "../MiVariable";
 
 const UserProfile = () => {
   const [userData, setUserData] = useState(null);
@@ -10,7 +11,7 @@ const UserProfile = () => {
     const fetchUserData = async () => {
       try {
         // Se corrigió el problema de la URL (se eliminó el espacio en el endpoint
-        const response = await axios.get('https://puntoshein.onrender.com/api/profile', { withCredentials: true });
+        const response = await axios.get(`${MIS_URL}/api/profile`, { withCredentials: true });
         setUserData(response.data);
         setLoading(false);
       } catch (error) {

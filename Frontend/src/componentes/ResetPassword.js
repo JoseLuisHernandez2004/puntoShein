@@ -4,6 +4,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { MdLock, MdVisibility, MdVisibilityOff } from 'react-icons/md'; // Importar íconos de visibilidad
+import { MIS_URL } from "./MiVariable";
+
 
 const ResetPassword = () => {
   const { token } = useParams();
@@ -47,9 +49,9 @@ const ResetPassword = () => {
     try {
       // Realizar la solicitud POST para restablecer la contraseña
       const response = await axios.post(
-        `https://puntoshein.onrender.com/api/reset-password/${token}`,
+        `${MIS_URL}/api/reset-password/${token}`,
         { newPassword }
-      );
+      );      
 
       if (response.data.message === 'Contraseña actualizada con éxito') {
         await Swal.fire({
