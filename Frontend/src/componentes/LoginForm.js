@@ -1,4 +1,3 @@
-// LoginForm Component
 import React, { useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
@@ -7,6 +6,19 @@ import { MdEmail, MdLock, MdVisibility, MdVisibilityOff } from 'react-icons/md';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { MIS_URL } from "./MiVariable";
 
+const logFrontendError = async (error, component) => {
+  try {
+    await axios.post(`${MIS_URL}/api/log-frontend-error`, {
+      message: error.message,
+      stack: error.stack,
+      component: component,
+      url: window.location.href,
+    });
+  } catch (logError) {
+    console.error('Error al registrar el error en el servidor:', logError);
+  }
+};
+
 const LoginForm = ({ setIsLoggedIn, setUserRole }) => {
   const [formData, setFormData] = useState({
     email: '',
@@ -14,7 +26,7 @@ const LoginForm = ({ setIsLoggedIn, setUserRole }) => {
   });
   const [showPassword, setShowPassword] = useState(false);  
   const [recaptchaToken, setRecaptchaToken] = useState(null); 
-  const recaptchaRef = useRef(null); // Referencia para el reCAPTCHA
+  const recaptchaRef = useRef(null);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -45,31 +57,13 @@ const LoginForm = ({ setIsLoggedIn, setUserRole }) => {
       const response = await axios.post(`${MIS_URL}/api/login`, { ...formData, recaptchaToken }, {
         withCredentials: true
       });
-      
-      if (response.data.mfaRequired) {
-        Swal.fire({
-          icon: 'info',
-          title: 'Código MFA Requerido',
-          text: 'Se ha enviado un código MFA a tu correo electrónico.',
-          timer: 3000,
-          showConfirmButton: true,
-        });
-        // Guardar el email temporalmente para la verificación MFA
-        localStorage.setItem('mfaEmail', formData.email);
-        navigate('/verify-mfa');
-      } else {
-        // Si no se requiere MFA (opcional), proceder directamente con el inicio de sesión
-        handleLoginSuccess(response.data);
-      }
+
+      handleLoginSuccess(response.data);
 
     } catch (error) {
-      if (error.response) {
-        // Reiniciar el reCAPTCHA aquí si hay un error
-        if (recaptchaRef.current) {
-          recaptchaRef.current.reset(); // Reinicia el reCAPTCHA
-          setRecaptchaToken(null); // Borra el token actual
-        }
+      await logFrontendError(error, 'LoginForm'); 
 
+      if (error.response) {
         if (error.response.status === 403) {
           Swal.fire({
             icon: 'error',
@@ -116,8 +110,9 @@ const LoginForm = ({ setIsLoggedIn, setUserRole }) => {
     setIsLoggedIn(true);
     setUserRole(data.role);
 
+    // Redirigir según el rol
     if (data.role === 'admin') {
-      navigate('/admin/dashboard');
+      navigate('/admin/users'); // Cambia a la ruta de usuarios del admin
     } else {
       navigate('/user/dashboard');
     }
@@ -132,7 +127,6 @@ const LoginForm = ({ setIsLoggedIn, setUserRole }) => {
       <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-6">
         <h1 className="text-2xl font-bold mb-4 text-center">Iniciar Sesión</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
-          
           {/* Correo Electrónico Field */}
           <div>
             <label className="block text-black-600 text-md font-semibold mb-2" htmlFor="email">
@@ -181,7 +175,7 @@ const LoginForm = ({ setIsLoggedIn, setUserRole }) => {
           {/* reCAPTCHA */}
           <div className="mt-4">
             <ReCAPTCHA
-              ref={recaptchaRef}  // Asignar referencia
+              ref={recaptchaRef}  
               sitekey="6LeQ6GoqAAAAAME55CApzdiO7MWxWKlJXBAl4J2N"
               onChange={handleRecaptchaChange}
             />

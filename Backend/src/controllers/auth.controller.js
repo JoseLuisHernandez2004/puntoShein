@@ -9,7 +9,7 @@ import ErrorLog from '../models/errorLog.model.js';
 
 
 /* Variables para la funcion de bloqueo del numero de intentos de inicio de sesion */
-const MAX_ATTEMPTS = 5;
+const MAX_ATTEMPTS = 3;
 const LOCK_TIME = 2 * 60 * 1000; // 2 minutos
 const RECAPTCHA_SECRET = '6LeQ6GoqAAAAAIecNT-3pcgw1yfB49LyRY1eGR4-';
 

@@ -22,7 +22,5 @@ app.use(cookieParser());  // Para manejar cookies
 
 // Rutas
 app.use('/api', authRoutes);
-
 app.use('/api', errorRoutes);
-
 export default app;

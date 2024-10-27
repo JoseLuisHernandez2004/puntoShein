@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { MdMenu, MdClose, MdArrowDropDown } from 'react-icons/md';
 
-const Navbar = ({ isLoggedIn, userRole  }) => {
-  console.log('Valor de userRole:', userRole);
+const Navbar = ({ isLoggedIn, userRole }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
@@ -107,12 +106,11 @@ const Navbar = ({ isLoggedIn, userRole  }) => {
           {isLoggedIn ? (
             <>
               <Link
-                to={userRole === 'admin' ? '/admin/profile' : '/profile'}  // Redirigir según el rol
+                to={userRole === 'admin' ? '/admin/dashboard' : '/user/dashboard'}  // Redirigir según el rol
                 className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-300"
               >
-                Mi Perfil
+                Dashboard
               </Link>
-
               <Link
                 to="/logout"
                 className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-600 transition-colors duration-300"
@@ -196,11 +194,11 @@ const Navbar = ({ isLoggedIn, userRole  }) => {
           {isLoggedIn ? (
             <>
               <Link
-                to="/profile"
+                to={userRole === 'admin' ? '/admin/dashboard' : '/user/dashboard'}  // Redirigir según el rol
                 className="block text-gray-700 dark:text-gray-300 py-2 hover:text-gray-900 dark:hover:text-white transition-colors duration-300"
                 onClick={toggleMenu}
               >
-                Mi Perfil
+                Dashboard
               </Link>
               <Link
                 to="/logout"

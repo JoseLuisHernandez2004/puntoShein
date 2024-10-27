@@ -85,9 +85,10 @@ function App() {
           />
 
           <Route 
-            path="/admin/dashboard" 
+            path="/admin/dashboard"     
             element={isLoggedIn && userRole === 'admin' ? <AdminDashboard /> : <Navigate to="/login" />} 
           />
+        
         </Routes>
 
         {/* Footer */}
