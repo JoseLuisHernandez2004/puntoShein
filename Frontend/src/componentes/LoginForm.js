@@ -1,3 +1,4 @@
+// LoginForm Component
 import React, { useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
@@ -26,7 +27,7 @@ const LoginForm = ({ setIsLoggedIn, setUserRole }) => {
   });
   const [showPassword, setShowPassword] = useState(false);  
   const [recaptchaToken, setRecaptchaToken] = useState(null); 
-  const recaptchaRef = useRef(null);
+  const recaptchaRef = useRef(null); // Referencia para el reCAPTCHA
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -57,35 +58,34 @@ const LoginForm = ({ setIsLoggedIn, setUserRole }) => {
       const response = await axios.post(`${MIS_URL}/api/login`, { ...formData, recaptchaToken }, {
         withCredentials: true
       });
-
-      handleLoginSuccess(response.data);
+      
+      if (response.data.mfaRequired) {
+        Swal.fire({
+          icon: 'info',
+          title: 'Código MFA Requerido',
+          text: 'Se ha enviado un código MFA a tu correo electrónico.',
+          timer: 3000,
+          showConfirmButton: true,
+        });
+        // Guardar el email temporalmente para la verificación MFA
+        localStorage.setItem('mfaEmail', formData.email);
+        navigate('/verify-mfa');
+      } else {
+        handleLoginSuccess(response.data);
+      }
 
     } catch (error) {
-      await logFrontendError(error, 'LoginForm'); 
+      await logFrontendError(error, 'LoginForm'); // Registrar el error en el servidor
 
       if (error.response) {
-        if (error.response.status === 403) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Cuenta bloqueada',
-            text: error.response.data.message,
-            timer: 5000,
-          });
-        } else if (error.response.status === 401) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Intento fallido',
-            text: error.response.data.message,
-            timer: 1500,
-          });
-        } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Hubo un error al intentar iniciar sesión. Por favor, intenta nuevamente.',
-            timer: 1500,
-          });
+        // Reiniciar el reCAPTCHA aquí si hay un error
+        if (recaptchaRef.current) {
+          recaptchaRef.current.reset(); // Reinicia el reCAPTCHA
+          setRecaptchaToken(null); // Borra el token actual
         }
+
+        // Manejo de errores específicos
+        handleErrorResponse(error.response);
       } else {
         Swal.fire({
           icon: 'error',
@@ -110,11 +110,35 @@ const LoginForm = ({ setIsLoggedIn, setUserRole }) => {
     setIsLoggedIn(true);
     setUserRole(data.role);
 
-    // Redirigir según el rol
     if (data.role === 'admin') {
-      navigate('/admin/users'); // Cambia a la ruta de usuarios del admin
+      navigate('/admin/dashboard');
     } else {
       navigate('/user/dashboard');
+    }
+  };
+
+  const handleErrorResponse = (response) => {
+    if (response.status === 403) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Cuenta bloqueada',
+        text: response.data.message,
+        timer: 5000,
+      });
+    } else if (response.status === 401) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Intento fallido',
+        text: response.data.message,
+        timer: 1500,
+      });
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Hubo un error al intentar iniciar sesión. Por favor, intenta nuevamente.',
+        timer: 1500,
+      });
     }
   };
 
@@ -127,6 +151,7 @@ const LoginForm = ({ setIsLoggedIn, setUserRole }) => {
       <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-6">
         <h1 className="text-2xl font-bold mb-4 text-center">Iniciar Sesión</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
+          
           {/* Correo Electrónico Field */}
           <div>
             <label className="block text-black-600 text-md font-semibold mb-2" htmlFor="email">
@@ -175,7 +200,7 @@ const LoginForm = ({ setIsLoggedIn, setUserRole }) => {
           {/* reCAPTCHA */}
           <div className="mt-4">
             <ReCAPTCHA
-              ref={recaptchaRef}  
+              ref={recaptchaRef}  // Asignar referencia
               sitekey="6LeQ6GoqAAAAAME55CApzdiO7MWxWKlJXBAl4J2N"
               onChange={handleRecaptchaChange}
             />
