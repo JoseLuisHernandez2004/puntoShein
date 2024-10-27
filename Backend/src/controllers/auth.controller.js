@@ -6,7 +6,6 @@ import nodemailer from 'nodemailer';
 import { TOKEN_SECRET } from '../config.js';
 import axios from 'axios';
 
-
 /* Variables para la funcion de bloqueo del numero de intentos de inicio de sesion */
 const MAX_ATTEMPTS = 5;
 const LOCK_TIME = 2 * 60 * 1000; // 2 minutos
@@ -94,6 +93,7 @@ export const login = async (req, res) => {
     if (!isMatch) {
       userFound.loginAttempts += 1;
 
+      // Si alcanza el número máximo de intentos fallidos, bloquea la cuenta por un período determinado
       if (userFound.loginAttempts >= MAX_ATTEMPTS) {
         userFound.lockUntil = Date.now() + LOCK_TIME;
         userFound.loginAttempts = 0;
@@ -106,32 +106,79 @@ export const login = async (req, res) => {
     // Restablecer intentos fallidos después de un inicio de sesión exitoso
     userFound.loginAttempts = 0;
     userFound.lockUntil = null;
+
+    // *** Generar y enviar el código MFA ***
+    const mfaCode = Math.floor(100000 + Math.random() * 900000).toString(); // Generar un código MFA de 6 dígitos
+    await sendMfaCode(email, mfaCode); // Enviar el código MFA al correo del usuario
+
+    // Guardar el código MFA temporalmente en la base de datos del usuario
+    userFound.mfaCode = mfaCode;
     await userFound.save();
 
-    // Crear el token de acceso
-    const token = await createAccessToken({ id: userFound._id });
-
-    // Configuración de la cookie
-    res.cookie("token", token, { 
-      httpOnly: true,  // La cookie solo puede ser leída por el servidor
-      secure: process.env.NODE_ENV === 'production',  // Solo en HTTPS en producción
-      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',  // 'None' para dominios cruzados en producción
-      maxAge: 1000 * 60 * 60 * 24,  // Expira en 1 día
-    });
-
-    // Enviar la respuesta
-    res.json({
-      id: userFound._id,
-      username: userFound.username,
-      email: userFound.email,
-      role: userFound.role,
-      createdAt: userFound.createdAt,
-      updatedAt: userFound.updatedAt,
-    });
+    // Responder al cliente indicando que se requiere MFA
+    res.status(200).json({ mfaRequired: true });
 
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
+};
+
+export const verifyMfaCode = async (req, res) => {
+  const { email, mfaCode } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user || user.mfaCode !== mfaCode) {
+      return res.status(403).json({ success: false, message: 'Código MFA inválido.' });
+    }
+
+    // Crear el token de acceso
+    const token = await createAccessToken({ id: user._id });
+    res.cookie("token", token, { 
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+      maxAge: 1000 * 60 * 60 * 24, // Expira en 1 día
+    });
+
+    // Limpiar el código MFA
+    user.mfaCode = null;
+    await user.save();
+
+    res.json({
+      success: true,
+      id: user._id,
+      username: user.username,
+      email: user.email,
+      role: user.role, // Devolver el rol para redirección
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const sendMfaCode = async (email, mfaCode) => {
+  const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+      user: 'luis2004hdez@gmail.com',
+      pass: 'zjdt tnxx bite jdjc',
+    },
+    tls: {
+      rejectUnauthorized: false,
+    },
+  });
+
+  const mailOptions = {
+    from: 'puntoShein',
+    to: email,
+    subject: 'Código de verificación MFA',
+    text: `Tu código de verificación es: ${mfaCode}`,
+  };
+
+  await transporter.sendMail(mailOptions);
 };
 
 export const logout = (req, res) => {
@@ -144,13 +191,10 @@ export const logout = (req, res) => {
 };
 
 export const profile = async (req, res) => {
-  console.log('Token JWT:', req.cookies.token);  
   try {
-    const userFound = await User.findById(req.user.id); // Encuentra al usuario por su ID
-
+    const userFound = await User.findById(req.user.id);
     if (!userFound) return res.status(400).json({ message: "Usuario no encontrado" });
 
-    // Devuelve los detalles del usuario
     return res.json({
       id: userFound._id,
       username: userFound.username,
@@ -167,7 +211,6 @@ export const profile = async (req, res) => {
   }
 };
 
-
 export const forgotPassword = async (req, res) => {
   const { email } = req.body;
 
@@ -177,7 +220,7 @@ export const forgotPassword = async (req, res) => {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
-    // Generar token de restablecimiento válido por 1 hora
+    // Generar token de restablecimiento válido por 15 minutos
     const resetToken = jwt.sign({ id: user._id }, TOKEN_SECRET, { expiresIn: '15m' });
 
     const resetUrl = `https://puntoshein.netlify.app/reset-password/${resetToken}`;
@@ -185,11 +228,11 @@ export const forgotPassword = async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: 'Gmail',
       auth: {
-        user: 'luis2004hdez@gmail.com', //Mi correo
-        pass: 'zjdt tnxx bite jdjc',  // Mi contraseña de aplicaciones
+        user: 'luis2004hdez@gmail.com',
+        pass: 'zjdt tnxx bite jdjc',
       },
       tls: {
-        rejectUnauthorized: false // Ignora el certificado autofirmado
+        rejectUnauthorized: false,
       }
     });
 
@@ -208,13 +251,11 @@ export const forgotPassword = async (req, res) => {
   }
 };
 
-// Controlador para restablecer la contraseña
 export const resetPassword = async (req, res) => {
   const { token } = req.params;
   const { newPassword } = req.body;
 
   try {
-    // Verificar el token
     const decoded = jwt.verify(token, TOKEN_SECRET);
     const user = await User.findById(decoded.id);
 
@@ -222,25 +263,20 @@ export const resetPassword = async (req, res) => {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
-    // Verificar si ha pasado menos de 24 horas desde el último cambio de contraseña
-    const oneDay = 24 * 60 * 60 * 1000; // 24 horas en milisegundos
+    const oneDay = 24 * 60 * 60 * 1000;
     const now = Date.now();
 
     if (user.passwordChangedAt && (now - user.passwordChangedAt.getTime()) < oneDay) {
       return res.status(400).json({ message: "Solo puedes cambiar tu contraseña una vez cada 24 horas." });
     }
 
-    // Validar la nueva contraseña
     if (!newPassword || newPassword.length < 6) {
       return res.status(400).json({ message: "La nueva contraseña debe tener al menos 6 caracteres" });
     }
 
-    // Hashear la nueva contraseña
     const passwordHash = await bcrypt.hash(newPassword, 10);
-
-    // Actualizar la contraseña en la base de datos y registrar la fecha del cambio
     user.password = passwordHash;
-    user.passwordChangedAt = new Date(); // Registrar la fecha y hora del cambio de contraseña
+    user.passwordChangedAt = new Date();
     await user.save();
 
     res.json({ message: "Contraseña actualizada con éxito" });

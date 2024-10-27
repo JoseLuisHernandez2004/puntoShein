@@ -14,6 +14,7 @@ import Footer from './componentes/Compartido/Footer';
 import AdminProfile from './componentes/Admin/AdminProfile';
 import UserProfile from './componentes/User/UserProfile';
 import UserDashboard from './componentes/User/UserDashboard';  // Añadimos UserDashboard
+import VerifyMfa from './componentes/VerifyMfa';  // Añadimos VerifyMfa
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Estado para manejo de login
@@ -67,6 +68,10 @@ function App() {
             path="/recover-password" 
             element={<RecoverPassword />} 
           />
+          <Route 
+            path="/verify-mfa" 
+            element={<VerifyMfa setIsLoggedIn={setIsLoggedIn} setUserRole={setUserRole} />} 
+          />
 
           <Route 
             path="/about" 
@@ -83,20 +88,6 @@ function App() {
             path="/admin/dashboard" 
             element={isLoggedIn && userRole === 'admin' ? <AdminDashboard /> : <Navigate to="/login" />} 
           />
-          
-          {/* Ruta para UserProfile (solo cuando se hace clic en "Mi Perfil") */}
-          <Route 
-            path="/profile" 
-            element={isLoggedIn && userRole === 'user' ? <UserProfile /> : <Navigate to="/login" />} 
-          />
-
-          {/* Ruta para UserDashboard (la bienvenida) */}
-          <Route 
-            path="/user/dashboard" 
-            element={isLoggedIn && userRole === 'user' ? <UserDashboard /> : <Navigate to="/login" />} 
-          />
-
-
         </Routes>
 
         {/* Footer */}

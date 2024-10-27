@@ -1,3 +1,4 @@
+// LoginForm Component
 import React, { useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
@@ -43,25 +44,23 @@ const LoginForm = ({ setIsLoggedIn, setUserRole }) => {
       const response = await axios.post('https://puntoshein.onrender.com/api/login', { ...formData, recaptchaToken }, {
         withCredentials: true
       });
-    
-      Swal.fire({
-        icon: 'success',
-        title: '¡Inicio de sesión exitoso!',
-        text: 'Redirigiendo...',
-        timer: 1000,
-        showConfirmButton: false,
-      });
-    
-      localStorage.setItem('authToken', response.data.token);
-      setIsLoggedIn(true);
-      setUserRole(response.data.role); 
-
-      if (response.data.role === 'admin') {
-        navigate('/admin/dashboard'); 
+      
+      if (response.data.mfaRequired) {
+        Swal.fire({
+          icon: 'info',
+          title: 'Código MFA Requerido',
+          text: 'Se ha enviado un código MFA a tu correo electrónico.',
+          timer: 3000,
+          showConfirmButton: true,
+        });
+        // Guardar el email temporalmente para la verificación MFA
+        localStorage.setItem('mfaEmail', formData.email);
+        navigate('/verify-mfa');
       } else {
-        navigate('/user/dashboard'); 
+        // Si no se requiere MFA (opcional), proceder directamente con el inicio de sesión
+        handleLoginSuccess(response.data);
       }
-    
+
     } catch (error) {
       if (error.response) {
         // Reiniciar el reCAPTCHA aquí si hay un error
@@ -100,6 +99,26 @@ const LoginForm = ({ setIsLoggedIn, setUserRole }) => {
           timer: 1500,
         });
       }
+    }
+  };
+
+  const handleLoginSuccess = (data) => {
+    Swal.fire({
+      icon: 'success',
+      title: '¡Inicio de sesión exitoso!',
+      text: 'Redirigiendo...',
+      timer: 1000,
+      showConfirmButton: false,
+    });
+
+    localStorage.setItem('authToken', data.token);
+    setIsLoggedIn(true);
+    setUserRole(data.role);
+
+    if (data.role === 'admin') {
+      navigate('/admin/dashboard');
+    } else {
+      navigate('/user/dashboard');
     }
   };
 

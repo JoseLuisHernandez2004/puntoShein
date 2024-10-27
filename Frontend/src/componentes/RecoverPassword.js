@@ -1,27 +1,42 @@
+// RecoverPassword.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { MdEmail } from 'react-icons/md'; // Importar ícono de email
+import { useNavigate } from 'react-router-dom'; // Importar useNavigate
 
 const RecoverPassword = () => {
   const [email, setEmail] = useState('');
+  const navigate = useNavigate(); // Inicializar navigate
+  const [loading, setLoading] = useState(false); // Estado de carga
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); // Iniciar estado de carga
     try {
+      // Realizar la solicitud POST para recuperar la contraseña
       await axios.post('https://puntoshein.onrender.com/api/forgot-password', { email });
 
-      Swal.fire({
+      // Mostrar mensaje de éxito
+      await Swal.fire({
         icon: 'success',
         title: 'Correo enviado',
         text: 'Revisa tu bandeja de entrada para restablecer tu contraseña.',
+        confirmButtonText: 'Aceptar',
       });
+
+      // Redirigir al usuario al inicio de sesión
+      navigate('/login');
     } catch (error) {
+      console.error('Error al enviar el correo de recuperación:', error);
+      // Manejar errores de manera más detallada si están disponibles
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'No se pudo enviar la solicitud. Inténtalo de nuevo más tarde.',
+        text: error.response?.data?.message || 'No se pudo enviar la solicitud. Inténtalo de nuevo más tarde.',
       });
+    } finally {
+      setLoading(false); // Finalizar estado de carga
     }
   };
 
@@ -31,7 +46,7 @@ const RecoverPassword = () => {
         <h1 className="text-2xl font-bold text-center mb-4">Recuperar Contraseña</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
 
-          {/* Correo Electrónico Field con diseño actualizado */}
+          {/* Campo de Correo Electrónico con diseño actualizado */}
           <div>
             <label className="block text-black-600 text-md font-semibold mb-2" htmlFor="email">
               Correo Electrónico
@@ -51,13 +66,16 @@ const RecoverPassword = () => {
             </div>
           </div>
 
-          {/* Botón de enviar */}
+          {/* Botón de Enviar */}
           <div className="mt-6">
             <button
-              className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full transition-all duration-300"
+              className={`w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full transition-all duration-300 ${
+                loading ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
               type="submit"
+              disabled={loading} // Deshabilitar botón durante la carga
             >
-              Enviar
+              {loading ? 'Enviando...' : 'Enviar'}
             </button>
           </div>
         </form>

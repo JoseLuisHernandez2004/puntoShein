@@ -63,6 +63,9 @@ const userSchema = new mongoose.Schema({
         enum: ['user', 'admin'], // Solo puede ser 'user' o 'admin'
         default: 'user', // Por defecto, los nuevos usuarios serán 'user'
     },
+    mfaCode: {
+        type: String,
+    },
 },{
     timestamps:true
 })
