@@ -38,7 +38,7 @@ const VerifyMfa = ({ setIsLoggedIn, setUserRole }) => {
         icon: 'success',
         title: '¡Verificación Exitosa!',
         text: 'Redirigiendo...',
-        timer: 1500,
+        timer: 1100,
         showConfirmButton: false,
       });
 
