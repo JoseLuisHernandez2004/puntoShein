@@ -44,3 +44,5 @@ export const isAdmin = (req, res, next) => {
 
     next(); // Si es administrador, continuar con la siguiente función
 };
+
+

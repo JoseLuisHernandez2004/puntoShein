@@ -3,8 +3,8 @@ import express from 'express';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import cors from 'cors'; // Importar middleware de CORS
-
 import authRoutes from './routes/auth.routes.js';
+import errorRoutes from './routes/error.routes.js';
 
 const app = express();
 
@@ -22,5 +22,7 @@ app.use(cookieParser());  // Para manejar cookies
 
 // Rutas
 app.use('/api', authRoutes);
+
+app.use('/api', errorRoutes);
 
 export default app;

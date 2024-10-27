@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { login, logout, register, profile, resetPassword, forgotPassword, verifyMfaCode } from "../controllers/auth.controller.js";
 import { authRequired, isAdmin } from "../middlewares/validateToken.js";
+import { getErrors } from '../controllers/error.controller.js'; 
 
 const router = Router();
 
@@ -25,5 +26,8 @@ router.get('/admin/profile', authRequired, isAdmin, (req, res) => {
       role: req.user.role,
     });
 });
+
+router.get('/errors', isAdmin, getErrors);
+
 
 export default router;

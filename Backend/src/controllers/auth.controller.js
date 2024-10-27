@@ -5,12 +5,27 @@ import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
 import { TOKEN_SECRET } from '../config.js';
 import axios from 'axios';
+import ErrorLog from '../models/errorLog.model.js';
+
 
 /* Variables para la funcion de bloqueo del numero de intentos de inicio de sesion */
 const MAX_ATTEMPTS = 5;
 const LOCK_TIME = 2 * 60 * 1000; // 2 minutos
 const RECAPTCHA_SECRET = '6LeQ6GoqAAAAAIecNT-3pcgw1yfB49LyRY1eGR4-';
 
+// Función para registrar errores
+const logError = async (error, req, type = 'error') => {
+  const errorLog = new ErrorLog({
+    userEmail: req.body?.email || req.user?.email,
+    message: error.message,
+    stack: error.stack,
+    route: req.originalUrl,
+    method: req.method,
+    statusCode: res.statusCode || 500,
+    type: type, // Nuevo campo para diferenciar el tipo de registro
+  });
+  await errorLog.save(); // Guarda el registro en la base de datos
+};
 export const register = async (req, res) => {
   const { email, password, username, nombre, apellidoM, apellidoP, telefono } = req.body;
 
@@ -58,7 +73,10 @@ export const register = async (req, res) => {
     });
 
   } catch (error) {
+    await errorLog(error, req, res);
+
     res.status(500).json({ message: error.message });
+      
   }
 };
 
@@ -119,6 +137,7 @@ export const login = async (req, res) => {
     res.status(200).json({ mfaRequired: true });
 
   } catch (error) {
+    await logError(error, req, res);
     res.status(500).json({ message: error.message });
   }
 };
@@ -155,6 +174,7 @@ export const verifyMfaCode = async (req, res) => {
       updatedAt: user.updatedAt,
     });
   } catch (error) {
+    await logError(error, req);
     res.status(500).json({ message: error.message });
   }
 };
@@ -207,6 +227,7 @@ export const profile = async (req, res) => {
       updatedAt: userFound.updatedAt,
     });
   } catch (error) {
+    await logError(error, req);
     res.status(500).json({ message: error.message });
   }
 };
@@ -247,6 +268,7 @@ export const forgotPassword = async (req, res) => {
 
     res.json({ message: "Correo de recuperación enviado" });
   } catch (error) {
+    await logError(error, req);
     res.status(500).json({ message: "Error al procesar la solicitud: " + error.message });
   }
 };
@@ -281,6 +303,7 @@ export const resetPassword = async (req, res) => {
 
     res.json({ message: "Contraseña actualizada con éxito" });
   } catch (error) {
+    await logError(error, req);
     res.status(500).json({ message: "Error al restablecer la contraseña: " + error.message });
   }
 };
