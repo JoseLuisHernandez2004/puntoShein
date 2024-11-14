@@ -1,6 +1,5 @@
 import User from '../models/user.model.js';
 import bcrypt from 'bcryptjs';
-import validator from 'validator';
 import { createAccessToken } from '../libs/jwt.js';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
@@ -27,16 +26,6 @@ const logError = async (error, req, type = 'error') => {
   });
   await errorLog.save(); // Guarda el registro en la base de datos
 };
-// Función para validar la fortaleza de la contraseña
-function isStrongPassword(password) {
-  return validator.isStrongPassword(password, {
-    minLength: 8,
-    minLowercase: 1,
-    minUppercase: 1,
-    minNumbers: 1,
-    minSymbols: 1,
-  });
-}
 export const register = async (req, res) => {
   const { email, password, username, nombre, apellidoM, apellidoP, telefono } = req.body;
 
@@ -45,13 +34,6 @@ export const register = async (req, res) => {
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({ message: "El correo ya está registrado" });
-    }
-
-    // Validar fortaleza de la contraseña
-    if (!isStrongPassword(password)) {
-      return res.status(400).json({ 
-        message: "La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un símbolo."
-      });
     }
 
     // Hashear la contraseña usando bcrypt
@@ -92,7 +74,9 @@ export const register = async (req, res) => {
 
   } catch (error) {
     await errorLog(error, req, res);
+
     res.status(500).json({ message: error.message });
+      
   }
 };
 
@@ -301,7 +285,6 @@ export const resetPassword = async (req, res) => {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
-    // Verificar que el cambio de contraseña se permite solo una vez cada 24 horas
     const oneDay = 24 * 60 * 60 * 1000;
     const now = Date.now();
 
@@ -309,18 +292,13 @@ export const resetPassword = async (req, res) => {
       return res.status(400).json({ message: "Solo puedes cambiar tu contraseña una vez cada 24 horas." });
     }
 
-    // Verificar fortaleza de la nueva contraseña
-    if (!isStrongPassword(newPassword)) {
-      return res.status(400).json({ 
-        message: "La nueva contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un símbolo."
-      });
+    if (!newPassword || newPassword.length < 6) {
+      return res.status(400).json({ message: "La nueva contraseña debe tener al menos 6 caracteres" });
     }
 
-    // Hashear la nueva contraseña y actualizar campos relacionados
     const passwordHash = await bcrypt.hash(newPassword, 10);
     user.password = passwordHash;
-    user.passwordChangedAt = new Date(); // Actualizar la fecha del último cambio
-    user.tokenVersion += 1; // Incrementar tokenVersion para invalidar sesiones anteriores
+    user.passwordChangedAt = new Date();
     await user.save();
 
     res.json({ message: "Contraseña actualizada con éxito" });

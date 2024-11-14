@@ -1,15 +1,12 @@
 import jwt from 'jsonwebtoken';
 import { TOKEN_SECRET } from '../config.js';
 
-export function createAccessToken(user) {
+export function createAccessToken(payload) {
     return new Promise((resolve, reject) => {
-        // Incluir `tokenVersion` en el payload del token
-        const payload = { id: user._id, tokenVersion: user.tokenVersion };
-
         jwt.sign(
             payload,
-            TOKEN_SECRET, 
-            { expiresIn: "1min" }, // Expiración de 1 día
+            TOKEN_SECRET, // Use actual secret from config.js
+            { expiresIn: "1d" },
             (err, token) => {
                 if (err) reject(err);
                 resolve(token);
