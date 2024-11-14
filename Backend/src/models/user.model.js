@@ -66,9 +66,13 @@ const userSchema = new mongoose.Schema({
     mfaCode: {
         type: String,
     },
-},{
+    tokenVersion: {
+        type: Number,
+        default: 0, // Comienza en 0
+    },
+    },{
     timestamps:true
-})
+    })
 
 
 export default mongoose.model('User', userSchema) 

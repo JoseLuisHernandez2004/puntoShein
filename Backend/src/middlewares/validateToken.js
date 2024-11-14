@@ -43,4 +43,33 @@ export const isAdmin = (req, res, next) => {
     }
 
     next(); // Si es administrador, continuar con la siguiente función
-};
+};  
+export const validateToken = async (req, res, next) => {
+    const token = req.cookies.token;
+  
+    if (!token) return res.status(401).json({ message: 'Acceso denegado' });
+  
+    try {
+      const decoded = jwt.verify(token, TOKEN_SECRET);
+      const user = await User.findById(decoded.id);
+  
+      if (!user || user.tokenVersion !== decoded.tokenVersion) {
+        return res.status(403).json({ message: 'Sesión inválida. Inicia sesión nuevamente.' });
+      }
+  
+      req.user = decoded;
+  
+      // Renueva el token si está por expirar (opcional)
+      const timeToExpire = decoded.exp * 1000 - Date.now();
+      if (timeToExpire < 2 * 60 * 1000) { // Si queda menos de 2 minutos
+        const newToken = createAccessToken(user); // Usar la función actualizada
+        res.cookie('token', newToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
+      }
+  
+      next();
+    } catch (error) {
+      res.clearCookie('token');
+      return res.status(403).json({ message: 'Token inválido o expirado' });
+    }
+  };
+  

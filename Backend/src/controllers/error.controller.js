@@ -29,4 +29,4 @@ export const logFrontendError = async (req, res) => {
       console.error('Error al registrar error del frontend:', error);
       res.status(500).json({ message: 'Error al registrar el error del frontend' });
     }
-  };
+};  
