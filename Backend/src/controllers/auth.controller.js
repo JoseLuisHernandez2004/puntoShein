@@ -1,5 +1,6 @@
 import User from '../models/user.model.js';
 import bcrypt from 'bcryptjs';
+import validator from 'validator';
 import { createAccessToken } from '../libs/jwt.js';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
@@ -26,6 +27,17 @@ const logError = async (error, req, type = 'error') => {
   });
   await errorLog.save(); // Guarda el registro en la base de datos
 };
+// Función para validar la fortaleza de la contraseña
+function isStrongPassword(password) {
+  return validator.isStrongPassword(password, {
+    minLength: 8,
+    minLowercase: 1,
+    minUppercase: 1,
+    minNumbers: 1,
+    minSymbols: 1,
+  });
+}
+
 export const register = async (req, res) => {
   const { email, password, username, nombre, apellidoM, apellidoP, telefono } = req.body;
 
@@ -34,6 +46,13 @@ export const register = async (req, res) => {
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({ message: "El correo ya está registrado" });
+    }
+
+    // Validar fortaleza de la contraseña
+    if (!isStrongPassword(password)) {
+      return res.status(400).json({ 
+        message: "La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un símbolo."
+      });
     }
 
     // Hashear la contraseña usando bcrypt
@@ -74,9 +93,7 @@ export const register = async (req, res) => {
 
   } catch (error) {
     await errorLog(error, req, res);
-
     res.status(500).json({ message: error.message });
-      
   }
 };
 
@@ -98,7 +115,7 @@ export const login = async (req, res) => {
 
     // Buscar al usuario en la base de datos
     const userFound = await User.findOne({ email });
-    if (!userFound) return res.status(400).json({ message: "Usuario no encontrado" });
+    if (!userFound) return res.status(400).json({ message: "Correo o contraseña incorrectos" });
 
     // Verificar si la cuenta está bloqueada
     if (userFound.lockUntil && userFound.lockUntil > Date.now()) {

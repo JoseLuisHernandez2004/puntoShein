@@ -1,1 +1,1 @@
-export const TOKEN_SECRET = '@20221061Luis';
+export const TOKEN_SECRET = process.env.TOKEN_SECRET;
