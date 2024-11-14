@@ -1,6 +1,7 @@
 // src/componentes/Admin/CreateDocument.js
 import React, { useState } from 'react';
-import axios from '../../api/axios';
+import axios from 'axios'; // Usa axios directamente
+import { MIS_URL } from '../MiVariable'; // Importa la URL base
 
 const CreateDocument = () => {
   const [title, setTitle] = useState('');
@@ -10,18 +11,20 @@ const CreateDocument = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('/', { title, content, effectiveDate });
+      // Usa MIS_URL como la URL base para la solicitud POST
+      await axios.post(`${MIS_URL}/api/documents`, { title, content, effectiveDate });
       alert('Documento creado con éxito');
       setTitle('');
       setContent('');
       setEffectiveDate('');
     } catch (error) {
       console.error("Error al crear el documento:", error);
+      alert("Hubo un error al crear el documento. Por favor, intenta de nuevo.");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       <h2>Crear Documento Regulatorio</h2>
       <input
         type="text"

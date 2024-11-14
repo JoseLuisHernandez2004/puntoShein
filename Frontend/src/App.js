@@ -13,8 +13,11 @@ import About from './componentes/About';
 import Footer from './componentes/Compartido/Footer';
 import AdminProfile from './componentes/Admin/AdminProfile';
 import UserProfile from './componentes/User/UserProfile';
-import UserDashboard from './componentes/User/UserDashboard';  // Añadimos UserDashboard
-import VerifyMfa from './componentes/VerifyMfa';  // Añadimos VerifyMfa
+import UserDashboard from './componentes/User/UserDashboard';
+import VerifyMfa from './componentes/VerifyMfa';
+
+// Importar componentes del CRUD de documentos
+import AdminPanel from './componentes/Admin/AdminPanel'; // Panel de administración para documentos
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Estado para manejo de login
@@ -26,8 +29,7 @@ function App() {
       <div>
         {/* Navbar y Footer */}
         <Navbar isLoggedIn={isLoggedIn} userRole={userRole} />
-        <Footer isLoggedIn={isLoggedIn} />
-
+        
         {/* Rutas de la aplicación */}
         <Routes>
           <Route path="/" element={<Home isLoggedIn={isLoggedIn} />} />
@@ -88,7 +90,12 @@ function App() {
             path="/admin/dashboard"     
             element={isLoggedIn && userRole === 'admin' ? <AdminDashboard /> : <Navigate to="/login" />} 
           />
-        
+
+          {/* Rutas del CRUD de Documentos para administrador */}
+          <Route 
+            path="/admin/documents"     
+            element={isLoggedIn && userRole === 'admin' ? <AdminPanel /> : <Navigate to="/login" />} 
+          />
         </Routes>
 
         {/* Footer */}

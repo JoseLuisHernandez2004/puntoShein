@@ -1,5 +1,5 @@
 // controllers/document.controller.js
-import Document from '../models/Document.js';
+import Document from '../models/Documents.js';
 
 // Registrar un nuevo documento regulatorio
 export const createDocument = async (req, res) => {

@@ -1,6 +1,7 @@
+// AdminDashboard.js
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Footer from '../Compartido/Footer'; // Asegúrate de importar el Footer
+import Footer from '../Compartido/Footer'; // Importación del Footer
 
 const AdminDashboard = () => {
     return (
@@ -30,6 +31,9 @@ const AdminDashboard = () => {
                             <li>
                                 <Link to="/admin/orders" className="block p-4 hover:bg-gray-200">Pedidos</Link>
                             </li>
+                            <li>
+                                <Link to="/admin/documents" className="block p-4 hover:bg-gray-200">Documentos</Link>
+                            </li> {/* Nueva opción para Documentos */}
                         </ul>
                     </nav>
                 </aside>
@@ -37,7 +41,7 @@ const AdminDashboard = () => {
                 {/* Main Content */}
                 <div className="flex-1 p-6">
                     <h1 className="text-4xl font-bold">Bienvenido al Panel de Administración</h1>
-                    <p className="mt-4">Aquí puedes gestionar usuarios, productos, pedidos, y más.</p>
+                    <p className="mt-4">Aquí puedes gestionar usuarios, productos, pedidos, documentos regulatorios y más.</p>
                 </div>
             </div>
 

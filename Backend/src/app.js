@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors'; // Importar middleware de CORS
 import authRoutes from './routes/auth.routes.js';
 import errorRoutes from './routes/error.routes.js';
+import documentRoutes from './routes/document.routes.js';
 
 const app = express();
 
@@ -23,4 +24,5 @@ app.use(cookieParser());  // Para manejar cookies
 // Rutas
 app.use('/api', authRoutes);
 app.use('/api', errorRoutes);
+app.use('/api/documents', documentRoutes);
 export default app;
