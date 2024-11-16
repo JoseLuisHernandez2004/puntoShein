@@ -222,6 +222,8 @@ export const profile = async (req, res) => {
       apellidoP: userFound.apellidoP,
       apellidoM: userFound.apellidoM,
       telefono: userFound.telefono,
+      direccion: userFound.direccion, // Añadir dirección
+      fechaNacimiento: userFound.fechaNacimiento, // Añadir fecha de nacimiento
       email: userFound.email,
       createdAt: userFound.createdAt,
       updatedAt: userFound.updatedAt,
@@ -314,5 +316,29 @@ export const getAllUsers = async (req, res) => {
   } catch (error) {
     await logError(error, req);
     res.status(500).json({ message: 'Error al obtener los usuarios.' });
+  }
+};
+
+export const updateProfile = async (req, res) => {
+  const { nombre, apellidoP, apellidoM, telefono, direccion, fechaNacimiento } = req.body;
+
+  try {
+    const userFound = await User.findById(req.user.id);
+    if (!userFound) return res.status(400).json({ message: "Usuario no encontrado" });
+
+    // Actualizar los campos del usuario
+    userFound.nombre = nombre || userFound.nombre;
+    userFound.apellidoP = apellidoP || userFound.apellidoP;
+    userFound.apellidoM = apellidoM || userFound.apellidoM;
+    userFound.telefono = telefono || userFound.telefono;
+    userFound.direccion = direccion || userFound.direccion;
+    userFound.fechaNacimiento = fechaNacimiento || userFound.fechaNacimiento;
+
+    await userFound.save();
+
+    return res.json({ message: "Perfil actualizado correctamente" });
+  } catch (error) {
+    await logError(error, req);
+    res.status(500).json({ message: error.message });
   }
 };

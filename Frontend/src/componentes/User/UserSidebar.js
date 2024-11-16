@@ -15,7 +15,7 @@ const UserSidebar = () => {
           </li>
           <li>
             <Link to="/user/profile" className="flex items-center p-3 rounded-lg hover:bg-blue-100 transition-all">
-              <FaUser className="mr-3 text-blue-600" /> Perfil
+              <FaUser className="mr-3 text-blue-600" /> Mi Perfil
             </Link>
           </li>
           <li>
