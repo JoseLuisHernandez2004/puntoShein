@@ -1,67 +1,82 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import Swal from 'sweetalert2';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import Swal from "sweetalert2";
 import { MIS_URL } from "./MiVariable";
 
 const VerifyMfa = ({ setIsLoggedIn, setUserRole }) => {
-  const [mfaCode, setMfaCode] = useState('');
+  const [mfaCode, setMfaCode] = useState(Array(6).fill(""));
   const navigate = useNavigate();
-  const email = localStorage.getItem('mfaEmail'); // Obtener el email almacenado
+  const email = localStorage.getItem("mfaEmail"); // Obtener el email almacenado
 
-  const handleChange = (e) => {
-    setMfaCode(e.target.value);
+  const handleInputChange = (e, index) => {
+    const value = e.target.value;
+
+    if (/^[0-9]?$/.test(value)) { // Permitir solo números
+      const newCode = [...mfaCode];
+      newCode[index] = value;
+      setMfaCode(newCode);
+
+      // Mover el foco al siguiente campo automáticamente
+      if (value && index < 5) {
+        const nextInput = document.getElementById(`mfaCode-${index + 1}`);
+        nextInput?.focus();
+      }
+    }
+  };
+
+  const handleKeyDown = (e, index) => {
+    if (e.key === "Backspace" && !mfaCode[index] && index > 0) {
+      const prevInput = document.getElementById(`mfaCode-${index - 1}`);
+      prevInput?.focus();
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const code = mfaCode.join("");
 
-    // Verificar si se proporcionó el código MFA
-    if (!mfaCode) {
+    if (code.length !== 6) {
       Swal.fire({
-        icon: 'warning',
-        title: 'Código MFA requerido',
-        text: 'Por favor, ingresa el código MFA recibido en tu correo.',
+        icon: "warning",
+        title: "Código MFA incompleto",
+        text: "Por favor, completa el código de 6 dígitos.",
         timer: 3000,
       });
       return;
     }
 
     try {
-      // Enviar la solicitud de verificación al backend
-      const response = await axios.post(`${MIS_URL}/api/verify-mfa`, { email, mfaCode }, {
-        withCredentials: true,
-      });
+      const response = await axios.post(
+        `${MIS_URL}/api/verify-mfa`,
+        { email, mfaCode: code },
+        { withCredentials: true }
+      );
 
-      // Mostrar mensaje de éxito
       Swal.fire({
-        icon: 'success',
-        title: '¡Verificación Exitosa!',
-        text: 'Redirigiendo...',
+        icon: "success",
+        title: "¡Verificación Exitosa!",
+        text: "Redirigiendo...",
         timer: 1100,
         showConfirmButton: false,
       });
 
-      // Limpiar el email almacenado y guardar el token de sesión
-      localStorage.removeItem('mfaEmail');
-      localStorage.setItem('authToken', response.data.token);
-
-      // Actualizar el estado para indicar que el usuario ha iniciado sesión
+      localStorage.removeItem("mfaEmail");
+      localStorage.setItem("authToken", response.data.token);
       setIsLoggedIn(true);
       setUserRole(response.data.role);
 
-      // Redirigir según el rol del usuario
-      if (response.data.role === 'admin') {
-        navigate('/admin/dashboard');
+      if (response.data.role === "admin") {
+        navigate("/admin/dashboard");
       } else {
-        navigate('/user/dashboard');
+        navigate("/user/dashboard");
       }
     } catch (error) {
       console.error("Error de verificación MFA:", error.response?.data);
       Swal.fire({
-        icon: 'error',
-        title: 'Error de Verificación',
-        text: error.response?.data?.message || 'Código MFA inválido. Por favor, inténtalo de nuevo.',
+        icon: "error",
+        title: "Error de Verificación",
+        text: error.response?.data?.message || "Código MFA inválido. Por favor, inténtalo de nuevo.",
         timer: 3000,
       });
     }
@@ -73,19 +88,27 @@ const VerifyMfa = ({ setIsLoggedIn, setUserRole }) => {
         <h1 className="text-2xl font-bold mb-4 text-center">Verificar Código MFA</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-black-600 text-md font-semibold mb-2" htmlFor="mfaCode">
+            <label
+              className="block text-black-600 text-md font-semibold mb-2"
+              htmlFor="mfaCode"
+            >
               Código MFA
             </label>
-            <input
-              className="w-full border border-black-400 rounded-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-300 ease-in-out"
-              id="mfaCode"
-              type="text"
-              name="mfaCode"
-              value={mfaCode}
-              onChange={handleChange}
-              placeholder="Ingresa el código recibido"
-              required
-            />
+            <div className="flex space-x-2 justify-center">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <input
+                  key={index}
+                  id={`mfaCode-${index}`}
+                  className="w-12 h-12 text-center border border-black-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-300 text-lg font-bold"
+                  type="text"
+                  maxLength="1"
+                  value={mfaCode[index] || ""}
+                  onChange={(e) => handleInputChange(e, index)}
+                  onKeyDown={(e) => handleKeyDown(e, index)}
+                  required
+                />
+              ))}
+            </div>
           </div>
 
           <div className="mt-6">

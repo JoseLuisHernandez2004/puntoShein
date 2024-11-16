@@ -1,54 +1,26 @@
-// AdminDashboard.js
+// src/componentes/Admin/AdminDashboard.js
 import React from 'react';
-import { Link } from 'react-router-dom';
-import Footer from '../Compartido/Footer'; // Importación del Footer
+import { Link } from 'react-router-dom'; // Importar Link para la navegación interna
 
 const AdminDashboard = () => {
-    return (
-        <div className="flex flex-col h-screen bg-gray-100">
-            {/* Header */}
-            <header className="bg-white shadow p-4">
-                <h1 className="text-2xl font-bold">Panel de Administración</h1>
-            </header>
-
-            <div className="flex flex-1">
-                {/* Sidebar */}
-                <aside className="w-64 bg-white shadow-md">
-                    <nav className="mt-4">
-                        <ul>
-                            <li>
-                                <Link to="/admin/dashboard" className="block p-4 hover:bg-gray-200">Dashboard</Link>
-                            </li>
-                            <li>
-                                <Link to="/admin/profile" className="block p-4 hover:bg-gray-200">Perfil</Link>
-                            </li>
-                            <li>
-                                <Link to="/admin/users" className="block p-4 hover:bg-gray-200">Usuarios</Link>
-                            </li>
-                            <li>
-                                <Link to="/admin/products" className="block p-4 hover:bg-gray-200">Productos</Link>
-                            </li>
-                            <li>
-                                <Link to="/admin/orders" className="block p-4 hover:bg-gray-200">Pedidos</Link>
-                            </li>
-                            <li>
-                                <Link to="/admin/documents" className="block p-4 hover:bg-gray-200">Documentos</Link>
-                            </li> {/* Nueva opción para Documentos */}
-                        </ul>
-                    </nav>
-                </aside>
-
-                {/* Main Content */}
-                <div className="flex-1 p-6">
-                    <h1 className="text-4xl font-bold">Bienvenido al Panel de Administración</h1>
-                    <p className="mt-4">Aquí puedes gestionar usuarios, productos, pedidos, documentos regulatorios y más.</p>
-                </div>
-            </div>
-
-            {/* Footer */}
-            <Footer />
+  return (
+    <div className="mt-20"> {/* Añadido un margen superior para bajar el contenido */}
+      <h1 className="text-4xl font-bold text-gray-800">Bienvenido al Panel de Administración</h1>
+      <p className="mt-4 text-gray-600">Aquí puedes gestionar usuarios, productos, pedidos, documentos regulatorios y más.</p>
+      
+      {/* Ejemplo de tarjetas para mostrar contenido */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
+        <div className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+          <h2 className="text-2xl font-bold mb-4">Usuarios</h2>
+          <p className="text-gray-600">Gestión de usuarios registrados en la plataforma.</p>
+          <Link to="/admin/myUsers" className="mt-4 inline-block text-blue-600 hover:text-blue-800">
+            Ver Detalles
+          </Link>
         </div>
-    );
+        {/* Otros elementos como "Productos", "Pedidos", etc. */}
+      </div>
+    </div>
+  );
 };
 
 export default AdminDashboard;

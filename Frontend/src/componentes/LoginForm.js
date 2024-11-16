@@ -206,6 +206,9 @@ const LoginForm = ({ setIsLoggedIn, setUserRole }) => {
             />
           </div>
 
+            {/* Enlace para registrarse en caso de que no tenga una cuenta */}
+          
+
           {/* Botón de enviar */}
           <div className="mt-6">
             <button
@@ -214,6 +217,11 @@ const LoginForm = ({ setIsLoggedIn, setUserRole }) => {
             >
               Iniciar Sesión
             </button>
+          </div>
+          <div className="text-center mt-4">
+            <Link to="/register" className="text-blue-500 hover:text-blue-700 text-sm">
+              ¿No tienes una cuenta? Regístrate aquí
+            </Link>
           </div>
         </form>
 
