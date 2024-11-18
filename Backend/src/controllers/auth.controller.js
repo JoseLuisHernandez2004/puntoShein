@@ -212,9 +212,13 @@ export const logout = (req, res) => {
 
 export const profile = async (req, res) => {
   try {
-    const userFound = await User.findById(req.user.id);
-    if (!userFound) return res.status(400).json({ message: "Usuario no encontrado" });
+    // Encuentra al usuario por ID y excluye la contraseña de la consulta
+    const userFound = await User.findById(req.user.id).select('-password');
+    if (!userFound) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
 
+    // Devuelve la información del usuario, incluyendo los campos adicionales solicitados
     return res.json({
       id: userFound._id,
       username: userFound.username,
@@ -229,8 +233,9 @@ export const profile = async (req, res) => {
       updatedAt: userFound.updatedAt,
     });
   } catch (error) {
+    console.error("Error al obtener el perfil del usuario:", error); // Agrega un registro para depurar errores
     await logError(error, req);
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: "Error interno del servidor" });
   }
 };
 
@@ -318,27 +323,92 @@ export const getAllUsers = async (req, res) => {
     res.status(500).json({ message: 'Error al obtener los usuarios.' });
   }
 };
-
 export const updateProfile = async (req, res) => {
-  const { nombre, apellidoP, apellidoM, telefono, direccion, fechaNacimiento } = req.body;
-
   try {
-    const userFound = await User.findById(req.user.id);
-    if (!userFound) return res.status(400).json({ message: "Usuario no encontrado" });
+    const userId = req.user.id; // Asegúrate de que `req.user` contenga el usuario autenticado
+    const updatedUser = await User.findByIdAndUpdate(userId, req.body, {
+      new: true,
+      runValidators: true,
+    });
 
-    // Actualizar los campos del usuario
-    userFound.nombre = nombre || userFound.nombre;
-    userFound.apellidoP = apellidoP || userFound.apellidoP;
-    userFound.apellidoM = apellidoM || userFound.apellidoM;
-    userFound.telefono = telefono || userFound.telefono;
-    userFound.direccion = direccion || userFound.direccion;
-    userFound.fechaNacimiento = fechaNacimiento || userFound.fechaNacimiento;
+    if (!updatedUser) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
 
-    await userFound.save();
-
-    return res.json({ message: "Perfil actualizado correctamente" });
+    return res.status(200).json(updatedUser);
   } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error al actualizar el perfil" });
+  }
+};
+export const updateAdminProfile = async (req, res) => {
+  try {
+    const adminId = req.user.id; // El ID del admin debería estar en `req.user` tras la autenticación
+    console.log(`Actualizando perfil para admin con ID: ${adminId}`);
+
+    // Validar que los campos a actualizar no incluyen campos sensibles como `role` (si no deseas que se puedan actualizar)
+    const { role, ...updateFields } = req.body;
+
+    // Opcional: Evitar que el rol sea actualizado si no lo deseas
+    // delete updateFields.role;
+
+    const updatedAdmin = await User.findByIdAndUpdate(adminId, updateFields, {
+      new: true,
+      runValidators: true,
+    }).select('-password'); // Excluye la contraseña
+
+    if (!updatedAdmin) {
+      console.error("Administrador no encontrado");
+      return res.status(404).json({ message: "Administrador no encontrado." });
+    }
+
+    console.log("Perfil actualizado correctamente:", updatedAdmin);
+
+    // Formatear la fecha de nacimiento para la respuesta si está presente
+    const formattedAdmin = {
+      username: updatedAdmin.username,
+      email: updatedAdmin.email,
+      telefono: updatedAdmin.telefono,
+      direccion: updatedAdmin.direccion,
+      role: updatedAdmin.role,
+      nombre: updatedAdmin.nombre,
+      apellidoP: updatedAdmin.apellidoP,
+      apellidoM: updatedAdmin.apellidoM,
+      fechaNacimiento: updatedAdmin.fechaNacimiento ? updatedAdmin.fechaNacimiento.toISOString().split('T')[0] : '',
+    };
+
+    res.status(200).json(formattedAdmin);
+  } catch (error) {
+    console.error("Error al actualizar el perfil del administrador:", error);
     await logError(error, req);
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: "Error al actualizar el perfil del administrador" });
+  }
+};
+export const getAdminProfile = async (req, res) => {
+  try {
+      const adminId = req.user.id;
+      const admin = await User.findById(adminId).select('-password'); // Excluye la contraseña
+
+      if (!admin) {
+          return res.status(404).json({ message: "Administrador no encontrado." });
+      }
+
+      // Formatear la fecha de nacimiento si está presente
+      const formattedAdmin = {
+          username: admin.username,
+          email: admin.email,
+          telefono: admin.telefono,
+          direccion: admin.direccion,
+          role: admin.role,
+          nombre: admin.nombre,
+          apellidoP: admin.apellidoP,
+          apellidoM: admin.apellidoM,
+          fechaNacimiento: admin.fechaNacimiento ? admin.fechaNacimiento.toISOString().split('T')[0] : '',
+      };
+
+      res.status(200).json(formattedAdmin);
+  } catch (error) {
+      console.error("Error al obtener el perfil del administrador:", error);
+      res.status(500).json({ message: "Error al obtener el perfil del administrador." });
   }
 };

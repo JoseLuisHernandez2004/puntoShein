@@ -1,3 +1,5 @@
+// middlewares/validateToken.js
+
 import jwt from 'jsonwebtoken';
 import { TOKEN_SECRET } from '../config.js';
 import User from '../models/user.model.js'; // Asegúrate de importar el modelo de usuario

@@ -27,4 +27,6 @@ app.use('/api', authRoutes);
 app.use('/api', errorRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/documents', documentRoutes);
+
+
 export default app;
