@@ -11,7 +11,7 @@ import ErrorLog from '../models/errorLog.model.js';
 /* Variables para la funcion de bloqueo del numero de intentos de inicio de sesion */
 const MAX_ATTEMPTS = 3;
 const LOCK_TIME = 2 * 60 * 1000; // 2 minutos
-const RECAPTCHA_SECRET = '6LeQ6GoqAAAAAIecNT-3pcgw1yfB49LyRY1eGR4-';
+const RECAPTCHA_SECRET = process.env.RECAPTCHA_SECRET;
 
 // Función para registrar errores
 const logError = async (error, req, type = 'error') => {
@@ -256,8 +256,8 @@ export const forgotPassword = async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: 'Gmail',
       auth: {
-        user: 'luis2004hdez@gmail.com',
-        pass: 'zjdt tnxx bite jdjc',
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
       },
       tls: {
         rejectUnauthorized: false,
