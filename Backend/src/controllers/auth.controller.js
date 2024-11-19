@@ -57,7 +57,8 @@ export const register = async (req, res) => {
     const token = await createAccessToken({ id: userSaved._id });
 
     // Configurar una cookie con el token
-    res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
+    res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'Strict', });
+    
 
     // Responder con los detalles del usuario registrado
     res.json({
@@ -181,21 +182,21 @@ export const verifyMfaCode = async (req, res) => {
 
 export const sendMfaCode = async (email, mfaCode) => {
   const transporter = nodemailer.createTransport({
-    service: 'Gmail',
-    auth: {
-      user: 'luis2004hdez@gmail.com',
-      pass: 'zjdt tnxx bite jdjc',
-    },
-    tls: {
-      rejectUnauthorized: false,
-    },
+      service: 'Gmail',
+      auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS,
+      },
+      tls: {
+          rejectUnauthorized: false,
+      },
   });
 
   const mailOptions = {
-    from: 'puntoShein',
-    to: email,
-    subject: 'Código de verificación MFA',
-    text: `Tu código de verificación es: ${mfaCode}`,
+      from: 'puntoShein <no-reply@puntoshein.com>',
+      to: email,
+      subject: 'Código de verificación MFA',
+      text: `Tu código de verificación es: ${mfaCode}. Este código expirará en 10 minutos.`,
   };
 
   await transporter.sendMail(mailOptions);

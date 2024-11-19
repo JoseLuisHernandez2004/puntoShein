@@ -7,14 +7,23 @@ const DocumentList = ({ onSelectDocument }) => {
   const [currentDocument, setCurrentDocument] = useState(null);
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchCurrentDocument = async () => {
+      setLoading(true);
+      setError(null); // Resetea errores previos
       try {
-        const response = await axios.get(`${MIS_URL}/api/documents/current`);
+        const response = await axios.get(`${MIS_URL}/api/documents/current`, { withCredentials: true });
         setCurrentDocument(response.data);
-      } catch (error) {
-        console.error("Error al obtener el documento vigente:", error);
+      } catch (err) {
+        if (err.response?.status === 404) {
+          console.warn("No hay un documento vigente.");
+          setCurrentDocument(null);
+        } else {
+          console.error("Error al obtener el documento vigente:", err);
+          setError("Hubo un problema al cargar el documento vigente.");
+        }
       } finally {
         setLoading(false);
       }
@@ -25,11 +34,13 @@ const DocumentList = ({ onSelectDocument }) => {
 
   useEffect(() => {
     const fetchDocumentHistory = async (title) => {
+      setError(null); // Resetea errores previos
       try {
-        const response = await axios.get(`${MIS_URL}/api/documents/history/${title}`);
+        const response = await axios.get(`${MIS_URL}/api/documents/history/${title}`, { withCredentials: true });
         setHistory(response.data);
-      } catch (error) {
-        console.error("Error al obtener el historial:", error);
+      } catch (err) {
+        console.error("Error al obtener el historial:", err);
+        setError("Hubo un problema al cargar el historial.");
       }
     };
 
@@ -39,6 +50,7 @@ const DocumentList = ({ onSelectDocument }) => {
   }, [currentDocument]);
 
   if (loading) return <p>Cargando...</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
 
   return (
     <div className="p-6 bg-gray-50 rounded-lg shadow-md">
@@ -62,11 +74,15 @@ const DocumentList = ({ onSelectDocument }) => {
 
       <h2 className="text-2xl font-bold mt-8 mb-4 text-gray-800">Historial de Versiones</h2>
       <ul className="space-y-4">
-        {history.map((doc) => (
-          <li key={doc._id} className="bg-gray-100 p-4 rounded-lg shadow-inner">
-            <strong>Versión {doc.version}:</strong> {doc.content} (Fecha: {new Date(doc.updatedAt).toLocaleDateString()})
-          </li>
-        ))}
+        {history.length > 0 ? (
+          history.map((doc) => (
+            <li key={doc._id} className="bg-gray-100 p-4 rounded-lg shadow-inner">
+              <strong>Versión {doc.version}:</strong> {doc.content} (Fecha: {new Date(doc.updatedAt).toLocaleDateString()})
+            </li>
+          ))
+        ) : (
+          <p>No hay historial disponible para este documento.</p>
+        )}
       </ul>
     </div>
   );

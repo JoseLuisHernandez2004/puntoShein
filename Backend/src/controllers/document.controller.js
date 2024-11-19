@@ -10,10 +10,24 @@ export const createDocument = async (req, res) => {
       return res.status(400).json({ message: "Todos los campos son obligatorios" });
     }
 
-    const newDocument = new Document({ title, content, effectiveDate, version: 1, status: "vigente" });
+    if (isNaN(new Date(effectiveDate).getTime())) {
+      return res.status(400).json({ message: "La fecha efectiva no es válida" });
+    }
+
+    const newDocument = new Document({
+      title,
+      content,
+      effectiveDate,
+      version: 1,
+      status: "vigente"
+    });
+
     await newDocument.save();
+
+    console.log(`Documento creado: ${newDocument._id}`);
     res.status(201).json(newDocument);
   } catch (error) {
+    console.error("Error al crear documento:", error);
     res.status(500).json({ message: `Error al crear documento: ${error.message}` });
   }
 };
@@ -26,6 +40,10 @@ export const updateDocument = async (req, res) => {
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "ID de documento no válido" });
+    }
+
+    if (!content || content.trim() === "") {
+      return res.status(400).json({ message: "El contenido no puede estar vacío" });
     }
 
     const currentDocument = await Document.findById(id);
@@ -46,10 +64,13 @@ export const updateDocument = async (req, res) => {
       status: "vigente",
       isDeleted: false
     });
+
     await newVersion.save();
 
+    console.log(`Documento actualizado: ID anterior: ${currentDocument._id}, Nueva versión: ${newVersion._id}`);
     res.status(200).json(newVersion);
   } catch (error) {
+    console.error("Error al actualizar documento:", error);
     res.status(500).json({ message: `Error al actualizar documento: ${error.message}` });
   }
 };
@@ -72,8 +93,10 @@ export const deleteDocument = async (req, res) => {
     document.status = "no vigente";
     await document.save();
 
+    console.log(`Documento eliminado: ${id}`);
     res.status(200).json({ message: "Documento marcado como eliminado" });
   } catch (error) {
+    console.error("Error al eliminar documento:", error);
     res.status(500).json({ message: `Error al eliminar documento: ${error.message}` });
   }
 };
@@ -87,6 +110,7 @@ export const getCurrentVersion = async (req, res) => {
     }
     res.status(200).json(currentDocument);
   } catch (error) {
+    console.error("Error al obtener documento vigente:", error);
     res.status(500).json({ message: `Error al obtener documento vigente: ${error.message}` });
   }
 };
@@ -95,7 +119,9 @@ export const getCurrentVersion = async (req, res) => {
 export const getDocumentHistory = async (req, res) => {
   try {
     const { title } = req.params;
-    if (!title) return res.status(400).json({ message: "El título es obligatorio" });
+    if (!title || title.trim() === "") {
+      return res.status(400).json({ message: "El título proporcionado no es válido" });
+    }
 
     const history = await Document.find({ title, isDeleted: false }).sort({ version: -1 });
     if (!history.length) {
@@ -104,6 +130,7 @@ export const getDocumentHistory = async (req, res) => {
 
     res.status(200).json(history);
   } catch (error) {
+    console.error("Error al obtener historial de versiones:", error);
     res.status(500).json({ message: `Error al obtener historial de versiones: ${error.message}` });
   }
 };

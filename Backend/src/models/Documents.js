@@ -9,7 +9,9 @@ const documentSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now },
   effectiveDate: { type: Date, required: true },
   isDeleted: { type: Boolean, default: false },
-  status: { type: String, enum: ['vigente', 'no vigente'], default: 'vigente' }
+  status: { type: String, enum: ['vigente', 'no vigente'], default: 'vigente' } 
+},{
+  timestamps: true,
 });
 
 export default mongoose.model('Document', documentSchema);
