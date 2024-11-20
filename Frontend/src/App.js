@@ -21,6 +21,8 @@ import AdminPanel from './componentes/Admin/AdminPanel'; // Panel de administrac
 import Products from './componentes/Admin/products'; // Componente para gestionar productos
 import MyUsers from './componentes/Admin/myUsers';
 import ListaPedidos from './componentes/Admin/ListaPedidos';
+import CompanyProfile from './componentes/Admin/CompanyProfile'; // Componente para gestionar el perfil de la empresa
+
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -62,6 +64,7 @@ function App() {
             <Route path="products" element={<Products />} />
             <Route path="myUsers" element={<MyUsers />} />
             <Route path="Listapedidos" element={<ListaPedidos />} />
+            <Route path="company-profile" element={<CompanyProfile />} /> {/* Nueva ruta agregada para el perfil de la empresa */}
           </Route>
         </Routes>
 

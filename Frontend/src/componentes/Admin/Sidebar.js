@@ -1,7 +1,7 @@
 // src/componentes/Admin/Sidebar.js
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaUsers, FaBox, FaClipboardList, FaFileAlt } from 'react-icons/fa';
+import { FaUsers, FaBox, FaClipboardList, FaFileAlt, FaBuilding } from 'react-icons/fa';
 
 const Sidebar = () => {
   return (
@@ -38,6 +38,11 @@ const Sidebar = () => {
               <FaFileAlt className="mr-3 text-blue-600" /> Documentos
             </Link>
           </li>
+          <li>
+            <Link to="/admin/company-profile" className="flex items-center p-3 rounded-lg hover:bg-blue-100 transition-all">
+                <FaBuilding className="mr-3 text-blue-600" /> Configuración del Perfil de la Empresa
+            </Link>
+            </li>
         </ul>
       </nav>
     </aside>

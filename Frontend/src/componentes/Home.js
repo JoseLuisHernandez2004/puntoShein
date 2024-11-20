@@ -5,17 +5,17 @@ import 'react-multi-carousel/lib/styles.css';
 const Home = () => {
   const carouselItems = [
     {
-      image: 'https://scontent.fmex20-1.fna.fbcdn.net/v/t39.30808-6/463974262_886462293553734_8739716683164573374_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeFT6p4i9auSnTU13l6IMgwtZ58vAzW4pOVnny8DNbik5e1MTcviFBbCU_ipXU8_IXOLNP1r-iprID1KbCNyUPGo&_nc_ohc=IS2jEzeCkt0Q7kNvgGk5PLY&_nc_zt=23&_nc_ht=scontent.fmex20-1.fna&_nc_gid=Ab-UfW7p1B92OyDfdNY6YoL&oh=00_AYDKb9lldQHj5h7-D3_lPGgr-BvkcKxD6OXYVSOAMfR3_Q&oe=6731C8C5',
+      image: 'https://scontent.fver2-1.fna.fbcdn.net/v/t39.30808-6/369966618_645024687697497_2994804745531471255_n.png?stp=dst-png_s960x960&_nc_cat=102&ccb=1-7&_nc_sid=cc71e4&_nc_eui2=AeHnfnjOGwC1Jvd1N6OJHBt1jdMuayhn0O6N0y5rKGfQ7hSJFJ8KMDqB_ZrfOVI9fPudtLcJ8A5aUwLNh4JJOznB&_nc_ohc=G2GGEClb704Q7kNvgELbJ2K&_nc_zt=23&_nc_ht=scontent.fver2-1.fna&_nc_gid=Avib3-IH9j8PH-CtgSHccEH&oh=00_AYBydwehVVzQz-oipyBYeiG9xKqwPOdNC5u_2UMkImbpNA&oe=674315E3',
       title: 'Nueva Colección',
       description: 'Descubre las últimas tendencias en moda para esta temporada.'
     },
     {
-      image: 'https://scontent.fmex20-1.fna.fbcdn.net/v/t39.30808-6/457137391_848177607382203_6569964154041620214_n.jpg?stp=dst-jpg_s600x600&_nc_cat=105&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeGxAgEujiP1vDY7oZ-RsZPrZ5TIm3RlbtNnlMibdGVu098xNdWjELIWxVav4IAPxlS1hE9KWY9UnBcGmHeMxa_Q&_nc_ohc=OtgDbvFC6DkQ7kNvgFohFzv&_nc_zt=23&_nc_ht=scontent.fmex20-1.fna&_nc_gid=Axe1IWf933J0-MXJ5AaJPT8&oh=00_AYDAIPSux467M7WNljcd_TvOBFiXPraIdF8CupFKoQZaVA&oe=6731E6B3',
+      image: 'https://scontent.fver2-1.fna.fbcdn.net/v/t39.30808-6/466338192_903729708493659_8692554799405043626_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeHT2gpWH8uueQnKHZ58tsUviBh2vbAJhmOIGHa9sAmGY7ZJ_L98j9koHTTiZPkWVfUzxcqCN4QxMQkEZKAFGgWO&_nc_ohc=Sckf-6s-f-YQ7kNvgEp4Jf7&_nc_zt=23&_nc_ht=scontent.fver2-1.fna&_nc_gid=AG_7VSEzaMu4OXNzQE3DQbJ&oh=00_AYCx9JwnOKpDR9n0eaK3ZPU_uPcVi1SzNGSpOA1liqja6Q&oe=674341C9',
       title: 'Accesorios Elegantes',
       description: 'Complementa tu estilo con los mejores accesorios.'
     },
     {
-      image: 'https://scontent.fmex20-1.fna.fbcdn.net/v/t39.30808-6/369966618_645024687697497_2994804745531471255_n.png?stp=dst-png_s960x960&_nc_cat=102&ccb=1-7&_nc_sid=cc71e4&_nc_eui2=AeHnfnjOGwC1Jvd1N6OJHBt1jdMuayhn0O6N0y5rKGfQ7hSJFJ8KMDqB_ZrfOVI9fPudtLcJ8A5aUwLNh4JJOznB&_nc_ohc=XiViFnk5XTkQ7kNvgFhwQsk&_nc_zt=23&_nc_ht=scontent.fmex20-1.fna&_nc_gid=APidrXyfL-peTHNx_gujyiE&oh=00_AYD4wNy-hIWFc_AgpR8-YCljFSwONTyOXmakySV5FZt55w&oe=6731BA23',
+      image: 'https://scontent.fver2-1.fna.fbcdn.net/v/t39.30808-6/465098749_899054145627882_7868469103043509752_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeGaVP8I74LFF39FDFX6zBXjq0obri1-oC6rShuuLX6gLqw7ZNBiP2YqAHWhd7a8rkkphK9qW63I3gKITlitd2Hg&_nc_ohc=S2mrzYrhjXwQ7kNvgEW33HP&_nc_zt=23&_nc_ht=scontent.fver2-1.fna&_nc_gid=AEdaBKYW5ShmWkkA75PGh66&oh=00_AYBeOjD6eahDxih1kh3hBLFbeU--K1MtjGfgmUhP7aIRbg&oe=67433582',
       title: 'Ofertas Exclusivas',
       description: 'Aprovecha nuestras ofertas de fin de temporada.'
     }

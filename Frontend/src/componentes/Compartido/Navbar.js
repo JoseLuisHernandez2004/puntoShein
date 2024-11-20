@@ -46,7 +46,7 @@ const Navbar = ({ isLoggedIn, userRole }) => {
         <div className="flex items-center space-x-6">
           <Link to="/" className="flex items-center">
             <img
-              src="https://scontent.fmex20-1.fna.fbcdn.net/v/t39.30808-6/370115356_645029297697036_1951347873711812214_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeHfjHXAdaLXgFH9xRAvaiUGJQ0iOM2CJ34lDSI4zYInfoE7bvHUXJzrxh4mfXi8piRwpwHNrQRi8SI4gkvQ3x__&_nc_ohc=4-D7ix6lwL0Q7kNvgGodW38&_nc_zt=23&_nc_ht=scontent.fmex20-1.fna&_nc_gid=Aa9WL2gGVqrsHuyR8dL14WM&oh=00_AYACphVMNMQDDP7g-ow0_IrPTrPHPI9kuCbJ_BUUcMPoFg&oe=6731C17D"
+              src="https://scontent.fver2-1.fna.fbcdn.net/v/t39.30808-6/370115356_645029297697036_1951347873711812214_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeHfjHXAdaLXgFH9xRAvaiUGJQ0iOM2CJ34lDSI4zYInfoE7bvHUXJzrxh4mfXi8piRwpwHNrQRi8SI4gkvQ3x__&_nc_ohc=CXi5K48a8UsQ7kNvgFG1s3O&_nc_zt=23&_nc_ht=scontent.fver2-1.fna&_nc_gid=A0KquJ4YgKHsfwxhee3Mrs2&oh=00_AYCgfCFbcHALr4l51XZXz3oHSi8tYuQXzitQYOT01b44Ew&oe=67431D3D"
               alt="Punto Shein Logo"
               className="h-14 w-14 md:h-16 md:w-16 rounded-full object-cover transition-transform duration-300 hover:scale-105"
             />

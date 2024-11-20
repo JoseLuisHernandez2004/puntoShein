@@ -7,6 +7,9 @@ import authRoutes from './routes/auth.routes.js';
 import errorRoutes from './routes/error.routes.js';
 import documentRoutes from './routes/document.routes.js';
 import userRoutes from './routes/user.routes.js';
+import companyProfileRoutes from './routes/companyProfile.routes.js';
+
+
 
 const app = express();
 
@@ -27,6 +30,7 @@ app.use('/api', authRoutes);
 app.use('/api', errorRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/documents', documentRoutes);
+app.use('/api/company-profile', companyProfileRoutes); // Registrar rutas del perfil de la empresa
 
 
 export default app;
