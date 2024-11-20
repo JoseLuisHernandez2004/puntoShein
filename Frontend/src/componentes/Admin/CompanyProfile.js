@@ -5,11 +5,20 @@ import Swal from 'sweetalert2';
 
 const CompanyProfile = () => {
   const [profile, setProfile] = useState({
-    name: '',
-    address: '',
-    phone: '',
-    email: '',
-    description: ''
+    socialMedia: {
+      facebook: '',
+      twitter: '',
+      instagram: '',
+      linkedin: ''
+    },
+    slogan: '',
+    logo: '',
+    pageTitle: '',
+    contactInfo: {
+      address: '',
+      email: '',
+      phone: ''
+    }
   });
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -18,7 +27,26 @@ const CompanyProfile = () => {
     const fetchProfile = async () => {
       try {
         const response = await axios.get(`${MIS_URL}/api/company-profile`, { withCredentials: true });
-        setProfile(response.data);
+        const profileData = response.data;
+
+        // Asegúrate de que todos los campos estén inicializados incluso si no vienen en la respuesta
+        setProfile({
+          socialMedia: profileData.socialMedia || {
+            facebook: '',
+            twitter: '',
+            instagram: '',
+            linkedin: ''
+          },
+          slogan: profileData.slogan || '',
+          logo: profileData.logo || '',
+          pageTitle: profileData.pageTitle || '',
+          contactInfo: profileData.contactInfo || {
+            address: '',
+            email: '',
+            phone: ''
+          }
+        });
+
         setLoading(false);
       } catch (error) {
         console.error('Error al cargar el perfil de la empresa:', error);
@@ -32,10 +60,32 @@ const CompanyProfile = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setProfile(prevProfile => ({
-      ...prevProfile,
-      [name]: value
-    }));
+
+    // Manejar campos anidados
+    if (name.startsWith('socialMedia.')) {
+      const key = name.split('.')[1];
+      setProfile(prevProfile => ({
+        ...prevProfile,
+        socialMedia: {
+          ...prevProfile.socialMedia,
+          [key]: value
+        }
+      }));
+    } else if (name.startsWith('contactInfo.')) {
+      const key = name.split('.')[1];
+      setProfile(prevProfile => ({
+        ...prevProfile,
+        contactInfo: {
+          ...prevProfile.contactInfo,
+          [key]: value
+        }
+      }));
+    } else {
+      setProfile(prevProfile => ({
+        ...prevProfile,
+        [name]: value
+      }));
+    }
   };
 
   const handleSave = async () => {
@@ -58,41 +108,74 @@ const CompanyProfile = () => {
         <>
           <input
             type="text"
-            name="name"
-            value={profile.name}
+            name="pageTitle"
+            value={profile.pageTitle}
             onChange={handleInputChange}
-            placeholder="Nombre de la Empresa"
+            placeholder="Título de la Página"
             className="p-2 border rounded mb-4 w-full"
           />
           <input
             type="text"
-            name="address"
-            value={profile.address}
+            name="slogan"
+            value={profile.slogan}
+            onChange={handleInputChange}
+            placeholder="Eslogan"
+            className="p-2 border rounded mb-4 w-full"
+          />
+          <input
+            type="text"
+            name="contactInfo.address"
+            value={profile.contactInfo.address}
             onChange={handleInputChange}
             placeholder="Dirección"
             className="p-2 border rounded mb-4 w-full"
           />
           <input
             type="text"
-            name="phone"
-            value={profile.phone}
+            name="contactInfo.phone"
+            value={profile.contactInfo.phone}
             onChange={handleInputChange}
             placeholder="Teléfono"
             className="p-2 border rounded mb-4 w-full"
           />
           <input
             type="email"
-            name="email"
-            value={profile.email}
+            name="contactInfo.email"
+            value={profile.contactInfo.email}
             onChange={handleInputChange}
             placeholder="Correo Electrónico"
             className="p-2 border rounded mb-4 w-full"
           />
-          <textarea
-            name="description"
-            value={profile.description}
+          <input
+            type="text"
+            name="socialMedia.facebook"
+            value={profile.socialMedia.facebook}
             onChange={handleInputChange}
-            placeholder="Descripción de la Empresa"
+            placeholder="Facebook"
+            className="p-2 border rounded mb-4 w-full"
+          />
+          <input
+            type="text"
+            name="socialMedia.twitter"
+            value={profile.socialMedia.twitter}
+            onChange={handleInputChange}
+            placeholder="Twitter"
+            className="p-2 border rounded mb-4 w-full"
+          />
+          <input
+            type="text"
+            name="socialMedia.instagram"
+            value={profile.socialMedia.instagram}
+            onChange={handleInputChange}
+            placeholder="Instagram"
+            className="p-2 border rounded mb-4 w-full"
+          />
+          <input
+            type="text"
+            name="socialMedia.linkedin"
+            value={profile.socialMedia.linkedin}
+            onChange={handleInputChange}
+            placeholder="LinkedIn"
             className="p-2 border rounded mb-4 w-full"
           />
           <button onClick={handleSave} className="px-4 py-2 bg-green-600 text-white rounded mr-2">Guardar</button>
@@ -100,11 +183,15 @@ const CompanyProfile = () => {
         </>
       ) : (
         <>
-          <p><strong>Nombre:</strong> {profile.name}</p>
-          <p><strong>Dirección:</strong> {profile.address}</p>
-          <p><strong>Teléfono:</strong> {profile.phone}</p>
-          <p><strong>Correo Electrónico:</strong> {profile.email}</p>
-          <p><strong>Descripción:</strong> {profile.description}</p>
+          <p><strong>Título de la Página:</strong> {profile.pageTitle}</p>
+          <p><strong>Eslogan:</strong> {profile.slogan}</p>
+          <p><strong>Dirección:</strong> {profile.contactInfo?.address}</p>
+          <p><strong>Teléfono:</strong> {profile.contactInfo?.phone}</p>
+          <p><strong>Correo Electrónico:</strong> {profile.contactInfo?.email}</p>
+          <p><strong>Facebook:</strong> {profile.socialMedia?.facebook}</p>
+          <p><strong>Twitter:</strong> {profile.socialMedia?.twitter}</p>
+          <p><strong>Instagram:</strong> {profile.socialMedia?.instagram}</p>
+          <p><strong>LinkedIn:</strong> {profile.socialMedia?.linkedin}</p>
           <button onClick={() => setIsEditing(true)} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Editar Perfil</button>
         </>
       )}

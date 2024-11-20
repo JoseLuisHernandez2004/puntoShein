@@ -22,6 +22,7 @@ import Products from './componentes/Admin/products'; // Componente para gestiona
 import MyUsers from './componentes/Admin/myUsers';
 import ListaPedidos from './componentes/Admin/ListaPedidos';
 import CompanyProfile from './componentes/Admin/CompanyProfile'; // Componente para gestionar el perfil de la empresa
+import CompanyPublicProfile from './componentes/CompanyPublicProfile';
 
 
 function App() {
@@ -40,6 +41,10 @@ function App() {
           {/* Ruta principal */}
           <Route path="/" element={<Home isLoggedIn={isLoggedIn} />} />
 
+          {/* Ruta para perfil público de la empresa */}
+          <Route path="/company-public-profile" element={<CompanyPublicProfile />} />
+
+
           {/* Rutas de autenticación */}
           <Route path="/login" element={<LoginForm setIsLoggedIn={setIsLoggedIn} setUserRole={setUserRole} />} />
           <Route path="/register" element={verifiedEmail ? <RegisterForm verifiedEmail={verifiedEmail} /> : <VerificarCorreo onVerified={setVerifiedEmail} />} />
@@ -48,6 +53,7 @@ function App() {
           <Route path="/recover-password" element={<RecoverPassword />} />
           <Route path="/verify-mfa" element={<VerifyMfa setIsLoggedIn={setIsLoggedIn} setUserRole={setUserRole} />} />
           <Route path="/about" element={<About />} />
+
 
           {/* Rutas para usuarios regulares usando UserLayout */}
           <Route path="/user/*" element={isLoggedIn && userRole === 'user' ? <UserLayout /> : <Navigate to="/login" />}>

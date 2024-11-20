@@ -1,6 +1,6 @@
 // routes/companyProfile.routes.js
 import express from 'express';
-import { getCompanyProfile, updateCompanyProfile, uploadLogo } from '../controllers/companyProfile.controller.js';
+import { getCompanyProfile, updateCompanyProfile, uploadLogo, getPublicCompanyProfile} from '../controllers/companyProfile.controller.js';
 import { authorizeAdmin } from '../middlewares/authorizeAdmin.js'; // Middleware para restringir acceso a admin
 import { authRequired } from '../middlewares/validateToken.js'; // Middleware para requerir autenticación
 import multer from 'multer';
@@ -31,5 +31,9 @@ router.put('/', authRequired, authorizeAdmin, updateCompanyProfile);
 
 // Ruta para subir el logo de la empresa (disponible solo para administradores)
 router.put('/logo', authRequired, authorizeAdmin, upload.single('logo'), uploadLogo);
+//nueva ruta para obtener el perfil público
+router.get('/public', getPublicCompanyProfile);
+
+
 
 export default router;

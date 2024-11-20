@@ -51,3 +51,15 @@ export const uploadLogo = async (req, res) => {
     res.status(500).json({ message: 'Error al subir el logo de la empresa.' });
   }
 };
+export const getPublicCompanyProfile = async (req, res) => {
+    try {
+      const profile = await CompanyProfile.findOne();
+      if (!profile) {
+        return res.status(404).json({ message: 'No se encontró el perfil de la empresa.' });
+      }
+      res.json(profile);
+    } catch (error) {
+      res.status(500).json({ message: 'Error al obtener el perfil público de la empresa.' });
+    }
+  };
+  

@@ -1,36 +1,8 @@
 import mongoose from 'mongoose';
 
-const companyProfileSchema = new mongoose.Schema({
-  socialMedia: {
-    facebook: { type: String, validate: { validator: validateURL, message: 'URL no válida' } },
-    twitter: { type: String, validate: { validator: validateURL, message: 'URL no válida' } },
-    instagram: { type: String, validate: { validator: validateURL, message: 'URL no válida' } },
-    linkedin: { type: String, validate: { validator: validateURL, message: 'URL no válida' } },
-  },
-  slogan: {
-    type: String,
-    maxlength: 100,
-    trim: true,
-  },
-  logo: {
-    type: String, // Ruta del archivo del logo subido
-  },
-  pageTitle: {
-    type: String,
-    maxlength: 50,
-    trim: true,
-  },
-  contactInfo: {
-    address: { type: String },
-    email: { type: String, validate: { validator: validateEmail, message: 'Correo no válido' } },
-    phone: { type: String, validate: { validator: validatePhone, message: 'Teléfono no válido' } },
-  },
-}, {
-  timestamps: true,
-});
-
+// Funciones de validación
 function validateURL(url) {
-  const urlRegex = /^(https?|chrome):\/\/[^\s$.?#].[^\s]*$/gm;
+  const urlRegex = /^(https?|chrome):\/\/[^\s$.?#].[^\s]*$/;
   return urlRegex.test(url);
 }
 
@@ -43,5 +15,38 @@ function validatePhone(phone) {
   const phoneRegex = /^[0-9]{10}$/; // Ejemplo: teléfono con 10 dígitos
   return phoneRegex.test(phone);
 }
+
+// Definición del esquema de perfil de la empresa
+const companyProfileSchema = new mongoose.Schema({
+  socialMedia: {
+    facebook: { type: String, validate: { validator: validateURL, message: 'URL no válida' }, required: false },
+    twitter: { type: String, validate: { validator: validateURL, message: 'URL no válida' }, required: false },
+    instagram: { type: String, validate: { validator: validateURL, message: 'URL no válida' }, required: false },
+    linkedin: { type: String, validate: { validator: validateURL, message: 'URL no válida' }, required: false },
+  },
+  slogan: {
+    type: String,
+    maxlength: 100,
+    trim: true,
+    required: false,
+  },
+  logo: {
+    type: String, // Ruta del archivo del logo subido
+    required: false,
+  },
+  pageTitle: {
+    type: String,
+    maxlength: 50,
+    trim: true,
+    required: false,
+  },
+  contactInfo: {
+    address: { type: String, required: false },
+    email: { type: String, validate: { validator: validateEmail, message: 'Correo no válido' }, required: false },
+    phone: { type: String, validate: { validator: validatePhone, message: 'Teléfono no válido' }, required: false },
+  },
+}, {
+  timestamps: true,
+});
 
 export default mongoose.model('CompanyProfile', companyProfileSchema);

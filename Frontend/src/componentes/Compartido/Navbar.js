@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { MdMenu, MdClose, MdArrowDropDown } from 'react-icons/md';
+import { MIS_URL } from '../MiVariable'; // Asegúrate de definir correctamente MIS_URL con la URL de tu backend
 
 const Navbar = ({ isLoggedIn, userRole }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  const [companyLogo, setCompanyLogo] = useState('');
 
   // Cargar el modo desde localStorage al montar el componente
   useEffect(() => {
@@ -17,6 +20,20 @@ const Navbar = ({ isLoggedIn, userRole }) => {
       setDarkMode(false);
       document.body.classList.add('light');
     }
+  }, []);
+
+  // Obtener el logotipo de la empresa
+  useEffect(() => {
+    const fetchCompanyInfo = async () => {
+      try {
+        const response = await axios.get(`${MIS_URL}/api/company-profile`, { withCredentials: true });
+        setCompanyLogo(response.data.logo); // Asegúrate de que la propiedad `logo` contiene la URL de la imagen
+      } catch (error) {
+        console.error('Error al cargar la información de la empresa:', error);
+      }
+    };
+
+    fetchCompanyInfo();
   }, []);
 
   // Alternar entre modo oscuro y claro
@@ -45,11 +62,17 @@ const Navbar = ({ isLoggedIn, userRole }) => {
         {/* Logo */}
         <div className="flex items-center space-x-6">
           <Link to="/" className="flex items-center">
-            <img
-              src="https://scontent.fver2-1.fna.fbcdn.net/v/t39.30808-6/370115356_645029297697036_1951347873711812214_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeHfjHXAdaLXgFH9xRAvaiUGJQ0iOM2CJ34lDSI4zYInfoE7bvHUXJzrxh4mfXi8piRwpwHNrQRi8SI4gkvQ3x__&_nc_ohc=CXi5K48a8UsQ7kNvgFG1s3O&_nc_zt=23&_nc_ht=scontent.fver2-1.fna&_nc_gid=A0KquJ4YgKHsfwxhee3Mrs2&oh=00_AYCgfCFbcHALr4l51XZXz3oHSi8tYuQXzitQYOT01b44Ew&oe=67431D3D"
-              alt="Punto Shein Logo"
-              className="h-14 w-14 md:h-16 md:w-16 rounded-full object-cover transition-transform duration-300 hover:scale-105"
-            />
+            {companyLogo ? (
+              <img
+                src={companyLogo}
+                alt="Punto Shein Logo"
+                className="h-14 w-14 md:h-16 md:w-16 rounded-full object-cover transition-transform duration-300 hover:scale-105"
+              />
+            ) : (
+              <div className="h-14 w-14 md:h-16 md:w-16 bg-gray-300 rounded-full flex items-center justify-center">
+                Logo
+              </div>
+            )}
           </Link>
         </div>
 
@@ -68,6 +91,12 @@ const Navbar = ({ isLoggedIn, userRole }) => {
             className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-300"
           >
             Home
+          </Link>
+          <Link
+            to="/company-public-profile"
+            className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-300"
+          >
+            Sobre la Empresa
           </Link>
           <div className="relative">
             <button
@@ -103,10 +132,11 @@ const Navbar = ({ isLoggedIn, userRole }) => {
             )}
           </div>
 
+          {/* Authentication Links */}
           {isLoggedIn ? (
             <>
               <Link
-                to={userRole === 'admin' ? '/admin/dashboard' : '/user/dashboard'}  // Redirigir según el rol
+                to={userRole === 'admin' ? '/admin/dashboard' : '/user/dashboard'}
                 className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-300"
               >
                 Dashboard
@@ -194,7 +224,7 @@ const Navbar = ({ isLoggedIn, userRole }) => {
           {isLoggedIn ? (
             <>
               <Link
-                to={userRole === 'admin' ? '/admin/dashboard' : '/user/dashboard'}  // Redirigir según el rol
+                to={userRole === 'admin' ? '/admin/dashboard' : '/user/dashboard'}
                 className="block text-gray-700 dark:text-gray-300 py-2 hover:text-gray-900 dark:hover:text-white transition-colors duration-300"
                 onClick={toggleMenu}
               >
