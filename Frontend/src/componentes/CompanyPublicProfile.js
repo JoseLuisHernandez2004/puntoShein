@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { MIS_URL } from './MiVariable';
+import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from 'react-icons/fa'; // Importación de íconos
 
 const CompanyPublicProfile = () => {
   const [profile, setProfile] = useState(null);
@@ -17,42 +18,104 @@ const CompanyPublicProfile = () => {
         setLoading(false);
       }
     };
-  
+
     fetchCompanyProfile();
   }, []);
-  
 
-  if (loading) return <p>Cargando información de la empresa...</p>;
-  if (!profile) return <p>No se pudo cargar la información de la empresa.</p>;
+  if (loading) {
+    return <p className="text-center text-lg text-gray-500 mt-20">Cargando información de la empresa...</p>;
+  }
+
+  if (!profile) {
+    return <p className="text-center text-lg text-red-500 mt-20">No se pudo cargar la información de la empresa.</p>;
+  }
 
   return (
-    <div className="p-20 bg-gray-50 rounded-lg shadow-md">
-      <h2 className="text-3xl font-bold mb-4">{profile.pageTitle}</h2>
-      {profile.logo && (
-        <img
-          src={`${MIS_URL}/${profile.logo}`} // Ajusta la ruta para acceder correctamente al logo
-          alt="Logotipo de la Empresa"
-          className="w-32 h-32 object-cover mb-4"
-        />
-      )}
-      <p className="text-xl italic mb-4">"{profile.slogan}"</p>
-      <div className="mb-4">
-        <h3 className="text-2xl font-bold">Información de Contacto</h3>
-        <p><strong>Dirección:</strong> {profile.contactInfo?.address || 'No disponible'}</p>
-        <p><strong>Teléfono:</strong> {profile.contactInfo?.phone || 'No disponible'}</p>
-        <p><strong>Correo Electrónico:</strong> {profile.contactInfo?.email || 'No disponible'}</p>
+    <div className="container mx-auto mt-16 p-8 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl shadow-lg text-gray-800">
+      {/* Header */}
+      <div className="flex flex-col items-center text-center mb-10">
+        <h2 className="text-5xl font-extrabold text-black-800 mb-6">{profile.pageTitle}</h2>
+        {profile.logo && (
+          <img
+            src={`${MIS_URL}/${profile.logo}`}
+            alt="Logotipo de la Empresa"
+            className="w-40 h-40 md:w-48 md:h-48 object-cover mb-4 rounded-full border-4 border-blue-300 shadow-md"
+          />
+        )}
+        <p className="text-2xl font-light italic text-gray-500">"{profile.slogan}"</p>
       </div>
-      <div>
-        <h3 className="text-2xl font-bold mb-2">Síguenos en Redes Sociales</h3>
+
+      {/* Información de Contacto */}
+      <div className="mb-10 p-6 bg-white rounded-lg shadow-md border-2 border-gray-300">
+        <h3 className="text-3xl font-bold text-center text-black mb-6">Información de Contacto</h3>
+        <div className="text-lg text-gray-700 space-y-3">
+          <p><strong>Dirección:</strong> {profile.contactInfo?.address || 'No disponible'}</p>
+          <p><strong>Teléfono:</strong> {profile.contactInfo?.phone || 'No disponible'}</p>
+          <p><strong>Correo Electrónico:</strong> {profile.contactInfo?.email || 'No disponible'}</p>
+        </div>
+      </div>
+
+      {/* Identidad de la Empresa */}
+      <div className="mb-10 p-6 bg-white rounded-lg shadow-md border-2 border-gray-300">
+        <h3 className="text-3xl font-bold text-center text-black mb-6">Identidad de la Empresa</h3>
+        <div className="text-lg text-gray-700 space-y-3">
+          <p><strong>Misión:</strong> {profile.identidadEmpresa?.mision || 'No disponible'}</p>
+          <p><strong>Visión:</strong> {profile.identidadEmpresa?.vision || 'No disponible'}</p>
+        </div>
+      </div>
+
+      {/* Redes Sociales */}
+      <div className="mb-10 p-6 bg-white rounded-lg shadow-md border-2 border-gray-300">
+        <h3 className="text-3xl font-bold text-center text-black mb-6">Síguenos en Redes Sociales</h3>
         {profile.socialMedia ? (
-          <ul className="list-disc pl-6">
-            {profile.socialMedia.facebook && <li><a href={profile.socialMedia.facebook} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Facebook</a></li>}
-            {profile.socialMedia.twitter && <li><a href={profile.socialMedia.twitter} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Twitter</a></li>}
-            {profile.socialMedia.instagram && <li><a href={profile.socialMedia.instagram} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Instagram</a></li>}
-            {profile.socialMedia.linkedin && <li><a href={profile.socialMedia.linkedin} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">LinkedIn</a></li>}
-          </ul>
+          <div className="flex justify-center flex-wrap gap-8 text-xl">
+            {profile.socialMedia.facebook && (
+              <a
+                href={profile.socialMedia.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition duration-300"
+              >
+                <FaFacebook className="text-3xl" />
+                <span>Facebook</span>
+              </a>
+            )}
+            {profile.socialMedia.twitter && (
+              <a
+                href={profile.socialMedia.twitter}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-blue-400 hover:text-blue-600 transition duration-300"
+              >
+                <FaTwitter className="text-3xl" />
+                <span>Twitter</span>
+              </a>
+            )}
+            {profile.socialMedia.instagram && (
+              <a
+                href={profile.socialMedia.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-pink-600 hover:text-pink-800 transition duration-300"
+              >
+                <FaInstagram className="text-3xl" />
+                <span>Instagram</span>
+              </a>
+            )}
+            {profile.socialMedia.linkedin && (
+              <a
+                href={profile.socialMedia.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-blue-700 hover:text-blue-900 transition duration-300"
+              >
+                <FaLinkedin className="text-3xl" />
+                <span>LinkedIn</span>
+              </a>
+            )}
+          </div>
         ) : (
-          <p>No hay redes sociales disponibles.</p>
+          <p className="text-center text-gray-500">No hay redes sociales disponibles.</p>
         )}
       </div>
     </div>

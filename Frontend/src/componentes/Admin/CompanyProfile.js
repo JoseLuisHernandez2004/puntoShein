@@ -18,7 +18,11 @@ const CompanyProfile = () => {
       address: '',
       email: '',
       phone: ''
-    }
+    },
+    identidadEmpresa:{
+       mision: '',
+       vision: '' 
+    },
   });
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -44,7 +48,11 @@ const CompanyProfile = () => {
             address: '',
             email: '',
             phone: ''
-          }
+          },
+          identidadEmpresa:profileData.identidadEmpresa ||{
+            mision: '',
+            vision: '' 
+         }
         });
 
         setLoading(false);
@@ -80,7 +88,19 @@ const CompanyProfile = () => {
           [key]: value
         }
       }));
-    } else {
+    
+    
+    } else if 
+        (name.startsWith('identidadEmpresa.')) {
+            const key = name.split('.')[1];
+            setProfile(prevProfile => ({
+              ...prevProfile,
+              identidadEmpresa: {
+                ...prevProfile.identidadEmpresa,
+                [key]: value
+              }
+            }));
+    }else {
       setProfile(prevProfile => ({
         ...prevProfile,
         [name]: value
@@ -106,6 +126,7 @@ const CompanyProfile = () => {
       <h2 className="text-3xl font-bold mb-4">Configuración del Perfil de la Empresa</h2>
       {isEditing ? (
         <>
+        <label htmlFor="mision" className="block mb-2 font-medium text-gray-700"> <strong>Titulo de la empresa</strong></label>
           <input
             type="text"
             name="pageTitle"
@@ -114,6 +135,7 @@ const CompanyProfile = () => {
             placeholder="Título de la Página"
             className="p-2 border rounded mb-4 w-full"
           />
+          <label htmlFor="mision" className="block mb-2 font-medium text-gray-700"><strong>Slogan</strong></label>
           <input
             type="text"
             name="slogan"
@@ -122,6 +144,8 @@ const CompanyProfile = () => {
             placeholder="Eslogan"
             className="p-2 border rounded mb-4 w-full"
           />
+          {/* Input de Informacion de contacto */}
+          <label htmlFor="mision" className="block mb-2 font-medium text-gray-700"><strong>Dirección</strong></label>
           <input
             type="text"
             name="contactInfo.address"
@@ -130,6 +154,7 @@ const CompanyProfile = () => {
             placeholder="Dirección"
             className="p-2 border rounded mb-4 w-full"
           />
+          <label htmlFor="mision" className="block mb-2 font-medium text-gray-700"><strong>Teléfono</strong></label>
           <input
             type="text"
             name="contactInfo.phone"
@@ -138,6 +163,7 @@ const CompanyProfile = () => {
             placeholder="Teléfono"
             className="p-2 border rounded mb-4 w-full"
           />
+          <label htmlFor="mision" className="block mb-2 font-medium text-gray-700"><strong>Correo electrónico</strong></label>
           <input
             type="email"
             name="contactInfo.email"
@@ -146,6 +172,34 @@ const CompanyProfile = () => {
             placeholder="Correo Electrónico"
             className="p-2 border rounded mb-4 w-full"
           />
+          {/* text de identidad de empresa */}
+
+            <label htmlFor="mision" className="block mb-2 font-medium text-gray-700"><strong>Misión</strong></label>
+            <textarea
+            id="mision"
+            name="identidadEmpresa.mision"
+            value={profile.identidadEmpresa.mision}
+            onChange={handleInputChange}
+            placeholder="Escribe aquí la misión de la empresa..."
+            className="p-2 border rounded mb-4 w-full h-24 resize-none"
+            maxLength={500}
+            />
+            <p className="text-sm text-gray-500">{profile.identidadEmpresa.mision.length}/500 caracteres</p>
+
+            <label htmlFor="vision" className="block mb-2 font-medium text-gray-700"><strong>Visión</strong></label>
+            <textarea
+            id="vision"
+            name="identidadEmpresa.vision"
+            value={profile.identidadEmpresa.vision}
+            onChange={handleInputChange}
+            placeholder="Escribe aquí la visión de la empresa..."
+            className="p-2 border rounded mb-4 w-full h-24 resize-none"
+            maxLength={500}
+            />
+            <p className="text-sm text-gray-500">{profile.identidadEmpresa.vision.length}/500 caracteres</p>
+
+          {/* Input de Redes sociales */}
+          <label htmlFor="vision" className="block mb-2 font-medium text-gray-700"><strong>Facebook</strong></label>
           <input
             type="text"
             name="socialMedia.facebook"
@@ -154,6 +208,7 @@ const CompanyProfile = () => {
             placeholder="Facebook"
             className="p-2 border rounded mb-4 w-full"
           />
+          <label htmlFor="vision" className="block mb-2 font-medium text-gray-700"><strong>Twitter</strong></label>
           <input
             type="text"
             name="socialMedia.twitter"
@@ -162,6 +217,7 @@ const CompanyProfile = () => {
             placeholder="Twitter"
             className="p-2 border rounded mb-4 w-full"
           />
+          <label htmlFor="vision" className="block mb-2 font-medium text-gray-700"><strong>Instagram</strong></label>
           <input
             type="text"
             name="socialMedia.instagram"
@@ -170,6 +226,7 @@ const CompanyProfile = () => {
             placeholder="Instagram"
             className="p-2 border rounded mb-4 w-full"
           />
+          <label htmlFor="vision" className="block mb-2 font-medium text-gray-700"><strong>LinkedIn</strong></label>
           <input
             type="text"
             name="socialMedia.linkedin"
@@ -188,6 +245,8 @@ const CompanyProfile = () => {
           <p><strong>Dirección:</strong> {profile.contactInfo?.address}</p>
           <p><strong>Teléfono:</strong> {profile.contactInfo?.phone}</p>
           <p><strong>Correo Electrónico:</strong> {profile.contactInfo?.email}</p>
+          <p><strong>Misión:</strong> {profile.identidadEmpresa?.mision}</p>
+          <p><strong>Visión:</strong> {profile.identidadEmpresa?.vision}</p>
           <p><strong>Facebook:</strong> {profile.socialMedia?.facebook}</p>
           <p><strong>Twitter:</strong> {profile.socialMedia?.twitter}</p>
           <p><strong>Instagram:</strong> {profile.socialMedia?.instagram}</p>

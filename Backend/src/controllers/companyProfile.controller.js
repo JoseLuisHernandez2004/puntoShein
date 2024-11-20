@@ -17,11 +17,11 @@ export const getCompanyProfile = async (req, res) => {
 // Actualizar la configuración del perfil de la empresa
 export const updateCompanyProfile = async (req, res) => {
   try {
-    const { socialMedia, slogan, pageTitle, contactInfo } = req.body;
+    const { socialMedia, slogan, pageTitle, contactInfo,identidadEmpresa } = req.body;
 
     const updatedProfile = await CompanyProfile.findOneAndUpdate(
       {},
-      { socialMedia, slogan, pageTitle, contactInfo },
+      { socialMedia, slogan, pageTitle, contactInfo, identidadEmpresa },
       { new: true, upsert: true }
     );
 

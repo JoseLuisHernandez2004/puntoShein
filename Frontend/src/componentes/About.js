@@ -1,30 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { MIS_URL } from './MiVariable'; // Ajusta la importación según tu estructura
 
 const About = ({ isAdmin }) => {
   const [mission, setMission] = useState('');
   const [vision, setVision] = useState('');
   const [editing, setEditing] = useState(false);
 
-  // Fetch the current mission and vision from the backend when the component loads
+  // Fetch mission and vision from the public endpoint
+  const fetchMissionAndVision = async () => {
+    try {
+      const response = await axios.get(`${MIS_URL}/api/company-profile/public`);
+      setMission(response.data.identidadEmpresa?.mision || 'No disponible');
+      setVision(response.data.identidadEmpresa?.vision || 'No disponible');
+    } catch (error) {
+      console.error('Error fetching mission and vision:', error);
+    }
+  };
+
+  // Call fetchMissionAndVision when the component loads
   useEffect(() => {
-    const fetchAboutInfo = async () => {
-      try {
-        const response = await axios.get('/api/about'); // Adjust the endpoint as needed
-        setMission(response.data.mission);
-        setVision(response.data.vision);
-      } catch (error) {
-        console.error('Error fetching mission and vision:', error);
-      }
-    };
-    fetchAboutInfo();
+    fetchMissionAndVision();
   }, []);
 
   // Handle the submission of the updated values
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put('/api/about', { mission, vision }); // Adjust the endpoint as needed
+      await axios.put(`${MIS_URL}/api/company-profile/public`, { mission, vision });
+      fetchMissionAndVision(); // Refresh the data after saving
       setEditing(false);
       alert('Misión y Visión actualizadas con éxito');
     } catch (error) {
@@ -35,8 +39,8 @@ const About = ({ isAdmin }) => {
 
   return (
     <div className="container mx-auto px-6 py-10 mt-20">
-         <h1 className="text-4xl font-bold text-center mb-6">Quiénes Somos</h1>
-      
+      <h1 className="text-4xl font-bold text-center mb-6">Quiénes Somos</h1>
+
       {editing ? (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
