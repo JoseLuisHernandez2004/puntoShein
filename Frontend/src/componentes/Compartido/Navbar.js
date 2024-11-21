@@ -9,6 +9,7 @@ const Navbar = ({ isLoggedIn, userRole }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [companyLogo, setCompanyLogo] = useState('');
+  const [companyName, setCompanyName] = useState(''); 
 
   // Cargar el modo desde localStorage al montar el componente
   useEffect(() => {
@@ -30,7 +31,8 @@ useEffect(() => {
       const response = await axios.get(`${MIS_URL}/api/company-profile/public`);
       
       if (response.data?.logo) {
-        setCompanyLogo(response.data.logo); // Asegúrate de que la propiedad `logo` contiene la URL de la imagen
+        setCompanyLogo(response.data.logo); // logo
+        setCompanyName(response.data.pageTitle); // Obtén el nombre de la empresa
       }
     } catch (error) {
       console.error('Error al cargar la información pública de la empresa:', error);
@@ -64,8 +66,8 @@ useEffect(() => {
   return (
     <nav className="w-full bg-white dark:bg-gray-900 shadow-lg fixed top-0 z-50 transition-all duration-300 ease-in-out">
       <div className="container mx-auto flex justify-between items-center p-4">
-        {/* Logo */}
-        <div className="flex items-center space-x-6">
+        {/* Logo y Nombre de la Empresa */}
+        <div className="flex items-center space-x-4">
           <Link to="/" className="flex items-center">
             {companyLogo ? (
               <img
@@ -79,6 +81,9 @@ useEffect(() => {
               </div>
             )}
           </Link>
+          <span className="text-xl md:text-2xl font-bold text-gray-700 dark:text-gray-200">
+            {companyName || 'Cargando...'}
+          </span>
         </div>
 
         {/* Botón para cambiar entre oscuro y claro */}
