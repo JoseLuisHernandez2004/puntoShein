@@ -26,6 +26,7 @@ const CompanyProfile = () => {
   });
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
+  const [logoFile, setLogoFile] = useState(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -103,9 +104,28 @@ const CompanyProfile = () => {
     }
   };
 
+  const handleLogoChange = (e) => {
+    setLogoFile(e.target.files[0]);
+  };
+
   const handleSave = async () => {
     try {
+      // Update company profile text fields
       await axios.put(`${MIS_URL}/api/company-profile`, profile, { withCredentials: true });
+
+      // If a logo file was selected, upload it
+      if (logoFile) {
+        const formData = new FormData();
+        formData.append('logo', logoFile);
+
+        await axios.put(`${MIS_URL}/api/company-profile/logo`, formData, {
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+      }
+
       Swal.fire('Éxito', 'Perfil de la empresa actualizado con éxito.', 'success');
       setIsEditing(false);
     } catch (error) {
@@ -132,7 +152,7 @@ const CompanyProfile = () => {
             placeholder="Título de la Página"
             className="p-2 border rounded mb-4 w-full"
           />
-          
+
           <label htmlFor="slogan" className="block mb-2 font-medium text-gray-700">
             <strong>Slogan</strong>
           </label>
@@ -228,6 +248,17 @@ const CompanyProfile = () => {
             </div>
           ))}
 
+          {/* Logo Upload */}
+          <label htmlFor="logo" className="block mb-2 font-medium text-gray-700">
+            <strong>Logotipo</strong>
+          </label>
+          <input
+            type="file"
+            name="logo"
+            onChange={handleLogoChange}
+            className="p-2 border rounded mb-4 w-full"
+          />
+
           <button onClick={handleSave} className="px-4 py-2 bg-green-600 text-white rounded mr-2">Guardar</button>
           <button onClick={() => setIsEditing(false)} className="px-4 py-2 bg-red-600 text-white rounded">Cancelar</button>
         </>
@@ -244,6 +275,13 @@ const CompanyProfile = () => {
           <p><strong>Twitter:</strong> {profile.socialMedia?.twitter}</p>
           <p><strong>Instagram:</strong> {profile.socialMedia?.instagram}</p>
           <p><strong>LinkedIn:</strong> {profile.socialMedia?.linkedin}</p>
+          {profile.logo && (
+            <img
+              src={profile.logo}
+              alt="Logotipo de la Empresa"
+              className="h-20 w-20 object-cover mb-4 rounded-full border"
+            />
+          )}
           <button onClick={() => setIsEditing(true)} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Editar Perfil</button>
         </>
       )}

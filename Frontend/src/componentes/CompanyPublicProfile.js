@@ -8,19 +8,29 @@ const CompanyPublicProfile = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true; // Variable para controlar si el componente está montado
+
     const fetchCompanyProfile = async () => {
       try {
         const response = await axios.get(`${MIS_URL}/api/company-profile/public`);
-        setProfile(response.data);
+        if (isMounted) {
+          setProfile(response.data); // Actualizamos solo si el componente está montado
+          setLoading(false);
+        }
       } catch (error) {
-        console.error('Error al cargar el perfil de la empresa:', error);
-      } finally {
-        setLoading(false);
+        if (isMounted) {
+          console.error('Error al cargar el perfil de la empresa:', error);
+          setLoading(false);
+        }
       }
     };
 
     fetchCompanyProfile();
-  }, []);
+
+    return () => {
+      isMounted = false; // Evitamos actualizaciones si el componente se desmonta
+    };
+  }, []); // Se ejecuta solo una vez al montar el componente
 
   if (loading) {
     return (
@@ -41,7 +51,7 @@ const CompanyPublicProfile = () => {
         <h2 className="text-5xl font-extrabold text-blue-800 mb-6">{profile.pageTitle}</h2>
         {profile.logo ? (
           <img
-            src={`${MIS_URL}/${profile.logo}`}
+            src={profile.logo}
             alt="Logotipo de la Empresa"
             className="w-40 h-40 md:w-48 md:h-48 object-cover mb-4 rounded-full border-4 border-blue-300 shadow-md transition-transform duration-300 hover:scale-110"
           />

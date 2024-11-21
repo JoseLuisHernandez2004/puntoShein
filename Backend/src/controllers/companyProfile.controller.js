@@ -1,4 +1,12 @@
+import { v2 as cloudinary } from 'cloudinary';
 import CompanyProfile from '../models/companyProfile.model.js';
+
+// Configurar Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 // Obtener la configuración completa del perfil de la empresa (solo para administradores)
 export const getCompanyProfile = async (req, res) => {
@@ -17,11 +25,11 @@ export const getCompanyProfile = async (req, res) => {
 // Actualizar la configuración del perfil de la empresa (solo para administradores)
 export const updateCompanyProfile = async (req, res) => {
   try {
-    const { socialMedia, slogan, pageTitle, contactInfo, identidadEmpresa } = req.body;
+    const { socialMedia, slogan, pageTitle, contactInfo, identidadEmpresa,logo } = req.body;
 
     const updatedProfile = await CompanyProfile.findOneAndUpdate(
       {},
-      { socialMedia, slogan, pageTitle, contactInfo, identidadEmpresa },
+      { socialMedia, slogan, pageTitle, contactInfo, identidadEmpresa, logo },
       { new: true, upsert: true } // Crea el documento si no existe
     );
 
@@ -39,11 +47,16 @@ export const uploadLogo = async (req, res) => {
   }
 
   try {
+    // Subir el archivo a Cloudinary
+    const result = await cloudinary.uploader.upload(req.file.path);
+    console.log('Archivo recibido:', req.file);
+
     const updatedProfile = await CompanyProfile.findOneAndUpdate(
       {},
-      { logo: req.file.path },
+      { logo: result.secure_url }, // Guardar la URL del logo en la base de datos
       { new: true, upsert: true } // Crea el documento si no existe
     );
+    
 
     res.status(200).json(updatedProfile);
   } catch (error) {

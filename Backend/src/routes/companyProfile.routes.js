@@ -4,24 +4,21 @@ import { getCompanyProfile, updateCompanyProfile, uploadLogo, getPublicCompanyPr
 import { authorizeAdmin } from '../middlewares/authorizeAdmin.js'; // Middleware para restringir acceso a admin
 import { authRequired } from '../middlewares/validateToken.js'; // Middleware para requerir autenticación
 import multer from 'multer';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import { v2 as cloudinary } from 'cloudinary';
 
 const router = express.Router();
 
-// Configuración de multer para la subida de logos
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, './uploads'),
-  filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`),
-});
-const upload = multer({
-  storage,
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
-      cb(null, true);
-    } else {
-      cb(new Error('Solo se permiten archivos JPEG o PNG'));
-    }
-  },
-});
+// Configuración de almacenamiento en Cloudinary para multer
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+      folder: 'PuntoShein_logos',
+      allowed_formats: ['jpeg', 'png'],
+    },
+  });
+
+  const upload = multer({ storage });
 
 // Ruta para obtener la configuración del perfil (disponible solo para administradores)
 router.get('/', authRequired, authorizeAdmin, getCompanyProfile);
