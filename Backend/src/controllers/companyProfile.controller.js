@@ -80,6 +80,7 @@ export const getPublicCompanyProfile = async (req, res) => {
       slogan: profile.slogan,
       contactInfo: profile.contactInfo,
       socialMedia: profile.socialMedia,
+      identidadEmpresa: profile.identidadEmpresa,
       logo: profile.logo,
     };
 
