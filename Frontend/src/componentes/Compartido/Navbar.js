@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { MdMenu, MdClose, MdArrowDropDown } from 'react-icons/md';
+import { MdMenu, MdClose, MdArrowDropDown, MdDarkMode, MdLightMode } from 'react-icons/md';
 import { MIS_URL } from '../MiVariable'; // Asegúrate de definir correctamente MIS_URL con la URL de tu backend
 
 const Navbar = ({ isLoggedIn, userRole }) => {
@@ -23,18 +23,23 @@ const Navbar = ({ isLoggedIn, userRole }) => {
   }, []);
 
   // Obtener el logotipo de la empresa
-  useEffect(() => {
-    const fetchCompanyInfo = async () => {
-      try {
-        const response = await axios.get(`${MIS_URL}/api/company-profile`, { withCredentials: true });
+useEffect(() => {
+  const fetchCompanyInfo = async () => {
+    try {
+      // Utilizar siempre el endpoint público para obtener la información general de la empresa
+      const response = await axios.get(`${MIS_URL}/api/company-profile/public`);
+      
+      if (response.data?.logo) {
         setCompanyLogo(response.data.logo); // Asegúrate de que la propiedad `logo` contiene la URL de la imagen
-      } catch (error) {
-        console.error('Error al cargar la información de la empresa:', error);
       }
-    };
+    } catch (error) {
+      console.error('Error al cargar la información pública de la empresa:', error);
+    }
+  };
 
-    fetchCompanyInfo();
-  }, []);
+  fetchCompanyInfo();
+}, []);
+
 
   // Alternar entre modo oscuro y claro
   const toggleDarkMode = () => {
@@ -66,11 +71,11 @@ const Navbar = ({ isLoggedIn, userRole }) => {
               <img
                 src={companyLogo}
                 alt="Punto Shein Logo"
-                className="h-14 w-14 md:h-16 md:w-16 rounded-full object-cover transition-transform duration-300 hover:scale-105"
+                className="h-14 w-14 md:h-16 md:w-16 rounded-full object-cover transition-transform duration-300 hover:scale-110"
               />
             ) : (
               <div className="h-14 w-14 md:h-16 md:w-16 bg-gray-300 rounded-full flex items-center justify-center">
-                Logo
+                <span className="text-gray-500">Logo</span>
               </div>
             )}
           </Link>
@@ -79,9 +84,9 @@ const Navbar = ({ isLoggedIn, userRole }) => {
         {/* Botón para cambiar entre oscuro y claro */}
         <button
           onClick={toggleDarkMode}
-          className="text-gray-700 dark:text-white transition-colors duration-300"
+          className="text-gray-700 dark:text-white transition-transform duration-300 hover:scale-110"
         >
-          {darkMode ? 'Modo Claro' : 'Modo Oscuro'}
+          {darkMode ? <MdLightMode size={24} /> : <MdDarkMode size={24} />}
         </button>
 
         {/* Desktop Links */}
@@ -93,7 +98,7 @@ const Navbar = ({ isLoggedIn, userRole }) => {
             Home
           </Link>
           <Link
-            to="/company-public-profile"
+            to="/perfilEmpresaPublico"
             className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-300"
           >
             Sobre la Empresa
@@ -158,7 +163,7 @@ const Navbar = ({ isLoggedIn, userRole }) => {
               </Link>
               <Link
                 to="/register"
-                className="bg-green-600 dark:bg-green-700 text-white py-2 px-4 rounded hover:bg-green-700 dark:hover:bg-green-800 transition-colors duration-300"
+                className="bg-green-600 dark:bg-green-700 text-white py-2 px-4 rounded hover:bg-green-700 dark:hover:bg-green-800 transition-transform duration-300"
               >
                 Registrar
               </Link>
@@ -180,13 +185,20 @@ const Navbar = ({ isLoggedIn, userRole }) => {
 
       {/* Mobile Dropdown Menu */}
       {isMenuOpen && (
-        <div className="md:hidden bg-white dark:bg-gray-900 w-full px-4 pb-4 shadow-lg rounded-b-lg">
+        <div className="md:hidden bg-white dark:bg-gray-900 w-full px-4 pb-4 shadow-lg rounded-b-lg transition-transform duration-300">
           <Link
             to="/"
             className="block text-gray-700 dark:text-gray-300 py-2 hover:text-gray-900 dark:hover:text-white transition-colors duration-300"
             onClick={toggleMenu}
           >
             Home
+          </Link>
+          <Link
+            to="/perfilEmpresaPublico"
+            className="block text-gray-700 dark:text-gray-300 py-2 hover:text-gray-900 dark:hover:text-white transition-colors duration-300"
+            onClick={toggleMenu}
+          >
+            Sobre la Empresa
           </Link>
           <button
             className="block text-gray-700 dark:text-gray-300 py-2 hover:text-gray-900 dark:hover:text-white flex items-center justify-between transition-colors duration-300"

@@ -1,6 +1,6 @@
 import CompanyProfile from '../models/companyProfile.model.js';
 
-// Obtener la configuración del perfil de la empresa
+// Obtener la configuración completa del perfil de la empresa (solo para administradores)
 export const getCompanyProfile = async (req, res) => {
   try {
     const profile = await CompanyProfile.findOne();
@@ -14,15 +14,15 @@ export const getCompanyProfile = async (req, res) => {
   }
 };
 
-// Actualizar la configuración del perfil de la empresa
+// Actualizar la configuración del perfil de la empresa (solo para administradores)
 export const updateCompanyProfile = async (req, res) => {
   try {
-    const { socialMedia, slogan, pageTitle, contactInfo,identidadEmpresa } = req.body;
+    const { socialMedia, slogan, pageTitle, contactInfo, identidadEmpresa } = req.body;
 
     const updatedProfile = await CompanyProfile.findOneAndUpdate(
       {},
       { socialMedia, slogan, pageTitle, contactInfo, identidadEmpresa },
-      { new: true, upsert: true }
+      { new: true, upsert: true } // Crea el documento si no existe
     );
 
     res.status(200).json(updatedProfile);
@@ -32,7 +32,7 @@ export const updateCompanyProfile = async (req, res) => {
   }
 };
 
-// Subir el logo de la empresa
+// Subir el logo de la empresa (solo para administradores)
 export const uploadLogo = async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ message: 'No se ha proporcionado un archivo de logo.' });
@@ -42,7 +42,7 @@ export const uploadLogo = async (req, res) => {
     const updatedProfile = await CompanyProfile.findOneAndUpdate(
       {},
       { logo: req.file.path },
-      { new: true, upsert: true }
+      { new: true, upsert: true } // Crea el documento si no existe
     );
 
     res.status(200).json(updatedProfile);
@@ -51,15 +51,28 @@ export const uploadLogo = async (req, res) => {
     res.status(500).json({ message: 'Error al subir el logo de la empresa.' });
   }
 };
+
+// Obtener la información pública del perfil de la empresa (disponible para todos)
 export const getPublicCompanyProfile = async (req, res) => {
-    try {
-      const profile = await CompanyProfile.findOne();
-      if (!profile) {
-        return res.status(404).json({ message: 'No se encontró el perfil de la empresa.' });
-      }
-      res.json(profile);
-    } catch (error) {
-      res.status(500).json({ message: 'Error al obtener el perfil público de la empresa.' });
+  try {
+    // Aquí solo devolvemos la información que es pública
+    const profile = await CompanyProfile.findOne();
+    if (!profile) {
+      return res.status(404).json({ message: 'No se encontró el perfil de la empresa.' });
     }
-  };
-  
+
+    // Filtramos la información para que solo la parte pública sea devuelta
+    const publicProfile = {
+      pageTitle: profile.pageTitle,
+      slogan: profile.slogan,
+      contactInfo: profile.contactInfo,
+      socialMedia: profile.socialMedia,
+      logo: profile.logo,
+    };
+
+    res.status(200).json(publicProfile);
+  } catch (error) {
+    console.error('Error al obtener el perfil público de la empresa:', error);
+    res.status(500).json({ message: 'Error al obtener el perfil público de la empresa.' });
+  }
+};

@@ -45,7 +45,7 @@ const companyProfileSchema = new mongoose.Schema({
     email: { type: String, validate: { validator: validateEmail, message: 'Correo no válido' }, required: false },
     phone: { type: String, validate: { validator: validatePhone, message: 'Teléfono no válido' }, required: false },
   },
-    // Identidad corporativa
+  // Identidad corporativa
   identidadEmpresa: {
     mision: {
       type: String, // Campo para la misión de la empresa
@@ -59,4 +59,5 @@ const companyProfileSchema = new mongoose.Schema({
 }, {
   timestamps: true,
 });
+
 export default mongoose.model('CompanyProfile', companyProfileSchema);

@@ -19,9 +19,9 @@ const CompanyProfile = () => {
       email: '',
       phone: ''
     },
-    identidadEmpresa:{
-       mision: '',
-       vision: '' 
+    identidadEmpresa: {
+      mision: '',
+      vision: ''
     },
   });
   const [loading, setLoading] = useState(true);
@@ -33,7 +33,6 @@ const CompanyProfile = () => {
         const response = await axios.get(`${MIS_URL}/api/company-profile`, { withCredentials: true });
         const profileData = response.data;
 
-        // Asegúrate de que todos los campos estén inicializados incluso si no vienen en la respuesta
         setProfile({
           socialMedia: profileData.socialMedia || {
             facebook: '',
@@ -49,10 +48,10 @@ const CompanyProfile = () => {
             email: '',
             phone: ''
           },
-          identidadEmpresa:profileData.identidadEmpresa ||{
+          identidadEmpresa: profileData.identidadEmpresa || {
             mision: '',
-            vision: '' 
-         }
+            vision: ''
+          }
         });
 
         setLoading(false);
@@ -69,7 +68,6 @@ const CompanyProfile = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
-    // Manejar campos anidados
     if (name.startsWith('socialMedia.')) {
       const key = name.split('.')[1];
       setProfile(prevProfile => ({
@@ -88,19 +86,16 @@ const CompanyProfile = () => {
           [key]: value
         }
       }));
-    
-    
-    } else if 
-        (name.startsWith('identidadEmpresa.')) {
-            const key = name.split('.')[1];
-            setProfile(prevProfile => ({
-              ...prevProfile,
-              identidadEmpresa: {
-                ...prevProfile.identidadEmpresa,
-                [key]: value
-              }
-            }));
-    }else {
+    } else if (name.startsWith('identidadEmpresa.')) {
+      const key = name.split('.')[1];
+      setProfile(prevProfile => ({
+        ...prevProfile,
+        identidadEmpresa: {
+          ...prevProfile.identidadEmpresa,
+          [key]: value
+        }
+      }));
+    } else {
       setProfile(prevProfile => ({
         ...prevProfile,
         [name]: value
@@ -122,11 +117,13 @@ const CompanyProfile = () => {
   if (loading) return <p>Cargando perfil de la empresa...</p>;
 
   return (
-    <div className="p-20 bg-gray-50 rounded-lg shadow-md">
-      <h2 className="text-3xl font-bold mb-4">Configuración del Perfil de la Empresa</h2>
+    <div className="p-10 bg-gradient-to-r from-gray-50 to-gray-200 rounded-xl shadow-lg">
+      <h2 className="text-4xl font-bold text-center text-blue-800 mb-8">Configuración del Perfil de la Empresa</h2>
       {isEditing ? (
         <>
-        <label htmlFor="mision" className="block mb-2 font-medium text-gray-700"> <strong>Titulo de la empresa</strong></label>
+          <label htmlFor="pageTitle" className="block mb-2 font-medium text-gray-700">
+            <strong>Título de la empresa</strong>
+          </label>
           <input
             type="text"
             name="pageTitle"
@@ -135,7 +132,10 @@ const CompanyProfile = () => {
             placeholder="Título de la Página"
             className="p-2 border rounded mb-4 w-full"
           />
-          <label htmlFor="mision" className="block mb-2 font-medium text-gray-700"><strong>Slogan</strong></label>
+          
+          <label htmlFor="slogan" className="block mb-2 font-medium text-gray-700">
+            <strong>Slogan</strong>
+          </label>
           <input
             type="text"
             name="slogan"
@@ -144,8 +144,11 @@ const CompanyProfile = () => {
             placeholder="Eslogan"
             className="p-2 border rounded mb-4 w-full"
           />
-          {/* Input de Informacion de contacto */}
-          <label htmlFor="mision" className="block mb-2 font-medium text-gray-700"><strong>Dirección</strong></label>
+
+          {/* Información de contacto */}
+          <label htmlFor="contactInfo.address" className="block mb-2 font-medium text-gray-700">
+            <strong>Dirección</strong>
+          </label>
           <input
             type="text"
             name="contactInfo.address"
@@ -154,7 +157,10 @@ const CompanyProfile = () => {
             placeholder="Dirección"
             className="p-2 border rounded mb-4 w-full"
           />
-          <label htmlFor="mision" className="block mb-2 font-medium text-gray-700"><strong>Teléfono</strong></label>
+
+          <label htmlFor="contactInfo.phone" className="block mb-2 font-medium text-gray-700">
+            <strong>Teléfono</strong>
+          </label>
           <input
             type="text"
             name="contactInfo.phone"
@@ -163,7 +169,10 @@ const CompanyProfile = () => {
             placeholder="Teléfono"
             className="p-2 border rounded mb-4 w-full"
           />
-          <label htmlFor="mision" className="block mb-2 font-medium text-gray-700"><strong>Correo electrónico</strong></label>
+
+          <label htmlFor="contactInfo.email" className="block mb-2 font-medium text-gray-700">
+            <strong>Correo Electrónico</strong>
+          </label>
           <input
             type="email"
             name="contactInfo.email"
@@ -172,69 +181,53 @@ const CompanyProfile = () => {
             placeholder="Correo Electrónico"
             className="p-2 border rounded mb-4 w-full"
           />
-          {/* text de identidad de empresa */}
 
-            <label htmlFor="mision" className="block mb-2 font-medium text-gray-700"><strong>Misión</strong></label>
-            <textarea
-            id="mision"
+          {/* Identidad de la empresa */}
+          <label htmlFor="identidadEmpresa.mision" className="block mb-2 font-medium text-gray-700">
+            <strong>Misión</strong>
+          </label>
+          <textarea
+            id="identidadEmpresa.mision"
             name="identidadEmpresa.mision"
             value={profile.identidadEmpresa.mision}
             onChange={handleInputChange}
             placeholder="Escribe aquí la misión de la empresa..."
             className="p-2 border rounded mb-4 w-full h-24 resize-none"
             maxLength={500}
-            />
-            <p className="text-sm text-gray-500">{profile.identidadEmpresa.mision.length}/500 caracteres</p>
+          />
+          <p className="text-sm text-gray-500">{profile.identidadEmpresa.mision.length}/500 caracteres</p>
 
-            <label htmlFor="vision" className="block mb-2 font-medium text-gray-700"><strong>Visión</strong></label>
-            <textarea
-            id="vision"
+          <label htmlFor="identidadEmpresa.vision" className="block mb-2 font-medium text-gray-700">
+            <strong>Visión</strong>
+          </label>
+          <textarea
+            id="identidadEmpresa.vision"
             name="identidadEmpresa.vision"
             value={profile.identidadEmpresa.vision}
             onChange={handleInputChange}
             placeholder="Escribe aquí la visión de la empresa..."
             className="p-2 border rounded mb-4 w-full h-24 resize-none"
             maxLength={500}
-            />
-            <p className="text-sm text-gray-500">{profile.identidadEmpresa.vision.length}/500 caracteres</p>
+          />
+          <p className="text-sm text-gray-500">{profile.identidadEmpresa.vision.length}/500 caracteres</p>
 
-          {/* Input de Redes sociales */}
-          <label htmlFor="vision" className="block mb-2 font-medium text-gray-700"><strong>Facebook</strong></label>
-          <input
-            type="text"
-            name="socialMedia.facebook"
-            value={profile.socialMedia.facebook}
-            onChange={handleInputChange}
-            placeholder="Facebook"
-            className="p-2 border rounded mb-4 w-full"
-          />
-          <label htmlFor="vision" className="block mb-2 font-medium text-gray-700"><strong>Twitter</strong></label>
-          <input
-            type="text"
-            name="socialMedia.twitter"
-            value={profile.socialMedia.twitter}
-            onChange={handleInputChange}
-            placeholder="Twitter"
-            className="p-2 border rounded mb-4 w-full"
-          />
-          <label htmlFor="vision" className="block mb-2 font-medium text-gray-700"><strong>Instagram</strong></label>
-          <input
-            type="text"
-            name="socialMedia.instagram"
-            value={profile.socialMedia.instagram}
-            onChange={handleInputChange}
-            placeholder="Instagram"
-            className="p-2 border rounded mb-4 w-full"
-          />
-          <label htmlFor="vision" className="block mb-2 font-medium text-gray-700"><strong>LinkedIn</strong></label>
-          <input
-            type="text"
-            name="socialMedia.linkedin"
-            value={profile.socialMedia.linkedin}
-            onChange={handleInputChange}
-            placeholder="LinkedIn"
-            className="p-2 border rounded mb-4 w-full"
-          />
+          {/* Redes Sociales */}
+          {['facebook', 'twitter', 'instagram', 'linkedin'].map((platform) => (
+            <div key={platform}>
+              <label htmlFor={`socialMedia.${platform}`} className="block mb-2 font-medium text-gray-700">
+                <strong>{platform.charAt(0).toUpperCase() + platform.slice(1)}</strong>
+              </label>
+              <input
+                type="text"
+                name={`socialMedia.${platform}`}
+                value={profile.socialMedia[platform]}
+                onChange={handleInputChange}
+                placeholder={platform.charAt(0).toUpperCase() + platform.slice(1)}
+                className="p-2 border rounded mb-4 w-full"
+              />
+            </div>
+          ))}
+
           <button onClick={handleSave} className="px-4 py-2 bg-green-600 text-white rounded mr-2">Guardar</button>
           <button onClick={() => setIsEditing(false)} className="px-4 py-2 bg-red-600 text-white rounded">Cancelar</button>
         </>

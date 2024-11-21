@@ -32,5 +32,4 @@ app.use('/api/users', userRoutes);
 app.use('/api/documents', documentRoutes);
 app.use('/api/company-profile', companyProfileRoutes); // Registrar rutas del perfil de la empresa
 
-
 export default app;
