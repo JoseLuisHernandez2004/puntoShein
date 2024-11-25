@@ -1,10 +1,11 @@
-// src/componentes/Admin/CreateDocument.js
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { MIS_URL } from '../MiVariable';
+import { ThemeContext } from '../Style/Tema'; // Asegúrate de importar el ThemeContext
 
 const CreateDocument = () => {
+  const { darkMode } = useContext(ThemeContext); // Obtener el estado del modo oscuro
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [effectiveDate, setEffectiveDate] = useState('');
@@ -68,8 +69,8 @@ const CreateDocument = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-6 bg-gray-50 rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-4">Crear Documento Regulatorio</h2>
+    <form onSubmit={handleSubmit} className={`p-6 rounded-lg shadow-md ${darkMode ? 'bg-gray-800 text-white' : 'bg-gray-50 text-black'}`}>
+      <h2 className={`text-2xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Crear Documento Regulatorio</h2>
 
       <input
         type="text"
@@ -77,25 +78,25 @@ const CreateDocument = () => {
         onChange={(e) => setTitle(e.target.value)}
         placeholder="Título"
         required
-        className="p-2 border rounded mb-4"
+        className={`p-2 border rounded mb-4 ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-black'}`}
       />
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
         placeholder="Contenido del documento"
         required
-        className="p-2 border rounded mb-4"
+        className={`p-2 border rounded mb-4 ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-black'}`}
       />
       <input
         type="date"
         value={effectiveDate}
         onChange={(e) => setEffectiveDate(e.target.value)}
         required
-        className="p-2 border rounded mb-4"
+        className={`p-2 border rounded mb-4 ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-black'}`}
       />
       <button
         type="submit"
-        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        className={`px-4 py-2 rounded ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
       >
         Crear Documento
       </button>

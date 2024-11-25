@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { MdEmail, MdPerson, MdPhone, MdLock, MdVisibility, MdVisibilityOff } from 'react-icons/md'; 
 import { MIS_URL } from "./MiVariable";
+import { ThemeContext } from './Style/Tema'; 
 
 
 const RegisterForm = ({ verifiedEmail }) => {
@@ -33,6 +34,9 @@ const RegisterForm = ({ verifiedEmail }) => {
   const navigate = useNavigate();
 
   const validateText = (text) => /^[a-zA-ZÀ-ÿ\s]{1,25}$/.test(text);
+
+  const { darkMode } = useContext(ThemeContext); // Obtener el estado de darkMode
+
 
   const validatePassword = (password) => {
     const length = password.length >= 8;
@@ -144,20 +148,20 @@ const RegisterForm = ({ verifiedEmail }) => {
   const handleBlur = () => setIsFocused(false);
 
   return (
-    <div className="flex flex-col items-center justify-center bg-gray-100 px-4 py-10 md:py-20">
-      <div className="w-full max-w-lg bg-white rounded-lg shadow-lg p-6 md:p-10">
+    <div className={`flex flex-col items-center justify-center ${darkMode ? 'bg-gray-900' : 'bg-gray-100'} px-4 py-10 md:py-20`}>
+      <div className={`w-full max-w-lg ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-black'} rounded-lg shadow-lg p-6 md:p-10`}>
         <h1 className="text-2xl font-bold mb-4 text-center">Registrar</h1>
 
         <form onSubmit={handleSubmit} className="space-y-2">
           {/* Email Field */}
           <div>
-            <label className="block text-black-600 text-md font-semibold mb-2" htmlFor="email">
+            <label className={`block text-md font-semibold mb-2 ${darkMode ? 'text-white' : 'text-black'}`} htmlFor="email">
               Correo Electrónico
             </label>
-            <div className="flex items-center border border-black-400 rounded-full px-3 py-2 shadow-lg transition-all hover:shadow-xl">
-              <MdEmail className="text-black-400 mr-3" size={24} />
+            <div className={`flex items-center border rounded-full px-3 py-2 shadow-lg transition-all hover:shadow-xl ${darkMode ? 'border-gray-600' : 'border-black-400'}`}>
+              <MdEmail className={`text-${darkMode ? 'white' : 'black-400'} mr-3`} size={24} />
               <input
-                className="w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full text-blue-600 px-2 py-1 transition-all duration-300 ease-in-out"
+                className={`w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-black'} px-2 py-1 transition-all duration-300 ease-in-out`}
                 id="email"
                 type="email"
                 name="email"
@@ -168,23 +172,22 @@ const RegisterForm = ({ verifiedEmail }) => {
             </div>
           </div>
 
-
           {/* Username Field */}
           <div>
-            <label className="block text-black-600 text-md font-semibold mb-2" htmlFor="username">
+            <label className={`block text-md font-semibold mb-2 ${darkMode ? 'text-white' : 'text-black'}`} htmlFor="username">
               Nombre de Usuario
             </label>
-            <div className="flex items-center border border-black-400 rounded-full px-3 py-2 shadow-lg transition-all hover:shadow-xl">
-              <MdPerson className="text-black-400 mr-3" size={24} />
+            <div className={`flex items-center border rounded-full px-3 py-2 shadow-lg transition-all hover:shadow-xl ${darkMode ? 'border-gray-600' : 'border-black-400'}`}>
+              <MdPerson className={`text-${darkMode ? 'white' : 'black-400'} mr-3`} size={24} />
               <input
-                className="w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full text-blue-600 px-2 py-1 transition-all duration-300 ease-in-out"
+                className={`w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-black'} px-2 py-1 transition-all duration-300 ease-in-out`}
                 id="username"
                 type="text"
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
                 maxLength="20"
-                placeholder='Ingresa un nombre de usuario'
+                placeholder="Ingresa un nombre de usuario"
                 required
               />
             </div>
@@ -192,13 +195,13 @@ const RegisterForm = ({ verifiedEmail }) => {
 
           {/* Nombre Field */}
           <div>
-            <label className="block text-black-600 text-md font-semibold mb-2" htmlFor="nombre">
+            <label className={`block text-md font-semibold mb-2 ${darkMode ? 'text-white' : 'text-black'}`} htmlFor="nombre">
               Nombre
             </label>
-            <div className="flex items-center border border-black-400 rounded-full px-3 py-2 shadow-lg transition-all hover:shadow-xl">
-              <MdPerson className="text-black-400 mr-3" size={24} />
+            <div className={`flex items-center border rounded-full px-3 py-2 shadow-lg transition-all hover:shadow-xl ${darkMode ? 'border-gray-600' : 'border-black-400'}`}>
+              <MdPerson className={`text-${darkMode ? 'white' : 'black-400'} mr-3`} size={24} />
               <input
-                className="w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full text-blue-600 px-2 py-1 transition-all duration-300 ease-in-out"
+                className={`w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-black'} px-2 py-1 transition-all duration-300 ease-in-out`}
                 id="nombre"
                 type="text"
                 name="nombre"
@@ -212,16 +215,15 @@ const RegisterForm = ({ verifiedEmail }) => {
             {errors.nombre && <p className="text-red-500 text-xs italic">{errors.nombre}</p>}
           </div>
 
-
           {/* Apellido Paterno Field */}
           <div>
-            <label className="block text-black-600 text-md font-semibold mb-2" htmlFor="apellidoP">
+            <label className={`block text-md font-semibold mb-2 ${darkMode ? 'text-white' : 'text-black'}`} htmlFor="apellidoP">
               Apellido Paterno
             </label>
-            <div className="flex items-center border border-black-400 rounded-full px-3 py-2 shadow-lg transition-all hover:shadow-xl">
-              <MdPerson className="text-black-400 mr-3" size={24} />
+            <div className={`flex items-center border rounded-full px-3 py-2 shadow-lg transition-all hover:shadow-xl ${darkMode ? 'border-gray-600' : 'border-black-400'}`}>
+              <MdPerson className={`text-${darkMode ? 'white' : 'black-400'} mr-3`} size={24} />
               <input
-                className="w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full text-blue-600 px-2 py-1 transition-all duration-300 ease-in-out"
+                className={`w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-black'} px-2 py-1 transition-all duration-300 ease-in-out`}
                 id="apellidoP"
                 type="text"
                 name="apellidoP"
@@ -235,16 +237,15 @@ const RegisterForm = ({ verifiedEmail }) => {
             {errors.apellidoP && <p className="text-red-500 text-xs italic">{errors.apellidoP}</p>}
           </div>
 
-
           {/* Apellido Materno Field */}
           <div>
-            <label className="block text-black-600 text-md font-semibold mb-2" htmlFor="apellidoM">
+            <label className={`block text-md font-semibold mb-2 ${darkMode ? 'text-white' : 'text-black'}`} htmlFor="apellidoM">
               Apellido Materno
             </label>
-            <div className="flex items-center border border-black-400 rounded-full px-3 py-2 shadow-lg transition-all hover:shadow-xl">
-              <MdPerson className="text-black-400 mr-3" size={24} />
+            <div className={`flex items-center border rounded-full px-3 py-2 shadow-lg transition-all hover:shadow-xl ${darkMode ? 'border-gray-600' : 'border-black-400'}`}>
+              <MdPerson className={`text-${darkMode ? 'white' : 'black-400'} mr-3`} size={24} />
               <input
-                className="w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full text-blue-600 px-2 py-1 transition-all duration-300 ease-in-out"
+                className={`w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-black'} px-2 py-1 transition-all duration-300 ease-in-out`}
                 id="apellidoM"
                 type="text"
                 name="apellidoM"
@@ -258,16 +259,15 @@ const RegisterForm = ({ verifiedEmail }) => {
             {errors.apellidoM && <p className="text-red-500 text-xs italic">{errors.apellidoM}</p>}
           </div>
 
-
           {/* Phone Number Field */}
           <div>
-            <label className="block text-black-600 text-md font-semibold mb-2" htmlFor="telefono">
+            <label className={`block text-md font-semibold mb-2 ${darkMode ? 'text-white' : 'text-black'}`} htmlFor="telefono">
               Teléfono
             </label>
-            <div className="flex items-center border border-black-400 rounded-full px-3 py-2 shadow-lg transition-all hover:shadow-xl">
-              <MdPhone className="text-black-400 mr-3" size={24} />
+            <div className={`flex items-center border rounded-full px-3 py-2 shadow-lg transition-all hover:shadow-xl ${darkMode ? 'border-gray-600' : 'border-black-400'}`}>
+              <MdPhone className={`text-${darkMode ? 'white' : 'black-400'} mr-3`} size={24} />
               <input
-                className={`w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full text-blue-600 px-2 py-1 transition-all duration-300 ease-in-out ${errors.telefono ? 'border-red-500' : ''}`}
+                className={`w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full text-blue-600 px-2 py-1 transition-all duration-300 ease-in-out ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-black'} ${errors.telefono ? 'border-red-500' : ''}`}
                 id="telefono"
                 type="text"
                 name="telefono"
@@ -283,13 +283,13 @@ const RegisterForm = ({ verifiedEmail }) => {
 
           {/* Password Field */}
           <div>
-            <label className="block text-black-600 text-md font-semibold mb-2" htmlFor="password">
+          <label className={`block text-md font-semibold mb-2 ${darkMode ? 'text-white' : 'text-black'}`} htmlFor="password">
               Contraseña
             </label>
-            <div className="flex items-center border border-black-400 rounded-full px-3 py-2 shadow-lg transition-all hover:shadow-xl">
-              <MdLock className="text-black-400 mr-3" size={24} />
+            <div className={`flex items-center border rounded-full px-3 py-2 shadow-lg transition-all hover:shadow-xl ${darkMode ? 'border-gray-600' : 'border-black-400'}`}>
+              <MdLock className={`text-${darkMode ? 'white' : 'black-400'} mr-3`} size={24} />
               <input
-                className="w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full text-blue-600 px-2 py-1 transition-all duration-300 ease-in-out"
+              className={`w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full text-blue-600 px-2 py-1 transition-all duration-300 ease-in-out ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-black'}`}
                 id="password"
                 type={showPassword ? 'text' : 'password'}
                 name="password"
@@ -320,13 +320,13 @@ const RegisterForm = ({ verifiedEmail }) => {
 
           {/* Confirm Password Field */}
           <div>
-            <label className="block text-black-600 text-md font-semibold mb-2" htmlFor="confirmPassword">
+           <label className={`block text-md font-semibold mb-2 ${darkMode ? 'text-white' : 'text-black'}`} htmlFor="confirmPassword">
               Repetir Contraseña
             </label>
-            <div className="flex items-center border border-black-400 rounded-full px-3 py-2 shadow-lg transition-all hover:shadow-xl">
-              <MdLock className="text-black-400 mr-3" size={24} />
+            <div className={`flex items-center border rounded-full px-3 py-2 shadow-lg transition-all hover:shadow-xl ${darkMode ? 'border-gray-600' : 'border-black-400'}`}>
+              <MdLock className={`text-${darkMode ? 'white' : 'black-400'} mr-3`} size={24} />
               <input
-                className="w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full text-blue-600 px-2 py-1 transition-all duration-300 ease-in-out"
+                className={`w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full text-blue-600 px-2 py-1 transition-all duration-300 ease-in-out ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-black'}`}
                 id="confirmPassword"
                 type={showConfirmPassword ? 'text' : 'password'}
                 name="confirmPassword"
@@ -336,8 +336,7 @@ const RegisterForm = ({ verifiedEmail }) => {
                 required
               />
               <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                {showConfirmPassword ? <MdVisibilityOff className="text-black-400" size={24} /> : <MdVisibility className="text-black-400" size={24} />}
-              </button>
+                {showConfirmPassword ? <MdVisibilityOff className={`text-${darkMode ? 'white' : 'black-400'}`} size={24} /> : <MdVisibility className={`text-${darkMode ? 'white' : 'black-400'}`} size={24} />}              </button>
             </div>
             {errors.confirmPassword && <p className="text-red-500 text-xs italic">{errors.confirmPassword}</p>}
           </div>

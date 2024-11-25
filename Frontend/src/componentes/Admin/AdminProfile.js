@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { MIS_URL } from "../MiVariable";
 import Swal from 'sweetalert2';
-
+import { ThemeContext } from '../Style/Tema';
 const AdminProfile = () => {
+    const { darkMode } = useContext(ThemeContext);
     const [adminData, setAdminData] = useState({
         username: '',
         email: '',
@@ -161,131 +162,133 @@ const AdminProfile = () => {
     }
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
+            <div className={`flex flex-col items-center justify-center min-h-screen p-4 ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-black'}`}>
             <h1 className="text-4xl font-bold mb-6">Perfil de Administrador</h1>
-            <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-lg">
+            <div className={`bg-black shadow-md rounded-lg p-6 w-full max-w-lg ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
                 {isEditing ? (
                     <>
                         <div className="mb-4">
-                            <label htmlFor="username" className="block text-gray-700">Nombre de Usuario:</label>
+                            <label htmlFor="username" className={`block ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Nombre de Usuario:</label>
                             <input
                                 id="username"
                                 type="text"
                                 name="username"
                                 value={formData.username}
                                 onChange={handleInputChange}
-                                className="w-full p-2 border border-gray-300 rounded-lg"
+                                className={`w-full p-2 border ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-gray-300 bg-white text-black'} rounded-lg`}
                                 required
                             />
                         </div>
+
                         <div className="mb-4">
-                            <label htmlFor="email" className="block text-gray-700">Email:</label>
+                            <label htmlFor="email" className={`block ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Email:</label>
                             <input
                                 id="email"
                                 type="email"
                                 name="email"
                                 value={formData.email}
                                 onChange={handleInputChange}
-                                className="w-full p-2 border border-gray-300 rounded-lg"
+                                className={`w-full p-2 border ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-gray-300 bg-white text-black'} rounded-lg`}
                                 required
                             />
                         </div>
                         <div className="mb-4">
-                            <label htmlFor="nombre" className="block text-gray-700">Nombre:</label>
+                            <label htmlFor="nombre" className={`block ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Nombre:</label>
                             <input
                                 id="nombre"
                                 type="text"
                                 name="nombre"
                                 value={formData.nombre}
                                 onChange={handleInputChange}
-                                className="w-full p-2 border border-gray-300 rounded-lg"
+                                className={`w-full p-2 border ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-gray-300 bg-white text-black'} rounded-lg`}
                                 required
                             />
                         </div>
                         <div className="mb-4">
-                            <label htmlFor="apellidoP" className="block text-gray-700">Apellido Paterno:</label>
+                            <label htmlFor="apellidoP" className={`block ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Apellido Paterno:</label>
                             <input
                                 id="apellidoP"
                                 type="text"
                                 name="apellidoP"
                                 value={formData.apellidoP}
                                 onChange={handleInputChange}
-                                className="w-full p-2 border border-gray-300 rounded-lg"
+                                className={`w-full p-2 border ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-gray-300 bg-white text-black'} rounded-lg`}
                                 required
                             />
                         </div>
                         <div className="mb-4">
-                            <label htmlFor="apellidoM" className="block text-gray-700">Apellido Materno:</label>
+                            <label htmlFor="apellidoM" className={`block ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Apellido Materno:</label>
                             <input
                                 id="apellidoM"
                                 type="text"
                                 name="apellidoM"
                                 value={formData.apellidoM}
                                 onChange={handleInputChange}
-                                className="w-full p-2 border border-gray-300 rounded-lg"
+                                className={`w-full p-2 border ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-gray-300 bg-white text-black'} rounded-lg`}
                             />
                         </div>
                         <div className="mb-4">
-                            <label htmlFor="telefono" className="block text-gray-700">Teléfono:</label>
+                            <label htmlFor="telefono" className={`block ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Teléfono:</label>
                             <input
                                 id="telefono"
                                 type="text"
                                 name="telefono"
                                 value={formData.telefono}
                                 onChange={handleInputChange}
-                                className="w-full p-2 border border-gray-300 rounded-lg"
+                                className={`w-full p-2 border ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-gray-300 bg-white text-black'} rounded-lg`}
                                 pattern="\d{10}"
                                 title="El teléfono debe tener 10 dígitos"
                             />
                         </div>
                         <div className="mb-4">
-                            <label htmlFor="direccion" className="block text-gray-700">Dirección:</label>
+                            <label htmlFor="direccion" className={`block ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Dirección:</label>
                             <input
                                 id="direccion"
                                 type="text"
                                 name="direccion"
                                 value={formData.direccion}
                                 onChange={handleInputChange}
-                                className="w-full p-2 border border-gray-300 rounded-lg"
+                                className={`w-full p-2 border ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-gray-300 bg-white text-black'} rounded-lg`}
                             />
                         </div>
                         <div className="mb-4">
-                            <label htmlFor="fechaNacimiento" className="block text-gray-700">Fecha de Nacimiento:</label>
+                            <label htmlFor="fechaNacimiento" className={`block ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Fecha de Nacimiento:</label>
                             <input
                                 id="fechaNacimiento"
                                 type="date"
                                 name="fechaNacimiento"
                                 value={formData.fechaNacimiento}
                                 onChange={handleInputChange}
-                                className="w-full p-2 border border-gray-300 rounded-lg"
+                                className={`w-full p-2 border ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-gray-300 bg-white text-black'} rounded-lg`}
                             />
                         </div>
                         <div className="mb-4">
-                            <label htmlFor="role" className="block text-gray-700">Rol:</label>
+                            <label htmlFor="role" className={`block ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Rol:</label>
                             <input
                                 id="role"
                                 type="text"
                                 name="role"
                                 value={formData.role}
                                 disabled
-                                className="w-full p-2 border border-gray-300 rounded-lg bg-gray-200 cursor-not-allowed"
+                                className={`w-full p-2 border ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-gray-300 bg-gray-200 text-black cursor-not-allowed'} rounded-lg`}
                             />
                         </div>
                         <div className="flex justify-between">
                             <button
                                 onClick={handleSave}
-                                className={`px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 ${saving ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                className={`px-4 py-2 ${darkMode ? 'bg-green-700 hover:bg-green-600' : 'bg-green-500 hover:bg-green-600'} text-white rounded-lg ${saving ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 disabled={saving}
                             >
                                 {saving ? 'Guardando...' : 'Guardar'}
                             </button>
                             <button
                                 onClick={() => setIsEditing(false)}
-                                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                                className={`px-4 py-2 ${darkMode ? 'bg-red-700 hover:bg-red-600' : 'bg-red-500 hover:bg-red-600'} text-white rounded-lg`}
                             >
                                 Cancelar
                             </button>
                         </div>
+
                     </>
                 ) : (
                     <>

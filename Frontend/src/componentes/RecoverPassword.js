@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { MdEmail, MdTextsms } from 'react-icons/md'; // Importar íconos
 import { useNavigate } from 'react-router-dom';
 import { MIS_URL } from "./MiVariable";
+import { ThemeContext } from './Style/Tema'; 
+
 
 const RecoverPassword = () => {
   const [email, setEmail] = useState('');
@@ -11,6 +13,9 @@ const RecoverPassword = () => {
   const [recoveryMethod, setRecoveryMethod] = useState('email'); // Estado para el método de recuperación
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+
+  const { darkMode } = useContext(ThemeContext); // Obtener el estado de darkMode
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -47,8 +52,8 @@ const RecoverPassword = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-100 px-4">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-6">
+    <div className={`flex flex-col items-center justify-center h-screen ${darkMode ? 'bg-gray-900' : 'bg-gray-100'} px-4`}>
+      <div className={`w-full max-w-md ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-black'} rounded-lg shadow-lg p-6`}>
         <h1 className="text-2xl font-bold text-center mb-4">Recuperar Contraseña</h1>
         
         {/* Selector de Método de Recuperación */}

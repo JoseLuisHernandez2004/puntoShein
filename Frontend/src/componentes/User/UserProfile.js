@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { MIS_URL } from "../MiVariable";
 import Swal from 'sweetalert2';
+import { ThemeContext } from '../Style/Tema'; // Asegúrate de importar el ThemeContext
 
 const UserProfile = () => {
+  const { darkMode } = useContext(ThemeContext); // Obtener el valor de darkMode
   const [userData, setUserData] = useState({
     nombre: '',
     apellidoP: '',
@@ -115,9 +117,9 @@ const UserProfile = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white p-4">
-      <h1 className="text-4xl font-bold text-gray-800">Mi Perfil</h1>
-      <div className="mt-6 bg-white shadow-md rounded-lg p-6 w-full max-w-md">
+    <div className={`flex flex-col items-center justify-center min-h-screen p-4 ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
+      <h1 className="text-4xl font-bold">Mi Perfil</h1>
+      <div className={`mt-1 bg-black shadow-md rounded-lg p-6 w-full max-w-md ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-black'}`}>
         {!isEditing ? (
           <>
             <p><strong>Nombre:</strong> {userData.nombre}</p>
@@ -137,76 +139,82 @@ const UserProfile = () => {
         ) : (
           <>
             <div className="mb-4">
-              <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">Nombre:</label>
+              <label htmlFor="nombre" className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Nombre:</label>
               <input
                 id="nombre"
                 type="text"
                 name="nombre"
                 value={userData.nombre}
                 onChange={handleInputChange}
-                className="mt-1 p-2 w-full border rounded-lg"
+                className={`mt-1 p-2 w-full border ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-gray-300 bg-white text-black'} rounded-lg`}
                 required
               />
             </div>
+
             <div className="mb-4">
-              <label htmlFor="apellidoP" className="block text-sm font-medium text-gray-700">Apellido Paterno:</label>
+              <label htmlFor="apellidoP" className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Apellido Paterno:</label>
               <input
                 id="apellidoP"
                 type="text"
                 name="apellidoP"
                 value={userData.apellidoP}
                 onChange={handleInputChange}
-                className="mt-1 p-2 w-full border rounded-lg"
+                className={`mt-1 p-2 w-full border ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-gray-300 bg-white text-black'} rounded-lg`}
                 required
               />
             </div>
+
             <div className="mb-4">
-              <label htmlFor="apellidoM" className="block text-sm font-medium text-gray-700">Apellido Materno:</label>
+              <label htmlFor="apellidoM" className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Apellido Materno:</label>
               <input
                 id="apellidoM"
                 type="text"
                 name="apellidoM"
                 value={userData.apellidoM}
                 onChange={handleInputChange}
-                className="mt-1 p-2 w-full border rounded-lg"
+                className={`mt-1 p-2 w-full border ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-gray-300 bg-white text-black'} rounded-lg`}
               />
             </div>
+
             <div className="mb-4">
-              <label htmlFor="telefono" className="block text-sm font-medium text-gray-700">Teléfono:</label>
+              <label htmlFor="telefono" className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Teléfono:</label>
               <input
                 id="telefono"
                 type="text"
                 name="telefono"
                 value={userData.telefono}
                 onChange={handleInputChange}
-                className="mt-1 p-2 w-full border rounded-lg"
+                className={`mt-1 p-2 w-full border ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-gray-300 bg-white text-black'} rounded-lg`}
                 pattern="\d{10}"
                 title="El teléfono debe tener 10 dígitos"
                 required
               />
             </div>
+
             <div className="mb-4">
-              <label htmlFor="direccion" className="block text-sm font-medium text-gray-700">Dirección:</label>
+              <label htmlFor="direccion" className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Dirección:</label>
               <input
                 id="direccion"
                 type="text"
                 name="direccion"
                 value={userData.direccion}
                 onChange={handleInputChange}
-                className="mt-1 p-2 w-full border rounded-lg"
+                className={`mt-1 p-2 w-full border ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-gray-300 bg-white text-black'} rounded-lg`}
               />
             </div>
+
             <div className="mb-4">
-              <label htmlFor="fechaNacimiento" className="block text-sm font-medium text-gray-700">Fecha de Nacimiento:</label>
+              <label htmlFor="fechaNacimiento" className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Fecha de Nacimiento:</label>
               <input
                 id="fechaNacimiento"
                 type="date"
                 name="fechaNacimiento"
                 value={userData.fechaNacimiento}
                 onChange={handleInputChange}
-                className="mt-1 p-2 w-full border rounded-lg"
+                className={`mt-1 p-2 w-full border ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-gray-300 bg-white text-black'} rounded-lg`}
               />
             </div>
+
             <div className="flex justify-between">
               <button
                 onClick={handleSaveChanges}
@@ -222,6 +230,7 @@ const UserProfile = () => {
                 Cancelar
               </button>
             </div>
+
           </>
         )}
       </div>

@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { MIS_URL } from '../MiVariable';
 import Swal from 'sweetalert2'; // Importa SweetAlert2
+import { ThemeContext } from '../Style/Tema'; // Asegúrate de que ThemeContext esté importado
 
 const MyUsers = () => {
+  const { darkMode } = useContext(ThemeContext); // Obtén el estado del tema
   const [users, setUsers] = useState([]); // Estado para almacenar la lista de usuarios
   const [loading, setLoading] = useState(true); // Estado para manejar el indicador de carga
   const [error, setError] = useState(null); // Estado para manejar errores
@@ -136,33 +138,33 @@ const MyUsers = () => {
   }
 
   return (
-    <div className="mt-20 flex justify-center">
-      <div className="w-full max-w-4xl bg-white p-8 rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold text-gray-800 text-center mb-8">Gestión de Usuarios</h1>
+    <div className={`mt-2 flex justify-center ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-black'}`}>
+      <div className={`w-full max-w-4xl p-8 rounded-lg shadow-lg ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
+        <h1 className="text-3xl font-bold text-center mb-8">Gestión de Usuarios</h1>
         <div className="mt-8">
           {users.length > 0 ? (
             <ul className="space-y-4">
               {users.map(user => (
-                <li key={user._id} className="bg-gray-50 p-6 rounded-lg shadow-md hover:shadow-lg transition-all">
+                <li key={user._id} className={`p-6 rounded-lg shadow-md ${darkMode ? 'bg-gray-700 text-white' : 'bg-gray-50 text-black'} hover:shadow-lg transition-all`}>
                   <p className="text-lg font-bold">{user.nombre} {user.apellidoP} {user.apellidoM}</p>
-                  <p className="text-gray-600">{user.email}</p>
-                  <p className="text-gray-600">Teléfono: {user.telefono}</p>
-                  <p className="text-gray-600">Rol: {user.role}</p>
-                  <p className="text-gray-600">Estado: {user.isActive ? 'Activo' : 'Inactivo'}</p>
+                  <p className="text-white-600">Correo electrónico: {user.email}</p>
+                  <p className="text-white-600">Teléfono: {user.telefono}</p>
+                  <p className="text-white-600">Rol: {user.role}</p>
+                  <p className="text-white-600">Estado: {user.isActive ? 'Activo' : 'Inactivo'}</p>
 
                   {editingUserId === user._id ? (
                     <div className="mt-4">
                       <select
                         value={newRole}
                         onChange={(e) => setNewRole(e.target.value)}
-                        className="p-2 border border-gray-300 rounded-lg"
+                        className={`p-2 border ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-gray-300 bg-white text-black'} rounded-lg`}
                       >
                         <option value="user">Usuario</option>
                         <option value="admin">Administrador</option>
                       </select>
                       <button
                         onClick={() => handleSave(user._id)}
-                        className="ml-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                        className={`ml-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 ${darkMode ? 'bg-green-700' : 'bg-green-500'}`}
                       >
                         Guardar
                       </button>
@@ -177,19 +179,19 @@ const MyUsers = () => {
                     <div className="mt-4 flex space-x-2">
                       <button
                         onClick={() => handleEdit(user._id, user.role)}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                        className={`px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 ${darkMode ? 'bg-blue-600' : 'bg-blue-500'}`}
                       >
                         Cambiar Rol
                       </button>
                       <button
                         onClick={() => handleDeactivate(user._id)}
-                        className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
+                        className={`px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 ${darkMode ? 'bg-yellow-600' : 'bg-yellow-500'}`}
                       >
                         Desactivar
                       </button>
                       <button
                         onClick={() => handleDelete(user._id)}
-                        className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                        className={`px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 ${darkMode ? 'bg-red-600' : 'bg-red-500'}`}
                       >
                         Eliminar
                       </button>

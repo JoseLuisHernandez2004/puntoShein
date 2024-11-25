@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { MIS_URL } from "./MiVariable";
+import { ThemeContext } from "./Style/Tema"; // Asegúrate de que ThemeContext esté correctamente importado
 
 const VerifyMfa = ({ setIsLoggedIn, setUserRole }) => {
+  const { darkMode } = useContext(ThemeContext); // Usar el contexto para el tema
   const [mfaCode, setMfaCode] = useState(Array(6).fill(""));
   const navigate = useNavigate();
   const email = localStorage.getItem("mfaEmail"); // Obtener el email almacenado
@@ -83,13 +85,13 @@ const VerifyMfa = ({ setIsLoggedIn, setUserRole }) => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-100 px-4">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-6">
-        <h1 className="text-2xl font-bold mb-4 text-center">Verificar Código MFA</h1>
+    <div className={`flex flex-col items-center justify-center h-screen px-4 ${darkMode ? 'bg-gray-900' : 'bg-gray-100'}`}>
+      <div className={`w-full max-w-md rounded-lg shadow-lg p-6 ${darkMode ? 'bg-gray-800 text-white' : 'bg-white'}`}>
+        <h1 className={`text-2xl font-bold mb-4 text-center ${darkMode ? 'text-white' : 'text-gray-800'}`}>Verificar Código MFA</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label
-              className="block text-black-600 text-md font-semibold mb-2"
+              className={`block text-md font-semibold mb-2 ${darkMode ? 'text-gray-300' : 'text-black-600'}`}
               htmlFor="mfaCode"
             >
               Código MFA
@@ -99,7 +101,7 @@ const VerifyMfa = ({ setIsLoggedIn, setUserRole }) => {
                 <input
                   key={index}
                   id={`mfaCode-${index}`}
-                  className="w-12 h-12 text-center border border-black-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-300 text-lg font-bold"
+                  className={`w-12 h-12 text-center border ${darkMode ? 'border-gray-700' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 ${darkMode ? 'focus:ring-blue-400' : 'focus:ring-blue-600'} transition-all duration-300 text-lg font-bold ${darkMode ? 'bg-gray-700' : 'bg-white'}`}
                   type="text"
                   maxLength="1"
                   value={mfaCode[index] || ""}
@@ -113,7 +115,7 @@ const VerifyMfa = ({ setIsLoggedIn, setUserRole }) => {
 
           <div className="mt-6">
             <button
-              className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full transition-all duration-300"
+              className={`w-full py-2 px-4 rounded-full text-white font-bold ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-700'} transition-all duration-300`}
               type="submit"
             >
               Verificar

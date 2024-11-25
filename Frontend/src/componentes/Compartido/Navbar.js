@@ -1,59 +1,37 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { MdMenu, MdClose, MdArrowDropDown, MdDarkMode, MdLightMode } from 'react-icons/md';
 import { MIS_URL } from '../MiVariable'; // Asegúrate de definir correctamente MIS_URL con la URL de tu backend
+import { ThemeContext } from '../Style/Tema'; // Importa el contexto
 
 const Navbar = ({ isLoggedIn, userRole }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
   const [companyLogo, setCompanyLogo] = useState('');
   const [companyName, setCompanyName] = useState(''); 
 
-  // Cargar el modo desde localStorage al montar el componente
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-      setDarkMode(true);
-      document.body.classList.add('dark');
-    } else {
-      setDarkMode(false);
-      document.body.classList.add('light');
-    }
-  }, []);
+  // Obtén el estado y la función toggleDarkMode desde el ThemeContext
+  const { darkMode, toggleDarkMode } = useContext(ThemeContext);
 
   // Obtener el logotipo de la empresa
-useEffect(() => {
-  const fetchCompanyInfo = async () => {
-    try {
-      // Utilizar siempre el endpoint público para obtener la información general de la empresa
-      const response = await axios.get(`${MIS_URL}/api/company-profile/public`);
-      
-      if (response.data?.logo) {
-        setCompanyLogo(response.data.logo); // logo
-        setCompanyName(response.data.pageTitle); // Obtén el nombre de la empresa
+  useEffect(() => {
+    const fetchCompanyInfo = async () => {
+      try {
+        // Utilizar siempre el endpoint público para obtener la información general de la empresa
+        const response = await axios.get(`${MIS_URL}/api/company-profile/public`);
+        
+        if (response.data?.logo) {
+          setCompanyLogo(response.data.logo); // logo
+          setCompanyName(response.data.pageTitle); // Obtén el nombre de la empresa
+        }
+      } catch (error) {
+        console.error('Error al cargar la información pública de la empresa:', error);
       }
-    } catch (error) {
-      console.error('Error al cargar la información pública de la empresa:', error);
-    }
-  };
+    };
 
-  fetchCompanyInfo();
-}, []);
-
-
-  // Alternar entre modo oscuro y claro
-  const toggleDarkMode = () => {
-    if (darkMode) {
-      document.body.classList.replace('dark', 'light');
-      localStorage.setItem('theme', 'light');
-    } else {
-      document.body.classList.replace('light', 'dark');
-      localStorage.setItem('theme', 'dark');
-    }
-    setDarkMode(!darkMode);
-  };
+    fetchCompanyInfo();
+  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -88,7 +66,7 @@ useEffect(() => {
 
         {/* Botón para cambiar entre oscuro y claro */}
         <button
-          onClick={toggleDarkMode}
+          onClick={toggleDarkMode} // Usar la función del contexto para alternar el tema
           className="text-gray-700 dark:text-white transition-transform duration-300 hover:scale-110"
         >
           {darkMode ? <MdLightMode size={24} /> : <MdDarkMode size={24} />}

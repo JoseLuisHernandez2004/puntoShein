@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { ThemeProvider } from './componentes/Style/Tema';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom'; 
 import Home from './componentes/Home';
 import LoginForm from './componentes/LoginForm';
@@ -30,50 +31,52 @@ function App() {
   const [userRole, setUserRole] = useState(null);
 
   return (
-    <Router>
-      <div className="flex flex-col min-h-screen">
-        {/* Navbar */}
-        <Navbar isLoggedIn={isLoggedIn} userRole={userRole} />
+    <ThemeProvider>
+      <Router>
+        <div className="flex flex-col min-h-screen">
+          {/* Navbar */}
+          <Navbar isLoggedIn={isLoggedIn} userRole={userRole} />
 
-        {/* Contenido principal */}
-        <main className="flex-grow mt-16 mb-16 px-4">
-          <Routes>
-            {/* Ruta principal */}
-            <Route path="/" element={<Home isLoggedIn={isLoggedIn} />} />
-            <Route path="/perfilEmpresaPublico" element={<CompanyPublicProfile />} />
+          {/* Contenido principal */}
+          <main className="flex-grow mt-16 mb-16 px-4">
+            <Routes>
+              {/* Ruta principal */}
+              <Route path="/" element={<Home isLoggedIn={isLoggedIn} />} />
+              <Route path="/perfilEmpresaPublico" element={<CompanyPublicProfile />} />
 
-            {/* Rutas de autenticación */}
-            <Route path="/login" element={<LoginForm setIsLoggedIn={setIsLoggedIn} setUserRole={setUserRole} />} />
-            <Route path="/register" element={verifiedEmail ? <RegisterForm verifiedEmail={verifiedEmail} /> : <VerificarCorreo onVerified={setVerifiedEmail} />} />
-            <Route path="/logout" element={<Logout setIsLoggedIn={setIsLoggedIn} />} />
-            <Route path="/reset-password/:token" element={<ResetPassword />} />
-            <Route path="/recover-password" element={<RecoverPassword />} />
-            <Route path="/verify-mfa" element={<VerifyMfa setIsLoggedIn={setIsLoggedIn} setUserRole={setUserRole} />} />
-            <Route path="/about" element={<About />} />
+              {/* Rutas de autenticación */}
+              <Route path="/login" element={<LoginForm setIsLoggedIn={setIsLoggedIn} setUserRole={setUserRole} />} />
+              <Route path="/register" element={verifiedEmail ? <RegisterForm verifiedEmail={verifiedEmail} /> : <VerificarCorreo onVerified={setVerifiedEmail} />} />
+              <Route path="/logout" element={<Logout setIsLoggedIn={setIsLoggedIn} />} />
+              <Route path="/reset-password/:token" element={<ResetPassword />} />
+              <Route path="/recover-password" element={<RecoverPassword />} />
+              <Route path="/verify-mfa" element={<VerifyMfa setIsLoggedIn={setIsLoggedIn} setUserRole={setUserRole} />} />
+              <Route path="/about" element={<About />} />
 
-            {/* Rutas para usuarios regulares */}
-            <Route path="/user/*" element={isLoggedIn && userRole === 'user' ? <UserLayout /> : <Navigate to="/login" />}>
-              <Route path="dashboard" element={<UserDashboard />} />
-              <Route path="profile" element={<UserProfile />} />
-            </Route>
+              {/* Rutas para usuarios regulares */}
+              <Route path="/user/*" element={isLoggedIn && userRole === 'user' ? <UserLayout /> : <Navigate to="/login" />}>
+                <Route path="dashboard" element={<UserDashboard />} />
+                <Route path="profile" element={<UserProfile />} />
+              </Route>
 
-            {/* Rutas protegidas para administrador */}
-            <Route path="/admin/*" element={isLoggedIn && userRole === 'admin' ? <AdminLayout /> : <Navigate to="/login" />}>
-              <Route path="dashboard" element={<AdminDashboard />} />
-              <Route path="profile" element={<AdminProfile />} />
-              <Route path="documents" element={<AdminPanel />} />
-              <Route path="products" element={<Products />} />
-              <Route path="myUsers" element={<MyUsers />} />
-              <Route path="Listapedidos" element={<ListaPedidos />} />
-              <Route path="company-profile" element={<CompanyProfile />} />
-            </Route>
-          </Routes>
-        </main>
+              {/* Rutas protegidas para administrador */}
+              <Route path="/admin/*" element={isLoggedIn && userRole === 'admin' ? <AdminLayout /> : <Navigate to="/login" />}>
+                <Route path="dashboard" element={<AdminDashboard />} />
+                <Route path="profile" element={<AdminProfile />} />
+                <Route path="documents" element={<AdminPanel />} />
+                <Route path="products" element={<Products />} />
+                <Route path="myUsers" element={<MyUsers />} />
+                <Route path="Listapedidos" element={<ListaPedidos />} />
+                <Route path="company-profile" element={<CompanyProfile />} />
+              </Route>
+            </Routes>
+          </main>
 
-        {/* Footer */}
-        <Footer />
-      </div>
-    </Router>
+          {/* Footer */}
+          <Footer />
+        </div>
+      </Router>
+    </ThemeProvider>
   );
 }
 

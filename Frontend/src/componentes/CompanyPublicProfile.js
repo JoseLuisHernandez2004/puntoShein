@@ -1,11 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { MIS_URL } from './MiVariable';
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from 'react-icons/fa'; // Importación de íconos
+import { ThemeContext } from './Style/Tema'; // Importar el contexto
 
 const CompanyPublicProfile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Usar el contexto para obtener el estado de darkMode
+  const { darkMode } = useContext(ThemeContext);
 
   useEffect(() => {
     let isMounted = true; // Variable para controlar si el componente está montado
@@ -45,10 +49,10 @@ const CompanyPublicProfile = () => {
   }
 
   return (
-    <div className="container mx-auto mt-16 p-8 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl shadow-lg text-gray-800">
+    <div className={`container mx-auto mt-16 p-8 ${darkMode ? 'bg-gray-900 text-white' : 'bg-gradient-to-r from-gray-50 to-gray-100'} rounded-xl shadow-lg`}>
       {/* Header */}
       <div className="flex flex-col items-center text-center mb-10">
-        <h2 className="text-5xl font-extrabold text-blue-800 mb-6">{profile.pageTitle}</h2>
+        <h2 className={`text-5xl font-extrabold ${darkMode ? 'text-black-400' : 'text-black-800'} mb-6`}>{profile.pageTitle}</h2>
         {profile.logo ? (
           <img
             src={profile.logo}
@@ -60,13 +64,13 @@ const CompanyPublicProfile = () => {
             <span className="text-xl text-gray-500">Logo</span>
           </div>
         )}
-        <p className="text-2xl font-light italic text-gray-600">"{profile.slogan}"</p>
+        <p className={`text-2xl font-bold italic ${darkMode ? 'text-white' : 'text-gray-600'}`}>"{profile.slogan}"</p>
       </div>
 
       {/* Información de Contacto */}
-      <div className="mb-10 p-6 bg-white rounded-lg shadow-md border-2 border-gray-300">
-        <h3 className="text-3xl font-bold text-center text-blue-800 mb-6">Información de Contacto</h3>
-        <div className="text-lg text-gray-700 space-y-3">
+      <div className={`mb-10 p-6 ${darkMode ? 'bg-gray-800 text-white' : 'bg-white'} rounded-lg shadow-md border-2 border-gray-300`}>
+      <h3 className={`text-3xl font-bold text-center ${darkMode ? 'text-white' : 'text-black'} mb-6`}>Información de Contacto</h3>
+        <div className="text-lg space-y-3">
           <p><strong>Dirección:</strong> {profile.contactInfo?.address || 'No disponible'}</p>
           <p><strong>Teléfono:</strong> {profile.contactInfo?.phone || 'No disponible'}</p>
           <p><strong>Correo Electrónico:</strong> {profile.contactInfo?.email || 'No disponible'}</p>
@@ -74,17 +78,17 @@ const CompanyPublicProfile = () => {
       </div>
 
       {/* Identidad de la Empresa */}
-      <div className="mb-10 p-6 bg-white rounded-lg shadow-md border-2 border-gray-300">
-        <h3 className="text-3xl font-bold text-center text-blue-800 mb-6">Identidad de la Empresa</h3>
-        <div className="text-lg text-gray-700 space-y-3">
+      <div className={`mb-10 p-6 ${darkMode ? 'bg-gray-800 text-white' : 'bg-white'} rounded-lg shadow-md border-2 border-gray-300`}>
+      <h3 className={`text-3xl font-bold text-center ${darkMode ? 'text-white' : 'text-black'} mb-6`}>Identidad de la Empresa</h3>
+        <div className="text-lg space-y-3">
           <p><strong>Misión:</strong> {profile.identidadEmpresa?.mision || 'No disponible'}</p>
           <p><strong>Visión:</strong> {profile.identidadEmpresa?.vision || 'No disponible'}</p>
         </div>
       </div>
 
       {/* Redes Sociales */}
-      <div className="mb-10 p-6 bg-white rounded-lg shadow-md border-2 border-gray-300">
-        <h3 className="text-3xl font-bold text-center text-blue-800 mb-6">Síguenos en Redes Sociales</h3>
+      <div className={`mb-10 p-6 ${darkMode ? 'bg-gray-800 text-white' : 'bg-white'} rounded-lg shadow-md border-2 border-gray-300`}>
+      <h3 className={`text-3xl font-bold text-center ${darkMode ? 'text-white' : 'text-black'} mb-6`}>Síguenos en Redes Sociales</h3>
         {profile.socialMedia ? (
           <div className="flex justify-center flex-wrap gap-8 text-xl">
             {profile.socialMedia.facebook && (

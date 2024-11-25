@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { MdEmail } from 'react-icons/md'; // Importing email icon from React Icons
 import Swal from 'sweetalert2';
+import { ThemeContext } from './Style/Tema'; 
 
 const VerificarCorreo = ({ onVerified }) => {
   const [email, setEmail] = useState('');
@@ -37,22 +38,24 @@ const VerificarCorreo = ({ onVerified }) => {
       });
     }
   };
+  const { darkMode } = useContext(ThemeContext); // Obtener el estado de darkMode
+
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-6">
+    <div className={`flex flex-col items-center justify-center h-screen ${darkMode ? 'bg-gray-900' : 'bg-gray-100'}`}>
+      <div className={`w-full max-w-md ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-black'} rounded-lg shadow-lg p-6`}>
         <h1 className="text-2xl font-bold mb-4 text-center">Registrar</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           
           {/* Correo Electrónico Field */}
           <div>
-            <label className="block text-black-600 text-md font-semibold mb-2" htmlFor="email">
+            <label className={`block text-md font-semibold mb-2 ${darkMode ? 'text-white' : 'text-black'}`} htmlFor="email">
               Correo Electrónico
             </label>
-            <div className="flex items-center border border-black-400 rounded-full px-3 py-2 shadow-lg transition-all hover:shadow-xl">
-              <MdEmail className="text-black-400 mr-3" size={24} /> {/* React Icon for Email */}
+            <div className={`flex items-center border rounded-full px-3 py-2 shadow-lg transition-all hover:shadow-xl ${darkMode ? 'border-gray-600' : 'border-black-400'}`}>
+              <MdEmail className={`mr-3 ${darkMode ? 'text-white' : 'text-black-400'}`} size={24} /> {/* React Icon for Email */}
               <input
-                className="w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full text-blue-600 px-2 py-1 transition-all duration-300 ease-in-out"
+                className={`w-full focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-black'} px-2 py-1 transition-all duration-300 ease-in-out`}
                 id="email"
                 type="email"
                 value={email}
@@ -62,6 +65,7 @@ const VerificarCorreo = ({ onVerified }) => {
               />
             </div>
           </div>
+
   
           {/* Submit Button */}
           <button
