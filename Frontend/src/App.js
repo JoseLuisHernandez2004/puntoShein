@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ThemeProvider } from './componentes/Style/Tema';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom'; 
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Home from './componentes/Home';
 import LoginForm from './componentes/LoginForm';
 import RegisterForm from './componentes/RegisterForm';
@@ -8,22 +8,25 @@ import Logout from './componentes/Logout';
 import RecoverPassword from './componentes/RecoverPassword';
 import ResetPassword from './componentes/ResetPassword';
 import VerificarCorreo from './componentes/VerificarCorreo';
-import Navbar from './componentes/Compartido/Navbar'; 
+import Navbar from './componentes/Compartido/Navbar';
 import About from './componentes/About';
 import Footer from './componentes/Compartido/Footer';
-import AdminLayout from './componentes/Admin/AdminLayout'; 
-import UserLayout from './componentes/User/UserLayout'; 
+import AdminLayout from './componentes/Admin/AdminLayout';
+import UserLayout from './componentes/User/UserLayout';
 import UserProfile from './componentes/User/UserProfile';
 import UserDashboard from './componentes/User/UserDashboard';
 import VerifyMfa from './componentes/VerifyMfa';
 import AdminDashboard from './componentes/Admin/AdminDashboard';
 import AdminProfile from './componentes/Admin/AdminProfile';
-import AdminPanel from './componentes/Admin/AdminPanel'; 
-import Products from './componentes/Admin/products'; 
+import AdminPanel from './componentes/Admin/AdminPanel';
+import Products from './componentes/Admin/products';
 import MyUsers from './componentes/Admin/myUsers';
 import ListaPedidos from './componentes/Admin/ListaPedidos';
-import CompanyProfile from './componentes/Admin/CompanyProfile'; 
+import CompanyProfile from './componentes/Admin/CompanyProfile';
 import CompanyPublicProfile from './componentes/CompanyPublicProfile';
+import Terms from './componentes/Terms';  // Nuevo componente para Términos y Condiciones
+import Privacy from './componentes/Politicas';  // Nuevo componente para Política de Privacidad
+import DeslideL from './componentes/DeslideL';  // Nuevo componente para Deslinde Legal
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -69,6 +72,11 @@ function App() {
                 <Route path="Listapedidos" element={<ListaPedidos />} />
                 <Route path="company-profile" element={<CompanyProfile />} />
               </Route>
+
+              {/* Rutas para documentos regulatorios */}
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/legal" element={<DeslideL />} />
             </Routes>
           </main>
 

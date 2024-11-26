@@ -5,7 +5,8 @@ import {
   updateDocument,
   deleteDocument,
   getCurrentVersion,
-  getDocumentHistory
+  getDocumentHistory,
+  getLastThreeDocuments // Importar la nueva función del controlador
 } from '../controllers/document.controller.js';
 import { authRequired, isAdmin } from '../middlewares/validateToken.js'; // Importar middlewares
 
@@ -15,7 +16,8 @@ const router = express.Router();
 router.post('/', authRequired, isAdmin, createDocument); // Crear un nuevo documento
 router.put('/:id', authRequired, isAdmin, updateDocument); // Modificar documento (crear nueva versión)
 router.delete('/:id', authRequired, isAdmin, deleteDocument); // Marcar como eliminado
-router.get('/current', authRequired, isAdmin, getCurrentVersion); // Obtener versión vigente
-router.get('/history/:title', authRequired, isAdmin, getDocumentHistory); // Historial de versiones
+router.get('/current', authRequired, getCurrentVersion); // Obtener versión vigente (sin restricción a admin)
+router.get('/history/:title', authRequired, getDocumentHistory); // Historial de versiones (sin restricción a admin)
+router.get('/last-three', getLastThreeDocuments); // Obtener los tres últimos documentos vigentes
 
 export default router;

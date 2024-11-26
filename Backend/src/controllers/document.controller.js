@@ -6,20 +6,26 @@ export const createDocument = async (req, res) => {
   try {
     const { title, content, effectiveDate } = req.body;
 
+    // Validaciones en el servidor
     if (!title || !content || !effectiveDate) {
       return res.status(400).json({ message: "Todos los campos son obligatorios" });
+    }
+
+    if (!['Política de privacidad', 'Términos y condiciones', 'Deslinde legal'].includes(title)) {
+      return res.status(400).json({ message: "Título no válido. Debe ser uno de los documentos regulatorios definidos" });
     }
 
     if (isNaN(new Date(effectiveDate).getTime())) {
       return res.status(400).json({ message: "La fecha efectiva no es válida" });
     }
 
+    // Crear el nuevo documento
     const newDocument = new Document({
       title,
       content,
       effectiveDate,
       version: 1,
-      status: "vigente"
+      status: "vigente",
     });
 
     await newDocument.save();
@@ -33,10 +39,13 @@ export const createDocument = async (req, res) => {
 };
 
 // Modificar el contenido de un documento (crea una nueva versión)
+// Update the document without modifying the title
 export const updateDocument = async (req, res) => {
   try {
     const { id } = req.params;
     const { content } = req.body;
+
+    console.log("Datos recibidos para actualizar:", { id, content });
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "ID de documento no válido" });
@@ -51,29 +60,21 @@ export const updateDocument = async (req, res) => {
       return res.status(404).json({ message: "Documento no encontrado o ya eliminado" });
     }
 
-    // Marcar la versión actual como "no vigente"
-    currentDocument.status = "no vigente";
+    // Update the current document
+    currentDocument.content = content;
+    currentDocument.version += 1;
+    currentDocument.status = "vigente";
     await currentDocument.save();
 
-    // Crear una nueva versión
-    const newVersion = new Document({
-      title: currentDocument.title,
-      content,
-      effectiveDate: currentDocument.effectiveDate,
-      version: currentDocument.version + 1,
-      status: "vigente",
-      isDeleted: false
-    });
-
-    await newVersion.save();
-
-    console.log(`Documento actualizado: ID anterior: ${currentDocument._id}, Nueva versión: ${newVersion._id}`);
-    res.status(200).json(newVersion);
+    console.log(`Documento actualizado: ID: ${currentDocument._id}`);
+    res.status(200).json(currentDocument);
   } catch (error) {
     console.error("Error al actualizar documento:", error);
     res.status(500).json({ message: `Error al actualizar documento: ${error.message}` });
   }
 };
+
+
 
 // Marcar documento como eliminado lógicamente
 export const deleteDocument = async (req, res) => {
@@ -101,12 +102,19 @@ export const deleteDocument = async (req, res) => {
   }
 };
 
-// Consultar la versión vigente del documento
+// Consultar la versión vigente del documento específico
 export const getCurrentVersion = async (req, res) => {
   try {
-    const currentDocument = await Document.findOne({ status: "vigente", isDeleted: false });
+    const { title } = req.query;
+
+    if (!title || !['Política de privacidad', 'Términos y condiciones', 'Deslinde legal'].includes(title)) {
+      return res.status(400).json({ message: "Título no válido o no proporcionado" });
+    }
+
+    // Consulta con filtro de título y estado "vigente"
+    const currentDocument = await Document.findOne({ title, status: "vigente", isDeleted: false });
     if (!currentDocument) {
-      return res.status(404).json({ message: "No hay una versión vigente" });
+      return res.status(404).json({ message: "No hay una versión vigente para el documento solicitado" });
     }
     res.status(200).json(currentDocument);
   } catch (error) {
@@ -115,11 +123,13 @@ export const getCurrentVersion = async (req, res) => {
   }
 };
 
-// Consultar historial de versiones de un documento
+
+// Consultar historial de versiones de un documento específico
 export const getDocumentHistory = async (req, res) => {
   try {
     const { title } = req.params;
-    if (!title || title.trim() === "") {
+
+    if (!title || !['Política de privacidad', 'Términos y condiciones', 'Deslinde legal'].includes(title)) {
       return res.status(400).json({ message: "El título proporcionado no es válido" });
     }
 
@@ -132,5 +142,25 @@ export const getDocumentHistory = async (req, res) => {
   } catch (error) {
     console.error("Error al obtener historial de versiones:", error);
     res.status(500).json({ message: `Error al obtener historial de versiones: ${error.message}` });
+  }
+};
+// Obtener los tres últimos documentos vigentes de cada tipo
+export const getLastThreeDocuments = async (req, res) => {
+  try {
+    const titles = ['Política de privacidad', 'Términos y condiciones', 'Deslinde legal'];
+    let documents = {};
+
+    // Obtener los tres últimos documentos vigentes para cada título
+    for (let title of titles) {
+      const docs = await Document.find({ title, status: "vigente", isDeleted: false })
+                                  .sort({ version: -1 })
+                                  .limit(3);
+      documents[title] = docs;
+    }
+
+    res.status(200).json(documents);
+  } catch (error) {
+    console.error("Error al obtener los tres últimos documentos vigentes:", error);
+    res.status(500).json({ message: `Error al obtener los documentos: ${error.message}` });
   }
 };

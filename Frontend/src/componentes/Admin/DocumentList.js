@@ -5,17 +5,21 @@ import { ThemeContext } from '../Style/Tema'; // Importar el ThemeContext
 
 const DocumentList = ({ onSelectDocument }) => {
   const { darkMode } = useContext(ThemeContext); // Obtener el estado del tema
+  const [selectedTitle, setSelectedTitle] = useState('');
   const [currentDocument, setCurrentDocument] = useState(null);
   const [history, setHistory] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Obtener la versión vigente del documento seleccionado
   useEffect(() => {
-    const fetchCurrentDocument = async () => {
+    const fetchCurrentDocument = async (title) => {
+      if (!title) return;
+
       setLoading(true);
-      setError(null); // Resetea errores previos
+      setError(null);
       try {
-        const response = await axios.get(`${MIS_URL}/api/documents/current`, { withCredentials: true });
+        const response = await axios.get(`${MIS_URL}/api/documents/current?title=${title}`, { withCredentials: true });
         setCurrentDocument(response.data);
       } catch (err) {
         if (err.response?.status === 404) {
@@ -30,12 +34,17 @@ const DocumentList = ({ onSelectDocument }) => {
       }
     };
 
-    fetchCurrentDocument();
-  }, []);
+    if (selectedTitle) {
+      fetchCurrentDocument(selectedTitle);
+    }
+  }, [selectedTitle]);
 
+  // Obtener el historial de versiones del documento seleccionado
   useEffect(() => {
     const fetchDocumentHistory = async (title) => {
-      setError(null); // Resetea errores previos
+      if (!title) return;
+
+      setError(null);
       try {
         const response = await axios.get(`${MIS_URL}/api/documents/history/${title}`, { withCredentials: true });
         setHistory(response.data);
@@ -45,32 +54,52 @@ const DocumentList = ({ onSelectDocument }) => {
       }
     };
 
-    if (currentDocument?.title) {
-      fetchDocumentHistory(currentDocument.title);
+    if (selectedTitle) {
+      fetchDocumentHistory(selectedTitle);
     }
-  }, [currentDocument]);
+  }, [selectedTitle]);
+
+  const handleTitleChange = (e) => {
+    setSelectedTitle(e.target.value);
+    setCurrentDocument(null); // Limpiar datos del documento vigente al cambiar de título
+    setHistory([]); // Limpiar historial al cambiar de título
+  };
 
   if (loading) return <p>Cargando...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
     <div className={`p-6 rounded-lg shadow-md ${darkMode ? 'bg-gray-800 text-white' : 'bg-gray-50 text-black'}`}>
-      <h2 className={`text-2xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Documento Vigente</h2>
+      <h2 className={`text-2xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Seleccionar Documento Regulatorio</h2>
+      <select
+        value={selectedTitle}
+        onChange={handleTitleChange}
+        className={`p-2 border rounded mb-4 ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-black'}`}
+      >
+        <option value="">Seleccione un documento</option>
+        <option value="Política de privacidad">Política de privacidad</option>
+        <option value="Términos y condiciones">Términos y condiciones</option>
+        <option value="Deslinde legal">Deslinde legal</option>
+      </select>
+
       {currentDocument ? (
-        <div className={`p-6 rounded-lg shadow-inner ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
-          <h3 className={`text-lg font-semibold ${darkMode ? 'text-white' : 'text-gray-800'}`}>{currentDocument.title}</h3>
-          <p className={`text-gray-700 mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{currentDocument.content}</p>
-          <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Versión: {currentDocument.version}</p>
-          <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Fecha efectiva: {new Date(currentDocument.effectiveDate).toLocaleDateString()}</p>
-          <button
-            onClick={() => onSelectDocument(currentDocument._id)}
-            className={`mt-4 px-4 py-2 ${darkMode ? 'bg-blue-600' : 'bg-blue-500'} text-white rounded hover:${darkMode ? 'bg-blue-700' : 'bg-blue-600'}`}
-          >
-            Seleccionar para Actualizar/Eliminar
-          </button>
-        </div>
+        <>
+          <h2 className={`text-2xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Documento Vigente</h2>
+          <div className={`p-6 rounded-lg shadow-inner ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+            <h3 className={`text-lg font-semibold ${darkMode ? 'text-white' : 'text-gray-800'}`}>{currentDocument.title}</h3>
+            <p className={`text-gray-700 mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{currentDocument.content}</p>
+            <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Versión: {currentDocument.version}</p>
+            <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Fecha efectiva: {new Date(currentDocument.effectiveDate).toLocaleDateString()}</p>
+            <button
+              onClick={() => onSelectDocument(currentDocument._id)}
+              className={`mt-4 px-4 py-2 ${darkMode ? 'bg-blue-600' : 'bg-blue-500'} text-white rounded hover:${darkMode ? 'bg-blue-700' : 'bg-blue-600'}`}
+            >
+              Seleccionar para Actualizar/Eliminar
+            </button>
+          </div>
+        </>
       ) : (
-        <p>No hay un documento vigente.</p>
+        <p>No hay un documento vigente seleccionado o disponible.</p>
       )}
 
       <h2 className={`text-2xl font-bold mt-8 mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Historial de Versiones</h2>
