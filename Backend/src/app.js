@@ -15,7 +15,7 @@ const app = express();
 
 // Configuración de CORS
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://puntoshein.netlify.app'], // URLs permitidas
+  origin: ['http://localhost:3000', 'https://puntoshein.netlify.app', 'https://puntoshein.com'], // URLs permitidas
   credentials: true,  // Permitir cookies y encabezados
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
   allowedHeaders: ['Content-Type', 'Authorization'], // Encabezados permitidos
