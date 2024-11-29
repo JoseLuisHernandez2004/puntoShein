@@ -114,11 +114,21 @@ const CreateDocument = () => {
       <textarea
         id="content"
         value={content}
-        onChange={(e) => setContent(e.target.value)}
+        onChange={(e) => {
+          const input = e.target.value;
+          // Filtrar solo letras, números y espacios
+          const sanitizedInput = input.replace(/[^a-zA-Z\s]/g, '');
+          setContent(sanitizedInput);
+        }}
         placeholder="Escriba el contenido del documento aquí..."
         required
-        className={`p-3 w-full border rounded mb-4 h-40 focus:outline-none focus:ring-2 ${darkMode ? 'bg-gray-800 border-gray-600 text-white focus:ring-yellow-500' : 'bg-white border-gray-300 text-black focus:ring-blue-500'}`}
+        className={`p-3 w-full border rounded mb-4 h-40 focus:outline-none focus:ring-2 ${
+          darkMode
+            ? 'bg-gray-800 border-gray-600 text-white focus:ring-yellow-500'
+            : 'bg-white border-gray-300 text-black focus:ring-blue-500'
+        }`}
       />
+
 
       <button
         type="submit"
