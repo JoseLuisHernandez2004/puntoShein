@@ -3,17 +3,22 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import { MIS_URL } from '../MiVariable';
 import { ThemeContext } from '../Style/Tema';
+import DOMPurify from 'dompurify';
+import { FaFileAlt } from 'react-icons/fa';
+
+// Configurar DOMPurify para uso en React
+const purify = DOMPurify.sanitize;
 
 const CreateDocument = () => {
   const { darkMode } = useContext(ThemeContext);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [effectiveDate, setEffectiveDate] = useState('');
+  const [userId] = useState(''); // Asegúrate de obtener el ID del usuario
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!title || !content || !effectiveDate) {
+    if (!title || !content) {
       Swal.fire({
         title: 'Error',
         text: 'Todos los campos son obligatorios.',
@@ -33,15 +38,11 @@ const CreateDocument = () => {
       return;
     }
 
-    if (isNaN(new Date(effectiveDate).getTime())) {
-      Swal.fire({
-        title: 'Error',
-        text: 'La fecha efectiva no es válida.',
-        icon: 'error',
-        confirmButtonText: 'Aceptar',
-      });
-      return;
-    }
+    // Obtener la fecha y hora actual
+    const currentDate = new Date().toISOString();
+
+    // Sanitizar el contenido antes de enviarlo
+    const sanitizedContent = purify(content);
 
     try {
       Swal.fire({
@@ -53,10 +54,10 @@ const CreateDocument = () => {
         },
       });
 
-      // Send request to backend
+      // Enviar la solicitud al backend con el campo 'createdBy'
       await axios.post(
         `${MIS_URL}/api/documents`,
-        { title, content, effectiveDate },
+        { title, content: sanitizedContent, effectiveDate: currentDate, createdBy: userId }, // Usar el contenido sanitizado
         { withCredentials: true }
       );
 
@@ -69,7 +70,6 @@ const CreateDocument = () => {
 
       setTitle('');
       setContent('');
-      setEffectiveDate('');
     } catch (err) {
       console.error("Error al crear el documento:", err);
 
@@ -85,15 +85,22 @@ const CreateDocument = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className={`p-6 rounded-lg shadow-md ${darkMode ? 'bg-gray-800 text-white' : 'bg-gray-50 text-black'}`}
+      className={`p-8 rounded-lg shadow-lg ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'} max-w-xl mx-auto mt-10 border ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}
     >
-      <h2 className={`text-2xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Crear Documento Regulatorio</h2>
+      <div className="flex items-center mb-6">
+        <FaFileAlt className={`text-4xl mr-3 ${darkMode ? 'text-yellow-400' : 'text-blue-600'}`} />
+        <h2 className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>Crear Documento Regulatorio</h2>
+      </div>
 
+      <label className="block font-semibold mb-2" htmlFor="title">
+        Tipo de Documento
+      </label>
       <select
+        id="title"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         required
-        className={`p-2 border rounded mb-4 ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-black'}`}
+        className={`p-3 w-full border rounded mb-4 focus:outline-none focus:ring-2 ${darkMode ? 'bg-gray-800 border-gray-600 text-white focus:ring-yellow-500' : 'bg-white border-gray-300 text-black focus:ring-blue-500'}`}
       >
         <option value="">Seleccione un documento</option>
         <option value="Política de privacidad">Política de privacidad</option>
@@ -101,23 +108,21 @@ const CreateDocument = () => {
         <option value="Deslinde legal">Deslinde legal</option>
       </select>
 
+      <label className="block font-semibold mb-2" htmlFor="content">
+        Contenido del Documento
+      </label>
       <textarea
+        id="content"
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        placeholder="Contenido del documento"
+        placeholder="Escriba el contenido del documento aquí..."
         required
-        className={`p-2 border rounded mb-4 ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-black'}`}
+        className={`p-3 w-full border rounded mb-4 h-40 focus:outline-none focus:ring-2 ${darkMode ? 'bg-gray-800 border-gray-600 text-white focus:ring-yellow-500' : 'bg-white border-gray-300 text-black focus:ring-blue-500'}`}
       />
-      <input
-        type="date"
-        value={effectiveDate}
-        onChange={(e) => setEffectiveDate(e.target.value)}
-        required
-        className={`p-2 border rounded mb-4 ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-black'}`}
-      />
+
       <button
         type="submit"
-        className={`px-4 py-2 rounded ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+        className={`w-full py-3 rounded-lg text-lg font-semibold mt-4 transition-all duration-300 ease-in-out transform hover:scale-105 ${darkMode ? 'bg-yellow-500 hover:bg-yellow-600 text-gray-900' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
       >
         Crear Documento
       </button>

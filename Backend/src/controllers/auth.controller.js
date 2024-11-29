@@ -21,7 +21,7 @@ const logError = async (error, req, type = 'error') => {
     stack: error.stack,
     route: req.originalUrl,
     method: req.method,
-    statusCode: res.statusCode || 500,
+    statusCode: res.statusCode || 1000,
     type: type, // Nuevo campo para diferenciar el tipo de registro
   });
   await errorLog.save(); // Guarda el registro en la base de datos
@@ -82,33 +82,48 @@ export const register = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  const { email, password, recaptchaToken } = req.body;  // Se recibe el token de reCAPTCHA
+  const { email, password, recaptchaToken } = req.body; // Se recibe el token de reCAPTCHA
 
   try {
     // Validar el token de reCAPTCHA con Google
-    const recaptchaResponse = await axios.post(`https://www.google.com/recaptcha/api/siteverify`, null, {
-      params: {
-        secret: process.env.RECAPTCHA_SECRET,  // Asegúrate de que la clave secreta de reCAPTCHA esté en tus variables de entorno
-        response: recaptchaToken,
-      },
-    });
+    const recaptchaResponse = await axios.post(
+      'https://www.google.com/recaptcha/api/siteverify',
+      null,
+      {
+        params: {
+          secret: process.env.RECAPTCHA_SECRET, // Asegúrate de que la clave secreta de reCAPTCHA esté en tus variables de entorno
+          response: recaptchaToken,
+        },
+      }
+    );
 
     if (!recaptchaResponse.data.success) {
-      return res.status(400).json({ message: "Error en reCAPTCHA. Inténtalo de nuevo." });
+      return res.status(400).json({ message: 'Error en reCAPTCHA. Inténtalo de nuevo.' });
     }
 
     // Buscar al usuario en la base de datos
     const userFound = await User.findOne({ email });
-    if (!userFound) return res.status(400).json({ message: "Correo o contraseña incorrectos" });
+
+    if (!userFound) {
+      return res.status(400).json({ message: 'Correo o contraseña incorrectos' });
+    }
+
+    // Verificar si el usuario está activo
+    if (!userFound.isActive) {
+      return res.status(403).json({ message: 'Tu cuenta está desactivada. Contacta al administrador.' });
+    }
 
     // Verificar si la cuenta está bloqueada
     if (userFound.lockUntil && userFound.lockUntil > Date.now()) {
       const lockTimeRemaining = Math.ceil((userFound.lockUntil - Date.now()) / 1000);
-      return res.status(403).json({ message: `Cuenta bloqueada. Inténtalo de nuevo en ${lockTimeRemaining} segundos.` });
+      return res.status(403).json({
+        message: `Cuenta bloqueada. Inténtalo de nuevo en ${lockTimeRemaining} segundos.`,
+      });
     }
 
     // Verificar la contraseña
     const isMatch = await bcrypt.compare(password, userFound.password);
+
     if (!isMatch) {
       userFound.loginAttempts += 1;
 
@@ -122,24 +137,28 @@ export const login = async (req, res) => {
       return res.status(401).json({ message: 'Correo o contraseña incorrectos' });
     }
 
-    // Restablecer intentos fallidos después de un inicio de sesión exitoso
+    // Restablecer intentos fallidos y desbloquear la cuenta después de un inicio de sesión exitoso
     userFound.loginAttempts = 0;
     userFound.lockUntil = null;
 
     // *** Generar y enviar el código MFA ***
     const mfaCode = Math.floor(100000 + Math.random() * 900000).toString(); // Generar un código MFA de 6 dígitos
-    await sendMfaCode(email, mfaCode); // Enviar el código MFA al correo del usuario
+    const mfaCodeExpires = Date.now() + 10 * 60 * 1000; // El código expira en 10 minutos
+
+    // Enviar el código MFA al correo del usuario
+    await sendMfaCode(userFound.email, mfaCode);
 
     // Guardar el código MFA temporalmente en la base de datos del usuario
     userFound.mfaCode = mfaCode;
+    userFound.mfaCodeExpires = mfaCodeExpires;
     await userFound.save();
 
     // Responder al cliente indicando que se requiere MFA
-    res.status(200).json({ mfaRequired: true });
-
+    res.status(200).json({ mfaRequired: true, message: 'Código MFA enviado al correo electrónico.' });
   } catch (error) {
-    await logError(error, req, res);
-    res.status(500).json({ message: error.message });
+    console.error('Error en login:', error);
+    await logError(error, req, res); // Asegúrate de tener esta función implementada
+    res.status(500).json({ message: 'Error interno del servidor.' });
   }
 };
 

@@ -5,19 +5,27 @@ const documentSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
-    enum: ['Política de privacidad', 'Términos y condiciones', 'Deslinde legal'] // Lista de títulos permitidos
+    enum: ['Política de privacidad', 'Términos y condiciones', 'Deslinde legal']
   },
   content: {
     type: String,
-    required: true
+    required: true,
+    // Puedes agregar validaciones de longitud si es necesario
   },
   version: {
     type: Number,
-    default: 1, // La versión comienza en 1
+    default: 1,
+    min: 1
   },
   effectiveDate: {
     type: Date,
-    required: true
+    required: true,
+    validate: {
+      validator: function(v) {
+        return v instanceof Date && !isNaN(v);
+      },
+      message: props => `${props.value} no es una fecha válida!`
+    }
   },
   isDeleted: {
     type: Boolean,
@@ -30,14 +38,15 @@ const documentSchema = new mongoose.Schema({
   },
   createdBy: {
     type: String,
-    required: true // Puede ser el nombre o el ID del usuario que creó el documento
+    required: true
   },
   modifiedBy: {
-    type: String // Opcional, para quien realizó la última modificación
+    type: String
   }
 }, {
-  timestamps: true, // Automáticamente añade createdAt y updatedAt
+  timestamps: true,
 });
+
 
 // Índices para mejorar las consultas más comunes
 documentSchema.index({ title: 1, version: -1 }); // Índice compuesto por título y versión para búsquedas eficientes del historial

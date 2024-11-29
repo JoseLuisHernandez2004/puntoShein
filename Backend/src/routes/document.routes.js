@@ -6,6 +6,7 @@ import {
   deleteDocument,
   getCurrentVersion,
   getDocumentHistory,
+  getDocumentById,
   getLastThreeDocuments // Importar la nueva función del controlador
 } from '../controllers/document.controller.js';
 import { authRequired, isAdmin } from '../middlewares/validateToken.js'; // Importar middlewares
@@ -19,5 +20,7 @@ router.delete('/:id', authRequired, isAdmin, deleteDocument); // Marcar como eli
 router.get('/current', authRequired, getCurrentVersion); // Obtener versión vigente (sin restricción a admin)
 router.get('/history/:title', authRequired, getDocumentHistory); // Historial de versiones (sin restricción a admin)
 router.get('/last-three', getLastThreeDocuments); // Obtener los tres últimos documentos vigentes
+router.get('/:id', authRequired, getDocumentById); // Obtener un documento por ID
+
 
 export default router;

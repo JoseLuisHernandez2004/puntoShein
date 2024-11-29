@@ -11,7 +11,7 @@ const VerificarCorreo = ({ onVerified }) => {
     e.preventDefault();
     try {
       // API call to verify email
-      const response = await axios.get(`https://emailvalidation.abstractapi.com/v1/?api_key=b53dde68481e44e2a9205d182164acda&email=${email}`);
+      const response = await axios.get(`https://emailvalidation.abstractapi.com/v1/?api_key=7bbfccf479484b3394e36bc315b77f0b&email=${email}`);
       
       if (response.data.is_valid_format.value && response.data.deliverability === 'DELIVERABLE') {
         // Display success message with SweetAlert2

@@ -1,78 +1,119 @@
 import Document from '../models/Documents.js';
 import mongoose from 'mongoose';
 
+import { body, validationResult } from 'express-validator';
+
+// Middleware de validación
+export const validateDocument = [
+  body('title')
+    .notEmpty().withMessage('El título es obligatorio')
+    .isIn(['Política de privacidad', 'Términos y condiciones', 'Deslinde legal'])
+    .withMessage('Título no válido. Debe ser uno de los documentos regulatorios definidos'),
+  
+  body('content')
+    .notEmpty().withMessage('El contenido es obligatorio'),
+  
+  body('effectiveDate')
+    .notEmpty().withMessage('La fecha efectiva es obligatoria')
+    .isISO8601().withMessage('La fecha efectiva no es válida')
+    .toDate(),
+];
+
+
 // Registrar un nuevo documento regulatorio
-export const createDocument = async (req, res) => {
-  try {
-    const { title, content, effectiveDate } = req.body;
-
-    // Validaciones en el servidor
-    if (!title || !content || !effectiveDate) {
-      return res.status(400).json({ message: "Todos los campos son obligatorios" });
+export const createDocument = [
+  ...validateDocument,
+  async (req, res) => {
+    // Manejar los errores de validación
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
 
-    if (!['Política de privacidad', 'Términos y condiciones', 'Deslinde legal'].includes(title)) {
-      return res.status(400).json({ message: "Título no válido. Debe ser uno de los documentos regulatorios definidos" });
+    try {
+      const { title, content, effectiveDate } = req.body;
+      const createdBy = req.user.id;
+
+      // Verificar si ya existe un documento vigente del mismo título y marcarlo como no vigente
+      await Document.updateMany(
+        { title, status: 'vigente', isDeleted: false },
+        { status: 'no vigente' }
+      );
+
+      // Crear el nuevo documento
+      const newDocument = new Document({
+        title,
+        content,
+        effectiveDate,
+        createdBy,
+        version: 1,
+        status: 'vigente',
+      });
+
+      await newDocument.save();
+
+      console.log(`Documento creado: ${newDocument._id}`);
+      res.status(201).json(newDocument);
+    } catch (error) {
+      console.error("Error al crear documento:", error);
+      res.status(500).json({ message: `Error al crear documento: ${error.message}` });
     }
-
-    if (isNaN(new Date(effectiveDate).getTime())) {
-      return res.status(400).json({ message: "La fecha efectiva no es válida" });
-    }
-
-    // Crear el nuevo documento
-    const newDocument = new Document({
-      title,
-      content,
-      effectiveDate,
-      version: 1,
-      status: "vigente",
-    });
-
-    await newDocument.save();
-
-    console.log(`Documento creado: ${newDocument._id}`);
-    res.status(201).json(newDocument);
-  } catch (error) {
-    console.error("Error al crear documento:", error);
-    res.status(500).json({ message: `Error al crear documento: ${error.message}` });
   }
-};
+];
 
 // Modificar el contenido de un documento (crea una nueva versión)
-// Update the document without modifying the title
-export const updateDocument = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { content } = req.body;
+export const updateDocument = [
+  // Puedes reutilizar las validaciones si es necesario
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { content } = req.body;
 
-    console.log("Datos recibidos para actualizar:", { id, content });
+      console.log("Datos recibidos para actualizar:", { id, content });
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "ID de documento no válido" });
+      // Validar que el ID del documento es válido
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ message: "ID de documento no válido" });
+      }
+
+      // Validar que el contenido no esté vacío
+      if (!content || content.trim() === "") {
+        return res.status(400).json({ message: "El contenido no puede estar vacío" });
+      }
+
+      // Obtener el documento actual
+      const currentDocument = await Document.findById(id);
+      if (!currentDocument || currentDocument.isDeleted) {
+        return res.status(404).json({ message: "Documento no encontrado o ya eliminado" });
+      }
+
+      // Marcar el documento actual como "no vigente"
+      currentDocument.status = "no vigente";
+      await currentDocument.save();
+
+      // Crear una nueva versión del documento
+      const newVersion = new Document({
+        title: currentDocument.title,
+        content,
+        effectiveDate: currentDocument.effectiveDate, // O una nueva fecha si aplica
+        createdBy: currentDocument.createdBy,
+        version: currentDocument.version + 1,
+        status: "vigente",
+        modifiedBy: req.user.id, // Asignar el ID del usuario que modifica
+      });
+
+      await newVersion.save();
+
+      console.log(`Documento actualizado: ID: ${newVersion._id}`);
+      res.status(200).json(newVersion); // Devolver el documento actualizado
+    } catch (error) {
+      console.error("Error al actualizar documento:", error);
+      res.status(500).json({ message: `Error al actualizar documento: ${error.message}` });
     }
-
-    if (!content || content.trim() === "") {
-      return res.status(400).json({ message: "El contenido no puede estar vacío" });
-    }
-
-    const currentDocument = await Document.findById(id);
-    if (!currentDocument || currentDocument.isDeleted) {
-      return res.status(404).json({ message: "Documento no encontrado o ya eliminado" });
-    }
-
-    // Update the current document
-    currentDocument.content = content;
-    currentDocument.version += 1;
-    currentDocument.status = "vigente";
-    await currentDocument.save();
-
-    console.log(`Documento actualizado: ID: ${currentDocument._id}`);
-    res.status(200).json(currentDocument);
-  } catch (error) {
-    console.error("Error al actualizar documento:", error);
-    res.status(500).json({ message: `Error al actualizar documento: ${error.message}` });
   }
-};
+];
+
+
 
 
 
@@ -162,5 +203,26 @@ export const getLastThreeDocuments = async (req, res) => {
   } catch (error) {
     console.error("Error al obtener los tres últimos documentos vigentes:", error);
     res.status(500).json({ message: `Error al obtener los documentos: ${error.message}` });
+  }
+};
+export const getDocumentById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "ID de documento no válido" });
+    }
+
+    const document = await Document.findById(id);
+
+    if (!document || document.isDeleted) {
+      return res.status(404).json({ message: "Documento no encontrado o eliminado" });
+    }
+
+    // Asegúrate de devolver todo el contenido necesario
+    res.status(200).json(document);
+  } catch (error) {
+    console.error("Error al obtener documento por ID:", error);
+    res.status(500).json({ message: `Error al obtener documento: ${error.message}` });
   }
 };

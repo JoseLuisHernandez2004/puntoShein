@@ -69,6 +69,10 @@ const userSchema = new mongoose.Schema({
     mfaCode: {
       type: String,
     },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
     mfaCodeExpires: { // Nuevo campo para la expiración del código MFA
         type: Date,
       },
