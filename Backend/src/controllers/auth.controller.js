@@ -91,7 +91,7 @@ export const login = async (req, res) => {
       null,
       {
         params: {
-          secret: process.env.RECAPTCHA_SECRET, // Asegúrate de que la clave secreta de reCAPTCHA esté en tus variables de entorno
+          secret: process.env.RECAPTCHA_SECRET, // Clave secreta de reCAPTCHA
           response: recaptchaToken,
         },
       }
@@ -108,16 +108,16 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: 'Correo o contraseña incorrectos' });
     }
 
-    // Verificar si el usuario está activo
-    if (!userFound.isActive) {
-      return res.status(403).json({ message: 'Tu cuenta está desactivada. Contacta al administrador.' });
+    // Verificar si la cuenta está bloqueada permanentemente
+    if (userFound.isBlocked) {
+      return res.status(403).json({ message: 'Tu cuenta está bloqueada. Contacta al administrador.' });
     }
 
-    // Verificar si la cuenta está bloqueada
+    // Verificar si la cuenta está temporalmente bloqueada
     if (userFound.lockUntil && userFound.lockUntil > Date.now()) {
-      const lockTimeRemaining = Math.ceil((userFound.lockUntil - Date.now()) / 1000);
+      const lockTimeRemaining = Math.ceil((userFound.lockUntil - Date.now()) / 1000 / 60); // Minutos restantes
       return res.status(403).json({
-        message: `Cuenta bloqueada. Inténtalo de nuevo en ${lockTimeRemaining} segundos.`,
+        message: `Cuenta bloqueada. Inténtalo de nuevo en ${lockTimeRemaining} minutos.`,
       });
     }
 
@@ -127,10 +127,14 @@ export const login = async (req, res) => {
     if (!isMatch) {
       userFound.loginAttempts += 1;
 
-      // Si alcanza el número máximo de intentos fallidos, bloquea la cuenta por un período determinado
+      // Si alcanza el número máximo de intentos fallidos, bloquear al usuario permanentemente
       if (userFound.loginAttempts >= MAX_ATTEMPTS) {
-        userFound.lockUntil = Date.now() + LOCK_TIME;
-        userFound.loginAttempts = 0;
+        userFound.isBlocked = true; // Bloquear al usuario permanentemente
+        userFound.loginAttempts = 0; // Reiniciar intentos fallidos
+        await userFound.save();
+        return res.status(403).json({
+          message: 'Has alcanzado el límite de intentos fallidos. Tu cuenta ha sido bloqueada permanentemente.',
+        });
       }
 
       await userFound.save();
@@ -157,10 +161,13 @@ export const login = async (req, res) => {
     res.status(200).json({ mfaRequired: true, message: 'Código MFA enviado al correo electrónico.' });
   } catch (error) {
     console.error('Error en login:', error);
-    await logError(error, req, res); // Asegúrate de tener esta función implementada
+    await logError(error, req, res); // Función para registrar errores
     res.status(500).json({ message: 'Error interno del servidor.' });
   }
 };
+
+
+
 
 export const verifyMfaCode = async (req, res) => {
   const { email, mfaCode } = req.body;

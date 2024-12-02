@@ -9,8 +9,6 @@ import documentRoutes from './routes/document.routes.js';
 import userRoutes from './routes/user.routes.js';
 import companyProfileRoutes from './routes/companyProfile.routes.js';
 
-
-
 const app = express();
 
 // Configuración de CORS

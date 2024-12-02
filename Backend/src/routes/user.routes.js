@@ -1,13 +1,11 @@
-// user.routes.js
-
 import express from 'express';
 import {
   getUsers,
   getUserById,
   updateUserRole,
   deleteUser,
-  deactivateUser,
-  activateUser
+  blockUser,
+  unblockUser,
 } from '../controllers/user.controller.js';
 import { authRequired, isAdmin } from '../middlewares/validateToken.js';
 import { updateProfile } from '../controllers/auth.controller.js';
@@ -26,9 +24,11 @@ router.put('/:id', authRequired, isAdmin, updateUserRole);
 // Ruta para eliminar un usuario específico
 router.delete('/:id', authRequired, isAdmin, deleteUser);
 
-router.put('/:id/activate', authRequired, isAdmin, activateUser);
-// Ruta para desactivar un usuario específico
-router.put('/:id/deactivate', authRequired, isAdmin, deactivateUser);
+// Ruta para bloquear un usuario específico
+router.put('/:id/block', authRequired, isAdmin, blockUser);
+
+// Ruta para desbloquear un usuario específico
+router.put('/:id/unblock', authRequired, isAdmin, unblockUser);
 
 // Ruta para actualizar el perfil (si es necesario)
 router.put('/admin/profile', authRequired, isAdmin, updateProfile);

@@ -11,13 +11,12 @@ const MyUsers = () => {
   const [error, setError] = useState(null);
   const [editingUserId, setEditingUserId] = useState(null);
   const [newRole, setNewRole] = useState('');
-  const [currentUserId, setCurrentUserId] = useState(null); // Estado para almacenar el ID del usuario actual
+  const [currentUserId, setCurrentUserId] = useState(null);
 
   useEffect(() => {
     const fetchUsers = async () => {
       setLoading(true);
       try {
-        // Obtener todos los usuarios
         const response = await axios.get(`${MIS_URL}/api/users`, { withCredentials: true });
         if (response.status === 200) {
           setUsers(response.data);
@@ -25,11 +24,10 @@ const MyUsers = () => {
           throw new Error('Error al obtener los usuarios.');
         }
 
-        // Obtener el ID del usuario actual
         const currentUserResponse = await axios.get(`${MIS_URL}/api/profile`, {
           withCredentials: true,
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         });
         if (currentUserResponse.status === 200) {
@@ -37,7 +35,6 @@ const MyUsers = () => {
         } else {
           throw new Error('Error al obtener el perfil del usuario actual.');
         }
-
       } catch (err) {
         setError('Error al obtener los usuarios.');
         Swal.fire('Error', 'Error al obtener los usuarios.', 'error');
@@ -55,7 +52,6 @@ const MyUsers = () => {
   };
 
   const handleDelete = async (userId) => {
-    // Verificar si el usuario está intentando eliminar su propia cuenta
     if (userId === currentUserId) {
       Swal.fire('Acción no permitida', 'No puedes eliminar tu propia cuenta.', 'error');
       return;
@@ -75,15 +71,15 @@ const MyUsers = () => {
           const response = await axios.delete(`${MIS_URL}/api/users/${userId}`, {
             withCredentials: true,
             headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`,
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
             },
           });
 
           if (response.status === 200) {
             setUsers(users.filter(user => user._id !== userId));
-            Swal.fire('Eliminado', 'El usuario ha sido eliminado correctamente.', 'success');
+            Swal.fire('Eliminado', response.data.message, 'success');
           } else {
-            Swal.fire('Error', 'No se pudo eliminar el usuario.', 'error');
+            Swal.fire('Error', response.data.message, 'error');
           }
         } catch (error) {
           console.error('Error al eliminar el usuario:', error);
@@ -95,9 +91,8 @@ const MyUsers = () => {
   };
 
   const handleSave = async (userId) => {
-    // Verificar si el usuario está intentando cambiar su propio rol
     if (userId === currentUserId && newRole !== 'admin') {
-      Swal.fire('Acción no permitida', 'No puedes cambiar tu propio rol.', 'error');
+      Swal.fire('Acción no permitida', 'No puedes cambiar tu propio rol a algo diferente de administrador.', 'error');
       return;
     }
 
@@ -109,7 +104,7 @@ const MyUsers = () => {
           withCredentials: true,
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         }
       );
@@ -118,9 +113,9 @@ const MyUsers = () => {
         setUsers(users.map(user => (user._id === userId ? { ...user, role: newRole } : user)));
         setEditingUserId(null);
         setNewRole('');
-        Swal.fire('Éxito', 'Rol del usuario actualizado correctamente.', 'success');
+        Swal.fire('Éxito', response.data.message, 'success');
       } else {
-        throw new Error('Error al actualizar el rol del usuario.');
+        Swal.fire('Error', response.data.message, 'error');
       }
     } catch (err) {
       console.error(err);
@@ -129,60 +124,54 @@ const MyUsers = () => {
     }
   };
 
-  const handleActivate = async (userId) => {
+  const handleBlock = async (userId) => {
     try {
       const response = await axios.put(
-        `${MIS_URL}/api/users/${userId}/activate`,
+        `${MIS_URL}/api/users/${userId}/block`,
         {},
         {
           withCredentials: true,
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         }
       );
 
       if (response.status === 200) {
-        setUsers(users.map(user => (user._id === userId ? { ...user, isActive: true } : user)));
-        Swal.fire('Activado', 'El usuario ha sido activado.', 'success');
+        setUsers(users.map(user => (user._id === userId ? { ...user, isBlocked: true } : user)));
+        Swal.fire('Bloqueado', response.data.message, 'success');
       } else {
-        throw new Error('No se pudo activar el usuario.');
+        Swal.fire('Error', response.data.message, 'error');
       }
     } catch (err) {
       console.error(err);
-      const errorMessage = err.response?.data?.message || 'No se pudo activar el usuario.';
+      const errorMessage = err.response?.data?.message || 'No se pudo bloquear el usuario.';
       Swal.fire('Error', errorMessage, 'error');
     }
   };
 
-  const handleDeactivate = async (userId) => {
-    // Verificar si el usuario está intentando desactivar su propia cuenta
-    if (userId === currentUserId) {
-      Swal.fire('Acción no permitida', 'No puedes desactivar tu propia cuenta.', 'error');
-      return;
-    }
-
+  const handleUnblock = async (userId) => {
     try {
       const response = await axios.put(
-        `${MIS_URL}/api/users/${userId}/deactivate`,
+        `${MIS_URL}/api/users/${userId}/unblock`,
         {},
         {
           withCredentials: true,
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         }
       );
 
       if (response.status === 200) {
-        setUsers(users.map(user => (user._id === userId ? { ...user, isActive: false } : user)));
-        Swal.fire('Desactivado', 'El usuario ha sido desactivado.', 'success');
+        setUsers(users.map(user => (user._id === userId ? { ...user, isBlocked: false } : user)));
+        Swal.fire('Desbloqueado', response.data.message, 'success');
       } else {
-        throw new Error('No se pudo desactivar el usuario.');
+        Swal.fire('Error', response.data.message, 'error');
       }
     } catch (err) {
       console.error(err);
-      const errorMessage = err.response?.data?.message || 'No se pudo desactivar el usuario.';
+      const errorMessage = err.response?.data?.message || 'No se pudo desbloquear el usuario.';
       Swal.fire('Error', errorMessage, 'error');
     }
   };
@@ -219,10 +208,10 @@ const MyUsers = () => {
                     {user.nombre} {user.apellidoP} {user.apellidoM}
                     {user._id === currentUserId && ' (Yo)'}
                   </p>
-                  <p className="text-white-600">Correo electrónico: {user.email}</p>
-                  <p className="text-white-600">Teléfono: {user.telefono}</p>
-                  <p className="text-white-600">Rol: {user.role}</p>
-                  <p className="text-white-600">Estado: {user.isActive ? 'Activo' : 'Inactivo'}</p>
+                  <p>Correo electrónico: {user.email}</p>
+                  <p>Teléfono: {user.telefono}</p>
+                  <p>Rol: {user.role}</p>
+                  <p>Estado: {user.isBlocked ? 'Bloqueado' : 'Activo'}</p>
 
                   {editingUserId === user._id ? (
                     <div className="mt-4">
@@ -230,9 +219,7 @@ const MyUsers = () => {
                         value={newRole}
                         onChange={(e) => setNewRole(e.target.value)}
                         className={`p-2 border ${
-                          darkMode
-                            ? 'border-gray-600 bg-gray-800 text-white'
-                            : 'border-gray-300 bg-white text-black'
+                          darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-gray-300 bg-white text-black'
                         } rounded-lg`}
                       >
                         <option value="user">Usuario</option>
@@ -260,29 +247,29 @@ const MyUsers = () => {
                         className={`px-4 py-2 text-white rounded-lg hover:bg-blue-600 ${
                           darkMode ? 'bg-blue-600' : 'bg-blue-500'
                         }`}
-                        disabled={user._id === currentUserId} // Deshabilitar si es el usuario actual
+                        disabled={user._id === currentUserId}
                       >
                         Cambiar Rol
                       </button>
-                      {user.isActive ? (
+                      {user.isBlocked ? (
                         <button
-                          onClick={() => handleDeactivate(user._id)}
-                          className={`px-4 py-2 text-white rounded-lg hover:bg-yellow-600 ${
-                            darkMode ? 'bg-yellow-600' : 'bg-yellow-500'
-                          }`}
-                          disabled={user._id === currentUserId} // Deshabilitar si es el usuario actual
-                        >
-                          Desactivar
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => handleActivate(user._id)}
+                          onClick={() => handleUnblock(user._id)}
                           className={`px-4 py-2 text-white rounded-lg hover:bg-green-600 ${
                             darkMode ? 'bg-green-700' : 'bg-green-500'
                           }`}
-                          disabled={user._id === currentUserId} // Deshabilitar si es el usuario actual
+                          disabled={user._id === currentUserId}
                         >
-                          Activar
+                          Desbloquear
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleBlock(user._id)}
+                          className={`px-4 py-2 text-white rounded-lg hover:bg-yellow-600 ${
+                            darkMode ? 'bg-yellow-600' : 'bg-yellow-500'
+                          }`}
+                          disabled={user._id === currentUserId}
+                        >
+                          Bloquear
                         </button>
                       )}
                       <button
@@ -290,7 +277,7 @@ const MyUsers = () => {
                         className={`px-4 py-2 text-white rounded-lg hover:bg-red-600 ${
                           darkMode ? 'bg-red-600' : 'bg-red-500'
                         }`}
-                        disabled={user._id === currentUserId} // Deshabilitar si es el usuario actual
+                        disabled={user._id === currentUserId}
                       >
                         Eliminar
                       </button>

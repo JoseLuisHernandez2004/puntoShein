@@ -102,72 +102,73 @@ export const deleteUser = async (req, res) => {
   }
 };
 
-// Desactivar un usuario específico
-export const deactivateUser = async (req, res) => {
+// Bloquear un usuario específico
+export const blockUser = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const userToDeactivate = await User.findById(id);
+    const userToBlock = await User.findById(id);
 
-    if (!userToDeactivate) {
+    if (!userToBlock) {
       return res.status(404).json({ message: 'Usuario no encontrado.' });
     }
 
-    // Verificar si el usuario está intentando desactivar su propia cuenta
-    if (userToDeactivate._id.toString() === req.userId) {
-      return res.status(400).json({ message: 'No puedes desactivar tu propia cuenta.' });
+    // Verificar si el usuario está intentando bloquear su propia cuenta
+    if (userToBlock._id.toString() === req.userId) {
+      return res.status(400).json({ message: 'No puedes bloquear tu propia cuenta.' });
     }
 
-    // Verificar si se intenta desactivar el último administrador activo
-    if (userToDeactivate.role === 'admin' && userToDeactivate.isActive !== false) {
+    // Verificar si se intenta bloquear el único administrador activo
+    if (userToBlock.role === 'admin' && !userToBlock.isBlocked) {
       const activeAdmins = await User.find({
         role: 'admin',
-        _id: { $ne: userToDeactivate._id },
-        isActive: true,
+        _id: { $ne: userToBlock._id },
+        isBlocked: false,
       });
 
       if (activeAdmins.length === 0) {
         return res.status(400).json({
-          message: 'No se puede desactivar el único administrador activo.',
+          message: 'No se puede bloquear el único administrador activo.',
         });
       }
     }
 
-    userToDeactivate.isActive = false;
-    await userToDeactivate.save();
+    userToBlock.isBlocked = true;
+    await userToBlock.save();
 
     res.status(200).json({
-      message: 'Usuario desactivado correctamente.',
-      user: userToDeactivate,
+      message: 'Usuario bloqueado correctamente.',
+      user: userToBlock,
     });
   } catch (error) {
-    res.status(500).json({ message: 'Error al desactivar el usuario.' });
+    res.status(500).json({ message: 'Error al bloquear el usuario.' });
   }
 };
-// Activar un usuario específico
-export const activateUser = async (req, res) => {
+
+// Desbloquear un usuario específico
+export const unblockUser = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const userToActivate = await User.findById(id);
+    const userToUnblock = await User.findById(id);
 
-    if (!userToActivate) {
+    if (!userToUnblock) {
       return res.status(404).json({ message: 'Usuario no encontrado.' });
     }
 
-    // Verificar si el usuario ya está activo
-    if (userToActivate.isActive === true) {
-      return res.status(400).json({ message: 'El usuario ya está activo.' });
+    // Verificar si el usuario ya está desbloqueado
+    if (!userToUnblock.isBlocked) {
+      return res.status(400).json({ message: 'El usuario ya está desbloqueado.' });
     }
 
-    userToActivate.isActive = true;
-    await userToActivate.save();
+    userToUnblock.isBlocked = false;
+    await userToUnblock.save();
 
     res.status(200).json({
-      message: 'Usuario activado correctamente.',
-      user: userToActivate,
+      message: 'Usuario desbloqueado correctamente.',
+      user: userToUnblock,
     });
   } catch (error) {
-    res.status(500).json({ message: 'Error al activar el usuario.' });
+    res.status(500).json({ message: 'Error al desbloquear el usuario.' });
   }
 };

@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
-
-const userSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema(
+  {
     username: {
       type: String,
       required: true,
@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema({
         validator: function (v) {
           return /^\d{10}$/.test(v.toString());
         },
-        message: (props) => `${props.value} no es un número de teléfono válido. Debe tener 10 dígitos.`,
+        message: (props) => `${props.value} no es un número de teléfono válido.`,
       },
     },
     direccion: {
@@ -69,16 +69,17 @@ const userSchema = new mongoose.Schema({
     mfaCode: {
       type: String,
     },
-    isActive: {
+    isBlocked: {
       type: Boolean,
-      default: true,
+      default: false,
     },
-    mfaCodeExpires: { // Nuevo campo para la expiración del código MFA
-        type: Date,
-      },
-  }, {
+    mfaCodeExpires: {
+      type: Date,
+    },
+  },
+  {
     timestamps: true,
-  });
-  
-  export default mongoose.model('User', userSchema);
-  
+  }
+);
+
+export default mongoose.model('User', userSchema);
