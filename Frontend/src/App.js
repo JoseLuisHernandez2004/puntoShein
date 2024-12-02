@@ -27,6 +27,8 @@ import CompanyPublicProfile from './componentes/CompanyPublicProfile';
 import Terms from './componentes/Terms';  // Nuevo componente para Términos y Condiciones
 import Privacy from './componentes/Politicas';  // Nuevo componente para Política de Privacidad
 import DeslideL from './componentes/DeslideL';  // Nuevo componente para Deslinde Legal
+import AdminIncidencias from './componentes/Admin/AdminIndicencias';
+
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -71,6 +73,11 @@ function App() {
                 <Route path="myUsers" element={<MyUsers />} />
                 <Route path="Listapedidos" element={<ListaPedidos />} />
                 <Route path="company-profile" element={<CompanyProfile />} />
+
+
+                {/* Administracion de incidencias */}
+                <Route path="incidencias" element={<AdminIncidencias />} />
+
               </Route>
 
               {/* Rutas para documentos regulatorios */}

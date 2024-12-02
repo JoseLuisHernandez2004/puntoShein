@@ -172,3 +172,20 @@ export const unblockUser = async (req, res) => {
     res.status(500).json({ message: 'Error al desbloquear el usuario.' });
   }
 };
+export const getBlockedUsers = async (req, res) => {
+  try {
+    // Buscar usuarios bloqueados
+    const blockedUsers = await User.find({ isBlocked: true });
+
+    // Si no hay usuarios bloqueados, devolver un array vacío con estado 200
+    if (blockedUsers.length === 0) {
+      return res.status(200).json([]); // Devuelve un array vacío
+    }
+
+    // Devolver los usuarios bloqueados
+    res.status(200).json(blockedUsers);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al obtener los usuarios bloqueados: ' + error.message });
+  }
+};
+

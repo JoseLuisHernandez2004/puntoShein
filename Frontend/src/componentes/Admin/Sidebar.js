@@ -45,6 +45,11 @@ const Sidebar = () => {
               <FaBuilding className={`mr-3 ${darkMode ? 'text-white' : 'text-blue-600'}`} /> Configuración del Perfil de la Empresa
             </Link>
           </li>
+          <li>
+            <Link to="/admin/incidencias" className={`flex items-center p-3 rounded-lg hover:bg-blue-100 transition-all ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-blue-100'}`}>
+              <FaBuilding className={`mr-3 ${darkMode ? 'text-white' : 'text-blue-600'}`} /> Configuración de incidencias
+            </Link>
+          </li>
         </ul>
       </nav>
     </aside>
