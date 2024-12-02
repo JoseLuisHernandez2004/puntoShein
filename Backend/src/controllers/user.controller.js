@@ -188,4 +188,3 @@ export const getBlockedUsers = async (req, res) => {
     res.status(500).json({ message: 'Error al obtener los usuarios bloqueados: ' + error.message });
   }
 };
-

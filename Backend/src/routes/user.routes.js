@@ -6,7 +6,7 @@ import {
   deleteUser,
   blockUser,
   unblockUser,
-  getBlockedUsers
+  getBlockedUsers,
 } from '../controllers/user.controller.js';
 import { authRequired, isAdmin } from '../middlewares/validateToken.js';
 import { updateProfile } from '../controllers/auth.controller.js';

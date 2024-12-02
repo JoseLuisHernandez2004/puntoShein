@@ -56,10 +56,10 @@ const userSchema = new mongoose.Schema(
     },
     loginAttempts: {
       type: Number,
-      default: 0,
+      default: 0, // Contador de intentos fallidos
     },
     lockUntil: {
-      type: Date,
+      type: Date, // Fecha y hora hasta la cual el usuario está temporalmente bloqueado
     },
     role: {
       type: String,
@@ -67,18 +67,18 @@ const userSchema = new mongoose.Schema(
       default: 'user',
     },
     mfaCode: {
-      type: String,
+      type: String, // Código MFA temporal generado durante el login
     },
     isBlocked: {
       type: Boolean,
-      default: false,
+      default: false, // Indica si el usuario está bloqueado permanentemente
     },
     mfaCodeExpires: {
-      type: Date,
+      type: Date, // Expiración del código MFA
     },
   },
   {
-    timestamps: true,
+    timestamps: true, // Para registrar creación y actualizaciones
   }
 );
 

@@ -6,11 +6,10 @@ import nodemailer from 'nodemailer';
 import { TOKEN_SECRET } from '../config.js';
 import axios from 'axios';
 import ErrorLog from '../models/errorLog.model.js';
+import SessionConfig from '../models/sessionConfig.model.js';
 
 
 /* Variables para la funcion de bloqueo del numero de intentos de inicio de sesion */
-const MAX_ATTEMPTS = 3;
-const LOCK_TIME = 2 * 60 * 1000; // 2 minutos
 const RECAPTCHA_SECRET = process.env.RECAPTCHA_SECRET;
 
 // Función para registrar errores
@@ -80,11 +79,14 @@ export const register = async (req, res) => {
       
   }
 };
-
 export const login = async (req, res) => {
   const { email, password, recaptchaToken } = req.body; // Se recibe el token de reCAPTCHA
 
   try {
+    // Obtener configuración dinámica de intentos y tiempo de bloqueo
+    const sessionConfig = await SessionConfig.findOne() || { maxIntentos: 3, tiempoBloqueo: 1440 }; // Valores predeterminados: 1440 minutos = 24 horas
+    const { maxIntentos, tiempoBloqueo } = sessionConfig;
+
     // Validar el token de reCAPTCHA con Google
     const recaptchaResponse = await axios.post(
       'https://www.google.com/recaptcha/api/siteverify',
@@ -105,19 +107,27 @@ export const login = async (req, res) => {
     const userFound = await User.findOne({ email });
 
     if (!userFound) {
-      return res.status(400).json({ message: 'Correo o contraseña incorrectos' });
+      return res.status(400).json({ message: 'Correo o contraseña incorrectos.' });
+    }
+
+    // Si el usuario fue desbloqueado manualmente
+    if (!userFound.isBlocked && userFound.lockUntil) {
+      console.log("Usuario desbloqueado manualmente:", userFound.email);
+      userFound.lockUntil = null; // Quitar el bloqueo
+      userFound.loginAttempts = 0; // Reiniciar intentos fallidos
+      await userFound.save();
     }
 
     // Verificar si la cuenta está bloqueada permanentemente
-    if (userFound.isBlocked) {
-      return res.status(403).json({ message: 'Tu cuenta está bloqueada. Contacta al administrador.' });
+    if (userFound.isBlocked && !userFound.lockUntil) {
+      return res.status(403).json({ message: 'Tu cuenta está bloqueada permanentemente. Contacta al administrador.' });
     }
 
     // Verificar si la cuenta está temporalmente bloqueada
-    if (userFound.lockUntil && userFound.lockUntil > Date.now()) {
-      const lockTimeRemaining = Math.ceil((userFound.lockUntil - Date.now()) / 1000 / 60); // Minutos restantes
+    if (userFound.isBlocked && userFound.lockUntil > Date.now()) {
+      const tiempoBloqueoRemaining = Math.ceil((userFound.lockUntil - Date.now()) / 1000 / 60); // Minutos restantes
       return res.status(403).json({
-        message: `Cuenta bloqueada. Inténtalo de nuevo en ${lockTimeRemaining} minutos.`,
+        message: `Cuenta bloqueada. Inténtalo de nuevo en ${tiempoBloqueoRemaining} minutos.`,
       });
     }
 
@@ -127,23 +137,24 @@ export const login = async (req, res) => {
     if (!isMatch) {
       userFound.loginAttempts += 1;
 
-      // Si alcanza el número máximo de intentos fallidos, bloquear al usuario permanentemente
-      if (userFound.loginAttempts >= MAX_ATTEMPTS) {
-        userFound.isBlocked = true; // Bloquear al usuario permanentemente
-        userFound.loginAttempts = 0; // Reiniciar intentos fallidos
+      // Si alcanza el número máximo de intentos fallidos, bloquear al usuario temporalmente
+      if (userFound.loginAttempts >= maxIntentos) {
+        userFound.lockUntil = Date.now() + tiempoBloqueo * 60 * 1000; // Bloqueo temporal en milisegundos
+        userFound.isBlocked = true; // Reflejar el estado bloqueado
         await userFound.save();
         return res.status(403).json({
-          message: 'Has alcanzado el límite de intentos fallidos. Tu cuenta ha sido bloqueada permanentemente.',
+          message: `Has alcanzado el límite de intentos fallidos. Tu cuenta está bloqueada por ${tiempoBloqueo} minutos.`,
         });
       }
 
       await userFound.save();
-      return res.status(401).json({ message: 'Correo o contraseña incorrectos' });
+      return res.status(401).json({ message: 'Correo o contraseña incorrectos.' });
     }
 
-    // Restablecer intentos fallidos y desbloquear la cuenta después de un inicio de sesión exitoso
+    // Restablecer intentos fallidos después de un inicio de sesión exitoso
     userFound.loginAttempts = 0;
     userFound.lockUntil = null;
+    userFound.isBlocked = false; // Reflejar que no está bloqueado
 
     // *** Generar y enviar el código MFA ***
     const mfaCode = Math.floor(100000 + Math.random() * 900000).toString(); // Generar un código MFA de 6 dígitos
@@ -165,8 +176,6 @@ export const login = async (req, res) => {
     res.status(500).json({ message: 'Error interno del servidor.' });
   }
 };
-
-
 
 
 export const verifyMfaCode = async (req, res) => {
