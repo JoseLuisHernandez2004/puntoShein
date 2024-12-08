@@ -7,6 +7,7 @@ import { TOKEN_SECRET } from '../config.js';
 import axios from 'axios';
 import ErrorLog from '../models/errorLog.model.js';
 import SessionConfig from '../models/sessionConfig.model.js';
+import Incidencias from '../models/incidencia.model.js';
 
 
 /* Variables para la funcion de bloqueo del numero de intentos de inicio de sesion */
@@ -135,20 +136,28 @@ export const login = async (req, res) => {
 
     if (!isMatch) {
       userFound.loginAttempts += 1;
-
+    
+      // Registrar el intento fallido como una incidencia
+      await loginIncidencias(userFound._id, 'Intento fallido de inicio de sesión.', 'Activo');
+    
       // Si alcanza el número máximo de intentos fallidos, bloquear al usuario temporalmente
       if (userFound.loginAttempts >= maxIntentos) {
         userFound.lockUntil = Date.now() + tiempoBloqueo * 60 * 1000; // Bloqueo temporal en milisegundos
         userFound.isBlocked = true; // Reflejar el estado bloqueado
         await userFound.save();
+    
+        // Registrar la incidencia del bloqueo
+        await loginIncidencias(userFound._id, 'Alcanzó el límite de intentos fallidos y fue bloqueado.', 'Bloqueado');
+    
         return res.status(403).json({
           message: 'Alcanzaste el límite de intentos fallidos. Tu cuenta está bloqueada.',
         });
       }
-
+    
       await userFound.save();
       return res.status(401).json({ message: 'Correo o contraseña incorrectos.' });
     }
+    
 
     // Restablecer intentos fallidos después de un inicio de sesión exitoso
     userFound.loginAttempts = 0;
@@ -175,8 +184,6 @@ export const login = async (req, res) => {
     res.status(500).json({ message: 'Error interno del servidor.' });
   }
 };
-
-
 
 export const verifyMfaCode = async (req, res) => {
   const { email, mfaCode } = req.body;
@@ -446,5 +453,21 @@ export const getAdminProfile = async (req, res) => {
   } catch (error) {
       console.error("Error al obtener el perfil del administrador:", error);
       res.status(500).json({ message: "Error al obtener el perfil del administrador." });
+  }
+};
+export const loginIncidencias = async (userId, message, status = 'Activo') => {
+  try {
+    // Crear una nueva incidencia en la base de datos
+    const incidence = new Incidencias({
+      userId,
+      message,
+      status,
+    });
+
+    await incidence.save();
+    console.log('Incidencia registrada:', incidence);
+  } catch (error) {
+    console.error('Error al registrar la incidencia:', error);
+    throw new Error('No se pudo registrar la incidencia.');
   }
 };

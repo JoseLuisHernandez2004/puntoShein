@@ -81,6 +81,42 @@ const UsuariosBloqueados = () => {
     });
   };
 
+  const handleViewDetails = async (userId) => {
+    try {
+      // Realizar la solicitud al backend para obtener las incidencias del usuario
+      const response = await axios.get(`${MIS_URL}/api/incidencias/${userId}`, { withCredentials: true });
+  
+      if (response.status === 200 && Array.isArray(response.data)) {
+        // Crear una lista HTML para mostrar las incidencias
+        const incidencesList = response.data.map(
+          (incident, index) =>
+            `<li>
+              <strong>${index + 1}.</strong> ${incident.message} <br />
+              <small>
+                Estado: ${incident.status} | Fecha: ${new Date(incident.date).toLocaleString()}
+              </small>
+            </li>`
+        ).join('');
+  
+        // Mostrar las incidencias en un modal con SweetAlert2
+        Swal.fire({
+          title: 'Detalles de Bloqueo',
+          html: `<ul style="text-align: left; list-style: none; padding: 0;">${incidencesList}</ul>`,
+          icon: 'info',
+          confirmButtonText: 'Cerrar',
+        });
+      } else {
+        // Mostrar un mensaje si no se encuentran incidencias
+        Swal.fire('Información', 'No se encontraron incidencias para este usuario.', 'info');
+      }
+    } catch (error) {
+      console.error('Error al obtener las incidencias:', error);
+      Swal.fire('Error', 'No se pudieron cargar las incidencias.', 'error');
+    }
+  };
+  
+
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -100,8 +136,6 @@ const UsuariosBloqueados = () => {
             <thead>
               <tr className="bg-gray-100 dark:bg-gray-700">
                 <th className="text-left px-6 py-4 font-semibold border-b">Nombre</th>
-                <th className="text-left px-6 py-4 font-semibold border-b">Email</th>
-                <th className="text-left px-6 py-4 font-semibold border-b">Teléfono</th>
                 <th className="text-left px-6 py-4 font-semibold border-b">Acciones</th>
               </tr>
             </thead>
@@ -109,9 +143,13 @@ const UsuariosBloqueados = () => {
               {blockedUsers.map((user) => (
                 <tr key={user._id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                   <td className="px-6 py-4 border-b">{`${user.nombre} ${user.apellidoP} ${user.apellidoM}`}</td>
-                  <td className="px-6 py-4 border-b">{user.email}</td>
-                  <td className="px-6 py-4 border-b">{user.telefono}</td>
                   <td className="px-6 py-4 border-b flex space-x-2">
+                    <button
+                      onClick={() => handleViewDetails(user._id)}
+                      className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                    >
+                      Ver Detalles
+                    </button>
                     <button
                       onClick={() => handleUnblock(user._id)}
                       className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"

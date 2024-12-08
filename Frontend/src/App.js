@@ -33,6 +33,7 @@ import Productos2 from './componentes/Public/DetalleProductos2';
 
 
 
+
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [verifiedEmail, setVerifiedEmail] = useState(null);
@@ -79,7 +80,6 @@ function App() {
                 <Route path="myUsers" element={<MyUsers />} />
                 <Route path="Listapedidos" element={<ListaPedidos />} />
                 <Route path="company-profile" element={<CompanyProfile />} />
-
 
                 {/* Administracion de incidencias */}
                 <Route path="incidencias" element={<AdminIncidencias />} />

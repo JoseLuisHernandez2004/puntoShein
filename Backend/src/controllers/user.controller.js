@@ -1,4 +1,5 @@
 import User from '../models/user.model.js';
+import Incidencias from '../models/incidencia.model.js'; // Importar el modelo de incidencias
 
 export const getUsers = async (req, res) => {
     try {
@@ -64,7 +65,6 @@ export const updateUserRole = async (req, res) => {
   }
 };
 
-
 export const deleteUser = async (req, res) => {
   const { id } = req.params;
 
@@ -101,10 +101,10 @@ export const deleteUser = async (req, res) => {
     res.status(500).json({ message: 'Error al eliminar el usuario.' });
   }
 };
-
 // Bloquear un usuario específico
 export const blockUser = async (req, res) => {
   const { id } = req.params;
+  const { reason } = req.body;
 
   try {
     const userToBlock = await User.findById(id);
@@ -133,8 +133,17 @@ export const blockUser = async (req, res) => {
       }
     }
 
+    // Marcar al usuario como bloqueado
     userToBlock.isBlocked = true;
     await userToBlock.save();
+
+    // Registrar la incidencia del bloqueo
+    const bloqueoReason = reason || 'Bloqueo manual por parte del administrador.';
+    await Incidencias.create({
+      userId: userToBlock._id,
+      message: bloqueoReason,
+      status: 'Bloqueado',
+    });
 
     res.status(200).json({
       message: 'Usuario bloqueado correctamente.',

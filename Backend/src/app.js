@@ -9,6 +9,8 @@ import documentRoutes from './routes/document.routes.js';
 import userRoutes from './routes/user.routes.js';
 import companyProfileRoutes from './routes/companyProfile.routes.js';
 import configuracion_Sesion from './routes/confSesion.routes.js';
+import incidenciaRoutes from './routes/incidencias.routes.js';
+
 
 const app = express();
 
@@ -31,5 +33,6 @@ app.use('/api/users', userRoutes);
 app.use('/api/documents', documentRoutes);
 app.use('/api/company-profile', companyProfileRoutes);
 app.use('/api/conf_Sesion', configuracion_Sesion); 
+app.use('/api/incidencias', incidenciaRoutes);
 
 export default app;
