@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, setError } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { MIS_URL } from '../../MiVariable';
@@ -8,6 +8,7 @@ const ActualizarSesion = () => {
   const { darkMode } = useContext(ThemeContext);
   const [maxIntentos, setMaxIntentos] = useState('');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null); // Manejar errores de validación
 
   // Obtener la configuración actual de sesión
   useEffect(() => {
@@ -35,15 +36,15 @@ const ActualizarSesion = () => {
     const value = event.target.value;
     if (/^\d*$/.test(value)) {
       setter(value);
+      setError(null); // Limpiar mensaje de error si el valor es válido
     } else {
-      setError('Solo se permiten números.');
+      setError('Solo se permiten números.'); // Establecer mensaje de error si el valor no es válido
     }
   };
 
   // Actualizar la configuración de sesión
   const handleUpdate = async () => {
-
-    if (maxIntentos < 1 || maxIntentos > 5) {
+    if (!maxIntentos || maxIntentos < 1 || maxIntentos > 5) {
       return Swal.fire({
         title: 'Límite de Intentos Inválido',
         text: 'El número máximo de intentos debe ser entre 1 y 5. Esto es necesario para proteger las cuentas de los usuarios y prevenir intentos no autorizados.',
@@ -51,7 +52,7 @@ const ActualizarSesion = () => {
         confirmButtonText: 'Entendido',
       });
     }
-    
+
     try {
       const response = await axios.put(
         `${MIS_URL}/api/conf_Sesion/actualizarSesion`,
@@ -81,12 +82,13 @@ const ActualizarSesion = () => {
         <div className="mb-4">
           <label htmlFor="maxIntentos" className="block mb-2 font-medium">Máximo de Intentos</label>
           <input
-            type="text" // Cambia a text para aplicar validación personalizada
+            type="text"
             id="maxIntentos"
             value={maxIntentos}
             onChange={handleNumberInput(setMaxIntentos)}
             className={`w-full p-2 border rounded-lg ${darkMode ? 'bg-gray-800 border-gray-600 text-white' : 'bg-white border-gray-300 text-black'}`}
           />
+          {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
         </div>
         <button
           type="button"
