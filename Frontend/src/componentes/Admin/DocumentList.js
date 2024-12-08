@@ -56,11 +56,26 @@ const DocumentList = ({ onSelectDocument }) => {
           `${MIS_URL}/api/documents/history/${title}`,
           { withCredentials: true }
         );
-        // Guardar el historial en orden inverso
-        setHistory(response.data.reverse());
+
+        if (response.data.length === 0) {
+          // Si no hay historial, establecer un mensaje específico
+          setHistory([]);
+          setError(null); // Asegúrate de que no se muestre el mensaje de error
+        } else {
+          // Guardar el historial en orden inverso si existen documentos
+          setHistory(response.data.reverse());
+          setError(null);
+        }
       } catch (err) {
         console.error('Error al obtener el historial:', err);
-        setError('Hubo un problema al cargar el historial.');
+
+        // Mostrar un error solo si es un problema real del servidor
+        if (err.response?.status === 404) {
+          setHistory([]); // No hay historial
+          setError(null); // No es un error crítico
+        } else {
+          setError('Hubo un problema al cargar el historial.');
+        }
       }
     };
 
@@ -196,12 +211,14 @@ const DocumentList = ({ onSelectDocument }) => {
               </p>
               <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Estado: {doc.status}</p>
               <div className="flex gap-4 mt-4">
-                <button
-                  onClick={() => handleUpdate(doc._id)}
-                  className={`px-4 py-2 ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white rounded`}
-                >
-                  Actualizar
-                </button>
+                {doc.status === 'vigente' ? (
+                  <button
+                    onClick={() => handleUpdate(doc._id)}
+                    className={`px-4 py-2 ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white rounded`}
+                  >
+                    Actualizar
+                  </button>
+                ) : null}
                 <button
                   onClick={() => handleDelete(doc._id)}
                   className={`px-4 py-2 ${darkMode ? 'bg-red-600 hover:bg-red-700' : 'bg-red-500 hover:bg-red-600'} text-white rounded`}

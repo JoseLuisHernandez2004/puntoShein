@@ -28,6 +28,9 @@ import Terms from './componentes/Terms';  // Nuevo componente para Términos y C
 import Privacy from './componentes/Politicas';  // Nuevo componente para Política de Privacidad
 import DeslideL from './componentes/DeslideL';  // Nuevo componente para Deslinde Legal
 import AdminIncidencias from './componentes/Admin/AdminIndicencias';
+import Productos from './componentes/Public/DetalleProductos';
+import Productos2 from './componentes/Public/DetalleProductos2';
+
 
 
 function App() {
@@ -48,6 +51,9 @@ function App() {
               {/* Ruta principal */}
               <Route path="/" element={<Home isLoggedIn={isLoggedIn} />} />
               <Route path="/perfilEmpresaPublico" element={<CompanyPublicProfile />} />
+              <Route path="/productos" element={<Productos />} />
+              <Route path="/productos2" element={<Productos2 />} />
+
 
               {/* Rutas de autenticación */}
               <Route path="/login" element={<LoginForm setIsLoggedIn={setIsLoggedIn} setUserRole={setUserRole} />} />

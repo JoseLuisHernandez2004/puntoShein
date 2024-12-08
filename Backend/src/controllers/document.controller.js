@@ -22,7 +22,7 @@ export const validateDocument = [
 
 // Registrar un nuevo documento regulatorio
 export const createDocument = [
-  ...validateDocument,
+  ...validateDocument, // Middleware de validación
   async (req, res) => {
     // Manejar los errores de validación
     const errors = validationResult(req);
@@ -34,36 +34,42 @@ export const createDocument = [
       const { title, content, effectiveDate } = req.body;
       const createdBy = req.user.id;
 
-      // Verificar si ya existe un documento vigente del mismo título y marcarlo como no vigente
+      // Marcar cualquier documento vigente con el mismo título como 'no vigente'
       await Document.updateMany(
         { title, status: 'vigente', isDeleted: false },
         { status: 'no vigente' }
       );
 
-      // Crear el nuevo documento
+      // Crear el nuevo documento con versión 1
       const newDocument = new Document({
         title,
         content,
         effectiveDate,
         createdBy,
-        version: 1,
-        status: 'vigente',
+        version: 1, // Siempre se crea con la versión 1
+        status: 'vigente', // Este será el nuevo documento vigente
+        createdAt: new Date(), // Registrar fecha y hora de creación
+        updatedAt: new Date(), // Inicialmente igual a la de creación
       });
 
       await newDocument.save();
 
       console.log(`Documento creado: ${newDocument._id}`);
-      res.status(201).json(newDocument);
+      res.status(201).json({
+        message: "Documento creado exitosamente.",
+        document: newDocument,
+      });
     } catch (error) {
       console.error("Error al crear documento:", error);
-      res.status(500).json({ message: `Error al crear documento: ${error.message}` });
+      res.status(500).json({
+        message: `Error al crear documento: ${error.message}`,
+      });
     }
-  }
+  },
 ];
 
 // Modificar el contenido de un documento (crea una nueva versión)
 export const updateDocument = [
-  // Puedes reutilizar las validaciones si es necesario
   async (req, res) => {
     try {
       const { id } = req.params;
@@ -71,21 +77,27 @@ export const updateDocument = [
 
       console.log("Datos recibidos para actualizar:", { id, content });
 
-      // Validar que el ID del documento es válido
+      // Validar que el ID del documento sea válido
       if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ message: "ID de documento no válido" });
+        return res.status(400).json({ message: "ID de documento no válido." });
       }
 
       // Validar que el contenido no esté vacío
       if (!content || content.trim() === "") {
-        return res.status(400).json({ message: "El contenido no puede estar vacío" });
+        return res.status(400).json({ message: "El contenido no puede estar vacío." });
       }
 
       // Obtener el documento actual
       const currentDocument = await Document.findById(id);
       if (!currentDocument || currentDocument.isDeleted) {
-        return res.status(404).json({ message: "Documento no encontrado o ya eliminado" });
+        return res.status(404).json({ message: "Documento no encontrado o ya eliminado." });
       }
+
+      // Marcar cualquier otro documento vigente con el mismo título como 'no vigente'
+      await Document.updateMany(
+        { title: currentDocument.title, status: 'vigente', _id: { $ne: id }, isDeleted: false },
+        { status: 'no vigente' }
+      );
 
       // Marcar el documento actual como "no vigente"
       currentDocument.status = "no vigente";
@@ -95,27 +107,29 @@ export const updateDocument = [
       const newVersion = new Document({
         title: currentDocument.title,
         content,
-        effectiveDate: currentDocument.effectiveDate, // O una nueva fecha si aplica
-        createdBy: currentDocument.createdBy,
-        version: currentDocument.version + 1,
-        status: "vigente",
-        modifiedBy: req.user.id, // Asignar el ID del usuario que modifica
+        effectiveDate: currentDocument.effectiveDate, // Mantener la fecha efectiva original
+        createdBy: currentDocument.createdBy, // Mantener el creador original
+        version: currentDocument.version + 1, // Incrementar la versión
+        status: "vigente", // Marcar como vigente
+        modifiedBy: req.user.id, // Registrar el ID del usuario que modifica
+        updatedAt: new Date(),
       });
 
       await newVersion.save();
 
       console.log(`Documento actualizado: ID: ${newVersion._id}`);
-      res.status(200).json(newVersion); // Devolver el documento actualizado
+      res.status(200).json({
+        message: "Documento actualizado exitosamente.",
+        document: newVersion,
+      });
     } catch (error) {
       console.error("Error al actualizar documento:", error);
-      res.status(500).json({ message: `Error al actualizar documento: ${error.message}` });
+      res.status(500).json({
+        message: `Error al actualizar documento: ${error.message}`,
+      });
     }
-  }
+  },
 ];
-
-
-
-
 
 // Marcar documento como eliminado lógicamente
 export const deleteDocument = async (req, res) => {
@@ -154,6 +168,7 @@ export const getCurrentVersion = async (req, res) => {
 
     // Consulta con filtro de título y estado "vigente"
     const currentDocument = await Document.findOne({ title, status: "vigente", isDeleted: false });
+    
     if (!currentDocument) {
       return res.status(404).json({ message: "No hay una versión vigente para el documento solicitado" });
     }
@@ -163,7 +178,6 @@ export const getCurrentVersion = async (req, res) => {
     res.status(500).json({ message: `Error al obtener documento vigente: ${error.message}` });
   }
 };
-
 
 // Consultar historial de versiones de un documento específico
 export const getDocumentHistory = async (req, res) => {

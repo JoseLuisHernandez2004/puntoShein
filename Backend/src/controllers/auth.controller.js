@@ -120,14 +120,13 @@ export const login = async (req, res) => {
 
     // Verificar si la cuenta está bloqueada permanentemente
     if (userFound.isBlocked && !userFound.lockUntil) {
-      return res.status(403).json({ message: 'Tu cuenta está bloqueada permanentemente. Contacta al administrador.' });
+      return res.status(403).json({ message: 'Tu cuenta está bloqueada. Contacta al administrador.' });
     }
 
     // Verificar si la cuenta está temporalmente bloqueada
-    if (userFound.isBlocked && userFound.lockUntil > Date.now()) {
-      const tiempoBloqueoRemaining = Math.ceil((userFound.lockUntil - Date.now()) / 1000 / 60); // Minutos restantes
+    if (userFound.isBlocked) {
       return res.status(403).json({
-        message: `Cuenta bloqueada. Inténtalo de nuevo en ${tiempoBloqueoRemaining} minutos.`,
+        message: 'Tu cuenta está bloqueada. Contacta al administrador.',
       });
     }
 
@@ -143,7 +142,7 @@ export const login = async (req, res) => {
         userFound.isBlocked = true; // Reflejar el estado bloqueado
         await userFound.save();
         return res.status(403).json({
-          message: `Has alcanzado el límite de intentos fallidos. Tu cuenta está bloqueada por ${tiempoBloqueo} minutos.`,
+          message: 'Alcanzaste el límite de intentos fallidos. Tu cuenta está bloqueada.',
         });
       }
 
@@ -176,6 +175,7 @@ export const login = async (req, res) => {
     res.status(500).json({ message: 'Error interno del servidor.' });
   }
 };
+
 
 
 export const verifyMfaCode = async (req, res) => {

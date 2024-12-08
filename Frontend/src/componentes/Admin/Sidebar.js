@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { FaUsers, FaBox, FaClipboardList, FaFileAlt, FaBuilding } from 'react-icons/fa';
+import { FaUsers, FaBox, FaClipboardList, FaFileAlt, FaCog } from 'react-icons/fa';
 import { ThemeContext } from '../Style/Tema'; // Asegúrate de importar el contexto correctamente
 
 const Sidebar = () => {
@@ -42,12 +42,12 @@ const Sidebar = () => {
           </li>
           <li>
             <Link to="/admin/company-profile" className={`flex items-center p-3 rounded-lg hover:bg-blue-100 transition-all ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-blue-100'}`}>
-              <FaBuilding className={`mr-3 ${darkMode ? 'text-white' : 'text-blue-600'}`} /> Configuración del Perfil de la Empresa
+              <FaCog className={`mr-3 ${darkMode ? 'text-white' : 'text-blue-600'}`} /> Configuración del Perfil de la Empresa
             </Link>
           </li>
           <li>
             <Link to="/admin/incidencias" className={`flex items-center p-3 rounded-lg hover:bg-blue-100 transition-all ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-blue-100'}`}>
-              <FaBuilding className={`mr-3 ${darkMode ? 'text-white' : 'text-blue-600'}`} /> Configuración de incidencias
+              <FaCog className={`mr-3 ${darkMode ? 'text-white' : 'text-blue-600'}`} /> Configuración de incidencias
             </Link>
           </li>
         </ul>

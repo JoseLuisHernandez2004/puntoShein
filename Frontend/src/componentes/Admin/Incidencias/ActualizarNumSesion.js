@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, setError } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { MIS_URL } from '../../MiVariable';
@@ -33,13 +33,25 @@ const ActualizarSesion = () => {
   // Validar solo números
   const handleNumberInput = (setter) => (event) => {
     const value = event.target.value;
-    if (/^\d*$/.test(value)) { // Permite solo números
+    if (/^\d*$/.test(value)) {
       setter(value);
+    } else {
+      setError('Solo se permiten números.');
     }
   };
 
   // Actualizar la configuración de sesión
   const handleUpdate = async () => {
+
+    if (maxIntentos < 1 || maxIntentos > 5) {
+      return Swal.fire({
+        title: 'Límite de Intentos Inválido',
+        text: 'El número máximo de intentos debe ser entre 1 y 5. Esto es necesario para proteger las cuentas de los usuarios y prevenir intentos no autorizados.',
+        icon: 'warning',
+        confirmButtonText: 'Entendido',
+      });
+    }
+    
     try {
       const response = await axios.put(
         `${MIS_URL}/api/conf_Sesion/actualizarSesion`,
